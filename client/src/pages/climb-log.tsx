@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Filter, Plus, MoreVertical, Edit, Trash2, CalendarDays } from "lucide-react";
+import { Filter, Plus, MoreVertical, Edit, Trash2, CalendarDays, Mountain } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -172,22 +172,51 @@ export default function ClimbLog() {
                   <Card key={climb.id} className="bg-white shadow-sm border border-gray-100">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-sm text-gray-500 mb-1">
-                            {formatShortDate(climb.climbDate)}
-                          </div>
-                          <div className="font-semibold text-gray-900">
-                            {climb.gym}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {climb.routeType} • {climb.grade} • {climb.outcome}
-                          </div>
-                          {climb.notes && (
-                            <div className="text-sm text-gray-500 mt-1">
-                              {climb.notes}
+                        <div className="flex items-center space-x-3">
+                          {/* Circular media section */}
+                          <div className="flex-shrink-0">
+                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
+                              {climb.mediaUrl ? (
+                                climb.mediaUrl.toLowerCase().includes('.mp4') || 
+                                climb.mediaUrl.toLowerCase().includes('.mov') || 
+                                climb.mediaUrl.toLowerCase().includes('.avi') ? (
+                                  <video
+                                    src={climb.mediaUrl}
+                                    className="w-full h-full object-cover"
+                                    muted
+                                  />
+                                ) : (
+                                  <img
+                                    src={climb.mediaUrl}
+                                    alt="Climb media"
+                                    className="w-full h-full object-cover"
+                                  />
+                                )
+                              ) : (
+                                <Mountain className="w-6 h-6 text-gray-400" />
+                              )}
                             </div>
-                          )}
+                          </div>
+                          
+                          {/* Climb details */}
+                          <div className="flex-1">
+                            <div className="text-sm text-gray-500 mb-1">
+                              {formatShortDate(climb.climbDate)}
+                            </div>
+                            <div className="font-semibold text-gray-900">
+                              {climb.gym}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {climb.routeType} • {climb.grade} • {climb.outcome}
+                            </div>
+                            {climb.notes && (
+                              <div className="text-sm text-gray-500 mt-1">
+                                {climb.notes}
+                              </div>
+                            )}
+                          </div>
                         </div>
+                        
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
