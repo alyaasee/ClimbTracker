@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
@@ -29,12 +29,19 @@ export default function Verify() {
       });
       return response;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Invalidate the auth query to refresh user state
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      
       toast({
         title: "Welcome!",
         description: "You have successfully logged in.",
       });
-      setLocation("/");
+      
+      // Small delay to ensure state is updated before redirect
+      setTimeout(() => {
+        setLocation("/");
+      }, 100);
     },
     onError: (error: Error) => {
       toast({
