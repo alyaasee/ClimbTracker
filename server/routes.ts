@@ -16,6 +16,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           firstName: "Alyaa",
         });
       }
+      
+      // Recalculate streak to ensure it's up to date
+      const currentStreak = await storage.calculateWeeklyStreak(user.id);
+      if (currentStreak !== user.currentStreak) {
+        const today = format(new Date(), 'yyyy-MM-dd');
+        await storage.updateUserStreak(user.id, currentStreak, today);
+        user = await storage.getUserByUsername("demo"); // Refresh user data
+      }
+      
       res.json(user);
     } catch (error) {
       res.status(500).json({ error: "Failed to get user" });
@@ -51,21 +60,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: user.id,
       });
 
-      // Update user streak
+      // Update user streak using weekly calculation
+      const newStreak = await storage.calculateWeeklyStreak(user.id);
       const today = format(new Date(), 'yyyy-MM-dd');
-      const todayClimbs = await storage.getClimbsByUserAndDate(user.id, today);
-      
-      if (todayClimbs.length === 1) { // First climb of the day
-        const yesterday = format(new Date(Date.now() - 86400000), 'yyyy-MM-dd');
-        const yesterdayClimbs = await storage.getClimbsByUserAndDate(user.id, yesterday);
-        
-        let newStreak = 1;
-        if (yesterdayClimbs.length > 0) {
-          newStreak = (user.currentStreak || 0) + 1;
-        }
-        
-        await storage.updateUserStreak(user.id, newStreak, today);
-      }
+      await storage.updateUserStreak(user.id, newStreak, today);
 
       res.json(climb);
     } catch (error) {
@@ -76,6 +74,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update a climb
   app.put("/api/climbs/:id", async (req, res) => {
     try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
       const id = parseInt(req.params.id);
       const validatedData = insertClimbSchema.partial().parse(req.body);
       const climb = await storage.updateClimb(id, validatedData);
@@ -83,6 +86,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!climb) {
         return res.status(404).json({ error: "Climb not found" });
       }
+      
+      // Recalculate streak after update (in case date changed)
+      const newStreak = await storage.calculateWeeklyStreak(user.id);
+      const today = format(new Date(), 'yyyy-MM-dd');
+      await storage.updateUserStreak(user.id, newStreak, today);
       
       res.json(climb);
     } catch (error) {
@@ -93,8 +101,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete a climb
   app.delete("/api/climbs/:id", async (req, res) => {
     try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
       const id = parseInt(req.params.id);
       await storage.deleteClimb(id);
+      
+      // Recalculate streak after deletion
+      const newStreak = await storage.calculateWeeklyStreak(user.id);
+      const today = format(new Date(), 'yyyy-MM-dd');
+      await storage.updateUserStreak(user.id, newStreak, today);
+      
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete climb" });

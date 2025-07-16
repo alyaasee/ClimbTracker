@@ -7,6 +7,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserStreak(userId: number, streak: number, lastClimbDate: string): Promise<void>;
+  calculateWeeklyStreak(userId: number): Promise<number>;
   
   createClimb(climb: InsertClimb & { userId: number }): Promise<Climb>;
   getClimbsByUser(userId: number): Promise<Climb[]>;
@@ -64,6 +65,78 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ currentStreak: streak, lastClimbDate })
       .where(eq(users.id, userId));
+  }
+
+  async calculateWeeklyStreak(userId: number): Promise<number> {
+    const climbs = await this.getClimbsByUser(userId);
+    
+    if (climbs.length === 0) return 0;
+
+    // Get unique dates when user climbed
+    const uniqueDates = Array.from(new Set(climbs.map(climb => climb.climbDate))).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    
+    // Helper function to get the Sunday of a given date's week
+    const getSundayOfWeek = (dateStr: string): Date => {
+      const date = new Date(dateStr + 'T00:00:00.000Z'); // Ensure UTC parsing
+      const day = date.getUTCDay();
+      const diff = date.getUTCDate() - day;
+      const sunday = new Date(date);
+      sunday.setUTCDate(diff);
+      sunday.setUTCHours(0, 0, 0, 0);
+      return sunday;
+    };
+
+    // Group dates by week and count unique days per week
+    const weeklyData: { [weekKey: string]: Set<string> } = {};
+    
+    uniqueDates.forEach(dateStr => {
+      const sunday = getSundayOfWeek(dateStr);
+      const weekKey = sunday.toISOString().split('T')[0]; // Use Sunday's date as week key
+      
+      if (!weeklyData[weekKey]) {
+        weeklyData[weekKey] = new Set();
+      }
+      weeklyData[weekKey].add(dateStr);
+    });
+
+    // Calculate current streak (count unique days in consecutive weeks from most recent)
+    const sortedWeeks = Object.keys(weeklyData).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    
+    if (sortedWeeks.length === 0) return 0;
+    
+    let currentStreak = 0;
+    const today = new Date();
+    const currentWeekStart = getSundayOfWeek(today.toISOString().split('T')[0]);
+    
+    // Start from the most recent week and work backwards
+    for (let i = 0; i < sortedWeeks.length; i++) {
+      const weekKey = sortedWeeks[i];
+      const weekStart = new Date(weekKey);
+      
+      if (i === 0) {
+        // First week - check if it's current week or a recent past week
+        const weeksDiff = Math.floor((currentWeekStart.getTime() - weekStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
+        
+        if (weeksDiff >= 0 && weeksDiff <= 2) { // Allow current week or up to 2 weeks ago
+          currentStreak = weeklyData[weekKey].size;
+        } else {
+          break;
+        }
+      } else {
+        // Subsequent weeks - check if it's the immediate previous week
+        const previousWeekKey = sortedWeeks[i - 1];
+        const previousWeekStart = new Date(previousWeekKey);
+        const expectedWeekStart = new Date(previousWeekStart.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        if (weekStart.getTime() === expectedWeekStart.getTime()) {
+          currentStreak += weeklyData[weekKey].size;
+        } else {
+          break;
+        }
+      }
+    }
+
+    return currentStreak;
   }
 
   async createClimb(climb: InsertClimb & { userId: number }): Promise<Climb> {

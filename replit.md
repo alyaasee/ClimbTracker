@@ -59,7 +59,7 @@ Preferred communication style: Simple, everyday language.
 - Grade tracking with climbing-specific grading system
 - Outcome tracking (Send, Flash, Project, Attempt)
 - Daily and monthly statistics with visual charts
-- Streak tracking for consistent climbing
+- Weekly streak tracking (unique days per week, Sunday-Saturday)
 - Photo/video upload for climb documentation
 - Gym-specific dropdown with predefined locations
 - Grade progression tracking with line charts
