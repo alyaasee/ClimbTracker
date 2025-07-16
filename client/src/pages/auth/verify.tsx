@@ -10,14 +10,19 @@ import { useLocation } from "wouter";
 export default function Verify() {
   const [code, setCode] = useState("");
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const emailParam = params.get("email");
+    const nameParam = params.get("name");
     if (emailParam) {
       setEmail(emailParam);
+    }
+    if (nameParam) {
+      setName(nameParam);
     }
   }, []);
 
@@ -57,7 +62,7 @@ export default function Verify() {
     mutationFn: async (email: string) => {
       await apiRequest(`/api/auth/send-code`, {
         method: "POST",
-        body: { email }
+        body: { email, name }
       });
     },
     onSuccess: () => {

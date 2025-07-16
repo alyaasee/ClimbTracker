@@ -9,14 +9,15 @@ import { useLocation } from "wouter";
 
 export default function Login() {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const sendCodeMutation = useMutation({
-    mutationFn: async (email: string) => {
+    mutationFn: async ({ email, name }: { email: string; name: string }) => {
       await apiRequest(`/api/auth/send-code`, {
         method: "POST",
-        body: { email }
+        body: { email, name }
       });
     },
     onSuccess: () => {
@@ -24,7 +25,7 @@ export default function Login() {
         title: "Code sent!",
         description: "Please check your email for the verification code.",
       });
-      setLocation(`/auth/verify?email=${encodeURIComponent(email)}`);
+      setLocation(`/auth/verify?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`);
     },
     onError: (error: Error) => {
       toast({
@@ -59,7 +60,15 @@ export default function Login() {
       });
       return;
     }
-    sendCodeMutation.mutate(email);
+    if (!name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your name",
+        variant: "destructive",
+      });
+      return;
+    }
+    sendCodeMutation.mutate({ email, name });
   };
 
   const handleGoogleLogin = () => {
@@ -82,11 +91,19 @@ export default function Login() {
             Hi, Climber!
           </h1>
           <p className="text-gray-600 text-center mb-8">
-            Please enter your email address
+            Please enter your details to get started
           </p>
 
           {/* Email Form */}
-          <form onSubmit={handleEmailSubmit} className="space-y-6">
+          <form onSubmit={handleEmailSubmit} className="space-y-4">
+            <Input
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full h-12 bg-gray-50 border-0 rounded-xl px-4 text-gray-900 placeholder-gray-500"
+              disabled={sendCodeMutation.isPending}
+            />
             <Input
               type="email"
               placeholder="Enter your email"

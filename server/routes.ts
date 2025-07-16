@@ -16,7 +16,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post("/api/auth/send-code", async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email, name } = req.body;
       
       if (!email) {
         return res.status(400).json({ error: "Email is required" });
@@ -25,7 +25,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user exists, if not create one
       let user = await storage.getUserByEmail(email);
       if (!user) {
-        user = await storage.createAuthUser(email);
+        user = await storage.createAuthUser(email, name);
+      } else if (name && name.trim() && user.firstName !== name.trim()) {
+        // Update user's name if provided and different
+        await storage.updateUserName(user.id, name.trim());
+        user = await storage.getUserByEmail(email);
       }
 
       // Generate verification code

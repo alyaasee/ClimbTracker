@@ -15,6 +15,7 @@ export interface IStorage {
   updateVerificationCode(email: string, code: string, expiresAt: Date): Promise<void>;
   verifyUser(email: string, code: string): Promise<User | null>;
   updateLastLogin(userId: number): Promise<void>;
+  updateUserName(userId: number, firstName: string): Promise<void>;
   
   createClimb(climb: InsertClimb & { userId: number }): Promise<Climb>;
   getClimbsByUser(userId: number): Promise<Climb[]>;
@@ -129,6 +130,13 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(users)
       .set({ lastLoginAt: new Date() })
+      .where(eq(users.id, userId));
+  }
+
+  async updateUserName(userId: number, firstName: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ firstName })
       .where(eq(users.id, userId));
   }
 
