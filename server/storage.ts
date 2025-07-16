@@ -5,9 +5,15 @@ import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserStreak(userId: number, streak: number, lastClimbDate: string): Promise<void>;
   calculateWeeklyStreak(userId: number): Promise<number>;
+  
+  // Auth methods
+  createAuthUser(email: string, firstName?: string): Promise<User>;
+  updateVerificationCode(email: string, code: string, expiresAt: Date): Promise<void>;
+  verifyUser(email: string, code: string): Promise<User | null>;
   
   createClimb(climb: InsertClimb & { userId: number }): Promise<Climb>;
   getClimbsByUser(userId: number): Promise<Climb[]>;
@@ -52,12 +58,67 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async createAuthUser(email: string, firstName?: string): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values({
+        email,
+        firstName: firstName || 'Climber',
+        isVerified: false,
+      })
+      .returning();
+    return user;
+  }
+
+  async updateVerificationCode(email: string, code: string, expiresAt: Date): Promise<void> {
+    await db
+      .update(users)
+      .set({ 
+        verificationCode: code, 
+        codeExpiresAt: expiresAt 
+      })
+      .where(eq(users.email, email));
+  }
+
+  async verifyUser(email: string, code: string): Promise<User | null> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(
+        and(
+          eq(users.email, email),
+          eq(users.verificationCode, code),
+          gte(users.codeExpiresAt, new Date())
+        )
+      );
+
+    if (!user) return null;
+
+    // Update user as verified and clear verification code
+    const [verifiedUser] = await db
+      .update(users)
+      .set({ 
+        isVerified: true, 
+        verificationCode: null as string | null, 
+        codeExpiresAt: null as Date | null 
+      })
+      .where(eq(users.id, user.id))
+      .returning();
+
+    return verifiedUser;
   }
 
   async updateUserStreak(userId: number, streak: number, lastClimbDate: string): Promise<void> {

@@ -5,24 +5,140 @@ import { insertClimbSchema } from "@shared/schema";
 import { format } from "date-fns";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Create a default user for demo purposes
-  app.get("/api/user", async (req, res) => {
+  // Simple in-memory session store for demo purposes
+  const userSessions = new Map<string, { userId: number; email: string }>();
+
+  // Generate a 6-digit verification code
+  function generateVerificationCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  // Auth routes
+  app.post("/api/auth/send-code", async (req, res) => {
     try {
-      let user = await storage.getUserByUsername("demo");
-      if (!user) {
-        user = await storage.createUser({
-          username: "demo",
-          password: "password",
-          firstName: "Alyaa",
-        });
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
       }
+
+      // Check if user exists, if not create one
+      let user = await storage.getUserByEmail(email);
+      if (!user) {
+        user = await storage.createAuthUser(email);
+      }
+
+      // Generate verification code
+      const code = generateVerificationCode();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+      await storage.updateVerificationCode(email, code, expiresAt);
+
+      // In a real app, you'd send this via email service
+      console.log(`Verification code for ${email}: ${code}`);
+      
+      res.json({ message: "Verification code sent" });
+    } catch (error) {
+      console.error("Send code error:", error);
+      res.status(500).json({ error: "Failed to send verification code" });
+    }
+  });
+
+  app.post("/api/auth/verify-code", async (req, res) => {
+    try {
+      const { email, code } = req.body;
+      
+      if (!email || !code) {
+        return res.status(400).json({ error: "Email and code are required" });
+      }
+
+      const user = await storage.verifyUser(email, code);
+      if (!user) {
+        return res.status(400).json({ error: "Invalid or expired code" });
+      }
+
+      // Create session
+      const sessionId = Math.random().toString(36).substring(2, 15);
+      userSessions.set(sessionId, { userId: user.id, email: user.email || '' });
+
+      res.cookie('sessionId', sessionId, { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+
+      res.json({ message: "Successfully verified" });
+    } catch (error) {
+      console.error("Verify code error:", error);
+      res.status(500).json({ error: "Failed to verify code" });
+    }
+  });
+
+  app.get("/api/auth/user", async (req, res) => {
+    try {
+      const sessionId = req.cookies?.sessionId;
+      
+      if (!sessionId || !userSessions.has(sessionId)) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const session = userSessions.get(sessionId);
+      const user = await storage.getUser(session!.userId);
+      
+      if (!user) {
+        userSessions.delete(sessionId);
+        return res.status(401).json({ error: "User not found" });
+      }
+
+      res.json({
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        isAuthenticated: true,
+      });
+    } catch (error) {
+      console.error("Auth user error:", error);
+      res.status(500).json({ error: "Failed to get user" });
+    }
+  });
+
+  // Middleware to check authentication
+  const requireAuth = async (req: any, res: any, next: any) => {
+    try {
+      const sessionId = req.cookies?.sessionId;
+      
+      if (!sessionId || !userSessions.has(sessionId)) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const session = userSessions.get(sessionId);
+      const user = await storage.getUser(session!.userId);
+      
+      if (!user) {
+        userSessions.delete(sessionId);
+        return res.status(401).json({ error: "User not found" });
+      }
+
+      req.user = user;
+      next();
+    } catch (error) {
+      res.status(500).json({ error: "Authentication error" });
+    }
+  };
+
+  // Get current user data
+  app.get("/api/user", requireAuth, async (req: any, res) => {
+    try {
+      const user = req.user;
       
       // Recalculate streak to ensure it's up to date
       const currentStreak = await storage.calculateWeeklyStreak(user.id);
       if (currentStreak !== user.currentStreak) {
         const today = format(new Date(), 'yyyy-MM-dd');
         await storage.updateUserStreak(user.id, currentStreak, today);
-        user = await storage.getUserByUsername("demo"); // Refresh user data
+        // Refresh user data
+        const updatedUser = await storage.getUser(user.id);
+        return res.json(updatedUser);
       }
       
       res.json(user);
@@ -32,13 +148,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all climbs for user
-  app.get("/api/climbs", async (req, res) => {
+  app.get("/api/climbs", requireAuth, async (req: any, res) => {
     try {
-      const user = await storage.getUserByUsername("demo");
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      
+      const user = req.user;
       const climbs = await storage.getClimbsByUser(user.id);
       res.json(climbs);
     } catch (error) {
@@ -47,13 +159,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a new climb
-  app.post("/api/climbs", async (req, res) => {
+  app.post("/api/climbs", requireAuth, async (req: any, res) => {
     try {
-      const user = await storage.getUserByUsername("demo");
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
+      const user = req.user;
       const validatedData = insertClimbSchema.parse(req.body);
       const climb = await storage.createClimb({
         ...validatedData,
@@ -72,13 +180,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update a climb
-  app.put("/api/climbs/:id", async (req, res) => {
+  app.put("/api/climbs/:id", requireAuth, async (req: any, res) => {
     try {
-      const user = await storage.getUserByUsername("demo");
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
+      const user = req.user;
       const id = parseInt(req.params.id);
       const validatedData = insertClimbSchema.partial().parse(req.body);
       const climb = await storage.updateClimb(id, validatedData);
@@ -99,13 +203,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete a climb
-  app.delete("/api/climbs/:id", async (req, res) => {
+  app.delete("/api/climbs/:id", requireAuth, async (req: any, res) => {
     try {
-      const user = await storage.getUserByUsername("demo");
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
+      const user = req.user;
       const id = parseInt(req.params.id);
       await storage.deleteClimb(id);
       
@@ -121,13 +221,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get today's stats
-  app.get("/api/stats/today", async (req, res) => {
+  app.get("/api/stats/today", requireAuth, async (req: any, res) => {
     try {
-      const user = await storage.getUserByUsername("demo");
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      
+      const user = req.user;
       const today = format(new Date(), 'yyyy-MM-dd');
       const stats = await storage.getTodayStats(user.id, today);
       res.json(stats);
@@ -156,13 +252,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get available months with climbs
-  app.get("/api/stats/available-months", async (req, res) => {
+  app.get("/api/stats/available-months", requireAuth, async (req: any, res) => {
     try {
-      const user = await storage.getUserByUsername("demo");
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      
+      const user = req.user;
       const months = await storage.getAvailableMonths(user.id);
       res.json(months);
     } catch (error) {
@@ -171,13 +263,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get grade progression data
-  app.get("/api/stats/grade-progression", async (req, res) => {
+  app.get("/api/stats/grade-progression", requireAuth, async (req: any, res) => {
     try {
-      const user = await storage.getUserByUsername("demo");
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      
+      const user = req.user;
       const year = parseInt(req.query.year as string) || new Date().getFullYear();
       const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
       

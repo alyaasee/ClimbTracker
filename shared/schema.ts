@@ -5,9 +5,13 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  firstName: text("first_name").notNull(),
+  username: text("username").unique(),
+  password: text("password"),
+  email: text("email").unique(),
+  firstName: text("first_name"),
+  isVerified: boolean("is_verified").default(false),
+  verificationCode: text("verification_code"),
+  codeExpiresAt: timestamp("code_expires_at"),
   currentStreak: integer("current_streak").default(0),
   lastClimbDate: date("last_climb_date"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -40,6 +44,12 @@ export const climbRelations = relations(climbs, ({ one }) => ({
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+  email: true,
+  firstName: true,
+});
+
+export const authUserSchema = createInsertSchema(users).pick({
+  email: true,
   firstName: true,
 });
 
@@ -54,6 +64,7 @@ export const insertClimbSchema = createInsertSchema(climbs).pick({
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type AuthUser = z.infer<typeof authUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertClimb = z.infer<typeof insertClimbSchema>;
 export type Climb = typeof climbs.$inferSelect;
