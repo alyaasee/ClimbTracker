@@ -97,36 +97,36 @@ export default function Stats() {
           {/* Key Metrics */}
           <div className="grid grid-cols-3 gap-4 mb-8">
             <Card className="bg-white shadow-sm border border-gray-100">
-              <CardContent className="p-4 text-center">
+              <CardContent className="p-4 text-center flex flex-col items-center min-h-[100px]">
                 <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center mx-auto mb-2">
                   <Mountain className="w-5 h-5 text-emerald-600" />
                 </div>
-                <div className="text-sm text-gray-600 mb-1">Max Grade</div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-sm text-gray-600 mb-1 h-5 flex items-center">Max Grade</div>
+                <div className="text-2xl font-bold text-gray-900 h-8 flex items-center">
                   {monthlyStats?.maxGrade || '5a'}
                 </div>
               </CardContent>
             </Card>
             
             <Card className="bg-white shadow-sm border border-gray-100">
-              <CardContent className="p-4 text-center">
+              <CardContent className="p-4 text-center flex flex-col items-center min-h-[100px]">
                 <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-2">
                   <TrendingUp className="w-5 h-5 text-blue-600" />
                 </div>
-                <div className="text-sm text-gray-600 mb-1">Total Climbs</div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-sm text-gray-600 mb-1 h-5 flex items-center">Total Climbs</div>
+                <div className="text-2xl font-bold text-gray-900 h-8 flex items-center">
                   {monthlyStats?.totalClimbs || 0}
                 </div>
               </CardContent>
             </Card>
             
             <Card className="bg-white shadow-sm border border-gray-100">
-              <CardContent className="p-4 text-center">
+              <CardContent className="p-4 text-center flex flex-col items-center min-h-[100px]">
                 <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center mx-auto mb-2">
                   <Target className="w-5 h-5 text-purple-600" />
                 </div>
-                <div className="text-sm text-gray-600 mb-1">Success Rate</div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-sm text-gray-600 mb-1 h-5 flex items-center">Success Rate</div>
+                <div className="text-2xl font-bold text-gray-900 h-8 flex items-center">
                   {monthlyStats?.successRate || 0}%
                 </div>
               </CardContent>

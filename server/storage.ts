@@ -190,9 +190,20 @@ export class DatabaseStorage implements IStorage {
     routeTypeBreakdown: { routeType: string; count: number; percentage: number }[];
   }> {
     const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
-    const endDate = `${year}-${month.toString().padStart(2, '0')}-31`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const endDate = `${year}-${month.toString().padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`;
     
     const monthlyClimbs = await this.getClimbsByUserAndDateRange(userId, startDate, endDate);
+    
+    // If no climbs for this month, return empty stats
+    if (monthlyClimbs.length === 0) {
+      return {
+        totalClimbs: 0,
+        maxGrade: '5a',
+        successRate: 0,
+        routeTypeBreakdown: [],
+      };
+    }
     
     // Grade ordering for finding max grade
     const gradeOrder = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c'];
@@ -214,7 +225,7 @@ export class DatabaseStorage implements IStorage {
       routeTypeCounts[climb.routeType] = (routeTypeCounts[climb.routeType] || 0) + 1;
     });
 
-    const successRate = monthlyClimbs.length > 0 ? Math.round((successfulClimbs / monthlyClimbs.length) * 100) : 0;
+    const successRate = Math.round((successfulClimbs / monthlyClimbs.length) * 100);
 
     // Create route type breakdown with percentages
     const routeTypeBreakdown = Object.entries(routeTypeCounts)
@@ -272,36 +283,45 @@ export class DatabaseStorage implements IStorage {
     maxGrade: string;
     gradeValue: number;
   }[]> {
-    const availableMonths = await this.getAvailableMonths(userId);
-    const gradeOrder = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c'];
-    const monthNames = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ];
-    
-    const progressionData = [];
-    
-    for (const monthData of availableMonths) {
-      // Only include months up to the selected month
-      if (monthData.year > upToYear || (monthData.year === upToYear && monthData.month > upToMonth)) {
-        continue;
+    try {
+      const availableMonths = await this.getAvailableMonths(userId);
+      const gradeOrder = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c'];
+      const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      ];
+      
+      const progressionData = [];
+      
+      for (const monthData of availableMonths) {
+        // Only include months up to the selected month
+        if (monthData.year > upToYear || (monthData.year === upToYear && monthData.month > upToMonth)) {
+          continue;
+        }
+        
+        try {
+          const monthlyStats = await this.getMonthlyStats(userId, monthData.year, monthData.month);
+          
+          progressionData.push({
+            month: monthNames[monthData.month - 1],
+            year: monthData.year,
+            monthNum: monthData.month,
+            maxGrade: monthlyStats.maxGrade,
+            gradeValue: gradeOrder.indexOf(monthlyStats.maxGrade) + 1
+          });
+        } catch (error) {
+          console.error(`Error getting monthly stats for ${monthData.year}-${monthData.month}:`, error);
+        }
       }
       
-      const monthlyStats = await this.getMonthlyStats(userId, monthData.year, monthData.month);
-      
-      progressionData.push({
-        month: monthNames[monthData.month - 1],
-        year: monthData.year,
-        monthNum: monthData.month,
-        maxGrade: monthlyStats.maxGrade,
-        gradeValue: gradeOrder.indexOf(monthlyStats.maxGrade) + 1
+      return progressionData.sort((a, b) => {
+        if (a.year !== b.year) return a.year - b.year;
+        return a.monthNum - b.monthNum;
       });
+    } catch (error) {
+      console.error("Error in getGradeProgressionData:", error);
+      throw error;
     }
-    
-    return progressionData.sort((a, b) => {
-      if (a.year !== b.year) return a.year - b.year;
-      return a.monthNum - b.monthNum;
-    });
   }
 }
 

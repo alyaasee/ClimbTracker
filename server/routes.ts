@@ -150,6 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const stats = await storage.getMonthlyStats(user.id, year, month);
       res.json(stats);
     } catch (error) {
+      console.error("Monthly stats error:", error);
       res.status(500).json({ error: "Failed to get monthly stats" });
     }
   });
@@ -183,6 +184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const progressionData = await storage.getGradeProgressionData(user.id, year, month);
       res.json(progressionData);
     } catch (error) {
+      console.error("Grade progression error:", error);
       res.status(500).json({ error: "Failed to get grade progression data" });
     }
   });
