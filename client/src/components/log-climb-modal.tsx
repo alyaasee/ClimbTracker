@@ -63,8 +63,13 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
       });
       setSelectedFiles([]);
     },
-    onError: () => {
-      toast({ title: "Failed to log climb", variant: "destructive" });
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to log climb";
+      toast({ 
+        title: "Failed to log climb", 
+        description: errorMessage,
+        variant: "destructive" 
+      });
     },
   });
 
@@ -76,19 +81,35 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
       toast({ title: "Climb updated successfully!" });
       onOpenChange(false);
     },
-    onError: () => {
-      toast({ title: "Failed to update climb", variant: "destructive" });
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to update climb";
+      toast({ 
+        title: "Failed to update climb", 
+        description: errorMessage,
+        variant: "destructive" 
+      });
     },
   });
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
+      const firstFile = files[0];
+      
+      // Check file size (max 5MB)
+      if (firstFile.size > 5 * 1024 * 1024) {
+        toast({ 
+          title: "File too large", 
+          description: "Please select a file smaller than 5MB",
+          variant: "destructive" 
+        });
+        return;
+      }
+      
       const newFiles = Array.from(files);
       setSelectedFiles(prev => [...prev, ...newFiles]);
       
       // Convert first file to data URL for storage
-      const firstFile = newFiles[0];
       const reader = new FileReader();
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
