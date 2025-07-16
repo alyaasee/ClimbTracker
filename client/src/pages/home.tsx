@@ -8,13 +8,26 @@ import LogClimbModal from "@/components/log-climb-modal";
 export default function Home() {
   const [showLogModal, setShowLogModal] = useState(false);
 
-  const { data: user } = useQuery({
+  const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ["/api/user"],
   });
 
   const { data: todayStats } = useQuery({
     queryKey: ["/api/stats/today"],
   });
+
+  if (userLoading) {
+    return (
+      <div className="py-2 px-0 flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 mx-auto">
+            <span className="text-white font-bold text-xl">🧗</span>
+          </div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const summaryItems = [
     {
@@ -53,8 +66,8 @@ export default function Home() {
       <div className="py-3 mb-4">
         <h2 className="text-2xl font-bold text-gray-900 mb-3">
           {user?.lastLoginAt ? 
-            `Welcome back, ${user.firstName || "Climber"}!` : 
-            `Welcome, ${user.firstName || "Climber"}!`
+            `Welcome back, ${user?.firstName || "Climber"}!` : 
+            `Welcome, ${user?.firstName || "Climber"}!`
           }
         </h2>
         
