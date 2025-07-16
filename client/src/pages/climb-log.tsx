@@ -29,6 +29,9 @@ export default function ClimbLog() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/grade-progression"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/available-months"] });
       toast({ title: "Climb deleted successfully!" });
     },
     onError: () => {

@@ -199,16 +199,16 @@ export class DatabaseStorage implements IStorage {
     if (monthlyClimbs.length === 0) {
       return {
         totalClimbs: 0,
-        maxGrade: '5a',
+        maxGrade: '5c',
         successRate: 0,
         routeTypeBreakdown: [],
       };
     }
     
     // Grade ordering for finding max grade
-    const gradeOrder = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c'];
+    const gradeOrder = ['5c', '6a', '6a+', '6b', '6b+', '6c', '6c+', '7a', '7b', '7c'];
     
-    let maxGrade = '5a';
+    let maxGrade = '5c';
     let successfulClimbs = 0;
     
     // Count route types
@@ -285,7 +285,7 @@ export class DatabaseStorage implements IStorage {
   }[]> {
     try {
       const availableMonths = await this.getAvailableMonths(userId);
-      const gradeOrder = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c'];
+      const gradeOrder = ['5c', '6a', '6a+', '6b', '6b+', '6c', '6c+', '7a', '7b', '7c'];
       const monthNames = [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"

@@ -49,6 +49,9 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/grade-progression"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/available-months"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({ title: "Climb logged successfully!" });
       onOpenChange(false);
@@ -78,6 +81,9 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/grade-progression"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/available-months"] });
       toast({ title: "Climb updated successfully!" });
       onOpenChange(false);
     },
@@ -324,18 +330,16 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
                 <SelectValue placeholder="Select grade" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="5a">5a</SelectItem>
-                <SelectItem value="5b">5b</SelectItem>
                 <SelectItem value="5c">5c</SelectItem>
                 <SelectItem value="6a">6a</SelectItem>
+                <SelectItem value="6a+">6a+</SelectItem>
                 <SelectItem value="6b">6b</SelectItem>
+                <SelectItem value="6b+">6b+</SelectItem>
                 <SelectItem value="6c">6c</SelectItem>
+                <SelectItem value="6c+">6c+</SelectItem>
                 <SelectItem value="7a">7a</SelectItem>
                 <SelectItem value="7b">7b</SelectItem>
                 <SelectItem value="7c">7c</SelectItem>
-                <SelectItem value="8a">8a</SelectItem>
-                <SelectItem value="8b">8b</SelectItem>
-                <SelectItem value="8c">8c</SelectItem>
               </SelectContent>
             </Select>
           </div>
