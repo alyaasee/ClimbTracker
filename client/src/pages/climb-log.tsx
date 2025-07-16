@@ -28,7 +28,7 @@ export default function ClimbLog() {
   });
 
   const deleteClimbMutation = useMutation({
-    mutationFn: (id: number) => apiRequest("DELETE", `/api/climbs/${id}`),
+    mutationFn: (id: number) => apiRequest(`/api/climbs/${id}`, { method: "DELETE" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });

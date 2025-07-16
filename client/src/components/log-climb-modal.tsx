@@ -45,7 +45,7 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
   ];
 
   const createClimbMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("POST", "/api/climbs", data),
+    mutationFn: (data: any) => apiRequest("/api/climbs", { method: "POST", body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });
@@ -77,7 +77,7 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
   });
 
   const updateClimbMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("PUT", `/api/climbs/${climb?.id}`, data),
+    mutationFn: (data: any) => apiRequest(`/api/climbs/${climb?.id}`, { method: "PUT", body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });
