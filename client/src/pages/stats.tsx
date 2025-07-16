@@ -189,26 +189,46 @@ export default function Stats() {
               </h3>
               
               {monthlyStats?.routeTypeBreakdown && monthlyStats.routeTypeBreakdown.length > 0 ? (
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={monthlyStats.routeTypeBreakdown}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="count"
-                        label={({ routeType, percentage }) => `${routeType} ${percentage}%`}
-                      >
-                        {monthlyStats.routeTypeBreakdown.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={routeTypeColors[entry.routeType] || '#8884d8'} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value, name) => [value, 'Climbs']} />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
+                <div>
+                  <div className="h-64 mb-4">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={monthlyStats.routeTypeBreakdown}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="count"
+                          label={({ percentage }) => `${percentage}%`}
+                          labelLine={false}
+                        >
+                          {monthlyStats.routeTypeBreakdown.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={routeTypeColors[entry.routeType] || '#8884d8'} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          formatter={(value, name) => [value, 'Climbs']}
+                          labelFormatter={(label) => `Route Type: ${label}`}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  {/* Custom Legend for Mobile */}
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    {monthlyStats.routeTypeBreakdown.map((entry, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <div 
+                          className="w-3 h-3 rounded-sm flex-shrink-0"
+                          style={{ backgroundColor: routeTypeColors[entry.routeType] || '#8884d8' }}
+                        />
+                        <span className="text-gray-700 truncate">
+                          {entry.routeType} ({entry.count})
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-500">
