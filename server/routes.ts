@@ -263,6 +263,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
       
       const stats = await storage.getMonthlyStats(user.id, year, month);
+      
+      // Prevent caching to ensure fresh data
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+      
       res.json(stats);
     } catch (error) {
       console.error("Monthly stats error:", error);
@@ -289,6 +295,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
       
       const progressionData = await storage.getGradeProgressionData(user.id, year, month);
+      
+      // Prevent caching to ensure fresh data
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+      
       res.json(progressionData);
     } catch (error) {
       console.error("Grade progression error:", error);
