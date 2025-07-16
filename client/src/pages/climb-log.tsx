@@ -177,24 +177,35 @@ export default function ClimbLog() {
                           <div className="flex-shrink-0">
                             <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
                               {climb.mediaUrl ? (
-                                climb.mediaUrl.toLowerCase().includes('.mp4') || 
-                                climb.mediaUrl.toLowerCase().includes('.mov') || 
-                                climb.mediaUrl.toLowerCase().includes('.avi') ? (
+                                climb.mediaUrl.startsWith('data:video/') ? (
                                   <video
                                     src={climb.mediaUrl}
                                     className="w-full h-full object-cover"
                                     muted
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                      const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
+                                      if (nextSibling) {
+                                        nextSibling.classList.remove('hidden');
+                                      }
+                                    }}
                                   />
                                 ) : (
                                   <img
                                     src={climb.mediaUrl}
                                     alt="Climb media"
                                     className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                      const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
+                                      if (nextSibling) {
+                                        nextSibling.classList.remove('hidden');
+                                      }
+                                    }}
                                   />
                                 )
-                              ) : (
-                                <Mountain className="w-6 h-6 text-gray-400" />
-                              )}
+                              ) : null}
+                              <Mountain className={`w-6 h-6 text-gray-400 ${climb.mediaUrl ? 'hidden' : ''}`} />
                             </div>
                           </div>
                           
