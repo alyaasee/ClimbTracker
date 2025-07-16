@@ -2,16 +2,21 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Filter, Plus, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { Filter, Plus, MoreVertical, Edit, Trash2, CalendarDays } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { format, parseISO } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format, parseISO, isWithinInterval } from "date-fns";
 import LogClimbModal from "@/components/log-climb-modal";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import type { DateRange } from "react-day-picker";
 
 export default function ClimbLog() {
   const [showLogModal, setShowLogModal] = useState(false);
   const [editingClimb, setEditingClimb] = useState<any>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [showDateFilter, setShowDateFilter] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -31,8 +36,26 @@ export default function ClimbLog() {
     },
   });
 
-  // Group climbs by date
-  const groupedClimbs = climbs.reduce((groups: any, climb: any) => {
+  // Filter climbs by date range if active
+  const filteredClimbs = climbs.filter((climb: any) => {
+    if (!dateRange?.from) return true;
+    
+    const climbDate = parseISO(climb.climbDate);
+    
+    if (dateRange.to) {
+      // Range selection
+      return isWithinInterval(climbDate, {
+        start: dateRange.from,
+        end: dateRange.to
+      });
+    } else {
+      // Single date selection
+      return format(climbDate, 'yyyy-MM-dd') === format(dateRange.from, 'yyyy-MM-dd');
+    }
+  });
+
+  // Group filtered climbs by date
+  const groupedClimbs = filteredClimbs.reduce((groups: any, climb: any) => {
     const date = climb.climbDate;
     if (!groups[date]) {
       groups[date] = [];
@@ -73,9 +96,49 @@ export default function ClimbLog() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Climb Log</h2>
         <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="sm" className="p-2 text-gray-600 hover:text-gray-900">
-            <Filter className="w-4 h-4" />
-          </Button>
+          <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={`p-2 ${dateRange?.from ? 'text-blue-600 hover:text-blue-700' : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                <Filter className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <div className="p-3 border-b">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">Filter by date</h4>
+                  {dateRange?.from && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDateRange(undefined)}
+                      className="text-xs"
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+                {dateRange?.from && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {dateRange.to 
+                      ? `${format(dateRange.from, 'MMM d')} - ${format(dateRange.to, 'MMM d, yyyy')}`
+                      : format(dateRange.from, 'MMM d, yyyy')
+                    }
+                  </p>
+                )}
+              </div>
+              <Calendar
+                mode="range"
+                selected={dateRange}
+                onSelect={setDateRange}
+                numberOfMonths={1}
+                className="rounded-md"
+              />
+            </PopoverContent>
+          </Popover>
           <Button
             onClick={() => setShowLogModal(true)}
             className="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center p-0"
@@ -87,11 +150,15 @@ export default function ClimbLog() {
 
       {Object.keys(groupedClimbs).length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">No climbs logged yet</p>
-          <Button onClick={() => setShowLogModal(true)} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Log your first climb
-          </Button>
+          <p className="text-gray-500 mb-4">
+            {dateRange?.from ? "No climbs found for selected date range" : "No climbs logged yet"}
+          </p>
+          {!dateRange?.from && (
+            <Button onClick={() => setShowLogModal(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Log your first climb
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-6">
