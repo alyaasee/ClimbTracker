@@ -26,8 +26,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let user = await storage.getUserByEmail(email);
       if (!user) {
         user = await storage.createAuthUser(email, name);
-      } else if (name && name.trim() && user.firstName !== name.trim()) {
-        // Update user's name if provided and different
+      } else if (name && name.trim()) {
+        // Always update user's name if provided in login
         await storage.updateUserName(user.id, name.trim());
         user = await storage.getUserByEmail(email);
       }
