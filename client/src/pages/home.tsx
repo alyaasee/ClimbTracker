@@ -48,43 +48,47 @@ export default function Home() {
   ];
 
   return (
-    <div className="py-6">
+    <div className="py-2 px-0">
       {/* Welcome Section */}
-      <div className="py-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="py-3 mb-4">
+        <h2 className="text-2xl font-bold text-gray-900 mb-3">
           Welcome back, {user?.firstName || "Climber"}!
         </h2>
-        <div className="flex items-center space-x-2 text-amber-600">
-          <span className="text-base font-medium">You're on a </span>
-          <span className="text-lg font-bold">{user?.currentStreak || 0}</span>
-          <span className="text-base font-medium">-day streak!</span>
-          <span className="text-lg">🔥</span>
+        
+        {/* Streak Section - Full Width */}
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200">
+          <div className="flex items-center justify-center space-x-2 text-amber-700">
+            <span className="text-base font-medium">You're on a </span>
+            <span className="text-2xl font-bold">{user?.currentStreak || 0}</span>
+            <span className="text-base font-medium">-day streak!</span>
+            <span className="text-2xl">🔥</span>
+          </div>
         </div>
       </div>
 
       {/* Log Climb CTA */}
       <Button
         onClick={() => setShowLogModal(true)}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 px-6 rounded-xl font-semibold text-lg mb-6 flex items-center justify-center space-x-2"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 px-6 rounded-xl font-semibold text-lg mb-4 flex items-center justify-center space-x-2"
       >
         <Plus className="w-5 h-5" />
         <span>Log Climb</span>
       </Button>
 
-      {/* Today's Summary */}
-      <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <CardContent className="p-6">
+      {/* Today's Summary - Full Width */}
+      <Card className="bg-white rounded-xl shadow-sm border border-gray-100 mx-0">
+        <CardContent className="p-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Summary</h3>
           
-          <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
             {summaryItems.map((item, index) => (
-              <div key={index} className="flex items-center space-x-3">
-                <div className={`w-8 h-8 ${item.bgColor} rounded-lg flex items-center justify-center`}>
-                  <item.icon className={`w-4 h-4 ${item.iconColor}`} />
+              <div key={index} className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
+                <div className={`w-12 h-12 ${item.bgColor} rounded-lg flex items-center justify-center mb-2`}>
+                  <item.icon className={`w-6 h-6 ${item.iconColor}`} />
                 </div>
-                <div className="flex-1">
-                  <span className="text-gray-900 font-medium">{item.label}</span>
-                  <span className="text-xl font-bold text-gray-900 ml-2">{item.value}</span>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900 mb-1">{item.value}</div>
+                  <div className="text-sm text-gray-600 font-medium">{item.label.replace(':', '')}</div>
                 </div>
               </div>
             ))}

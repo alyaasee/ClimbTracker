@@ -14,7 +14,7 @@ function Router() {
   return (
     <div className="max-w-sm mx-auto bg-white min-h-screen relative">
       <MobileHeader />
-      <main className="pb-20 px-4">
+      <main className="pb-20 px-3">
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/climb-log" component={ClimbLog} />
