@@ -49,8 +49,8 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/monthly"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/grade-progression"] });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0]?.toString().startsWith("/api/stats/monthly") });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0]?.toString().startsWith("/api/stats/grade-progression") });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/available-months"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({ title: "Climb logged successfully!" });
@@ -81,8 +81,8 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/monthly"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/grade-progression"] });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0]?.toString().startsWith("/api/stats/monthly") });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0]?.toString().startsWith("/api/stats/grade-progression") });
       queryClient.invalidateQueries({ queryKey: ["/api/stats/available-months"] });
       toast({ title: "Climb updated successfully!" });
       onOpenChange(false);

@@ -24,17 +24,11 @@ export default function Stats() {
   }, [availableMonths]);
 
   const { data: monthlyStats } = useQuery({
-    queryKey: ["/api/stats/monthly", selectedYear, selectedMonth],
-    queryFn: () => 
-      fetch(`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`)
-        .then(res => res.json())
+    queryKey: [`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`],
   });
 
   const { data: gradeProgressionData = [] } = useQuery({
-    queryKey: ["/api/stats/grade-progression", selectedYear, selectedMonth],
-    queryFn: () => 
-      fetch(`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`)
-        .then(res => res.json())
+    queryKey: [`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`],
   });
 
   const formatMonthValue = (year: number, month: number) => {
