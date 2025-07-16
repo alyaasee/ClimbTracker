@@ -6,6 +6,7 @@ import { Filter, Plus, MoreVertical, Edit, Trash2, CalendarDays, Mountain } from
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { format, parseISO, isWithinInterval } from "date-fns";
 import LogClimbModal from "@/components/log-climb-modal";
 import { apiRequest } from "@/lib/queryClient";
@@ -17,6 +18,8 @@ export default function ClimbLog() {
   const [editingClimb, setEditingClimb] = useState<any>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [showDateFilter, setShowDateFilter] = useState(false);
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<{ url: string; type: 'image' | 'video' } | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -76,6 +79,15 @@ export default function ClimbLog() {
     if (window.confirm("Are you sure you want to delete this climb?")) {
       deleteClimbMutation.mutate(id);
     }
+  };
+
+  const handleMediaClick = (mediaUrl: string) => {
+    const isVideo = mediaUrl.startsWith('data:video/');
+    setSelectedMedia({
+      url: mediaUrl,
+      type: isVideo ? 'video' : 'image'
+    });
+    setShowMediaModal(true);
   };
 
   const formatDate = (dateString: string) => {
@@ -178,7 +190,10 @@ export default function ClimbLog() {
                         <div className="flex items-center space-x-3">
                           {/* Circular media section */}
                           <div className="flex-shrink-0">
-                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
+                            <div 
+                              className={`w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden ${climb.mediaUrl ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+                              onClick={() => climb.mediaUrl && handleMediaClick(climb.mediaUrl)}
+                            >
                               {climb.mediaUrl ? (
                                 climb.mediaUrl.startsWith('data:video/') ? (
                                   <video
@@ -275,6 +290,33 @@ export default function ClimbLog() {
         }}
         climb={editingClimb}
       />
+
+      {/* Media Modal */}
+      <Dialog open={showMediaModal} onOpenChange={setShowMediaModal}>
+        <DialogContent className="sm:max-w-[90vw] sm:max-h-[90vh] p-0">
+          <DialogHeader className="p-4">
+            <DialogTitle>Media View</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center p-4">
+            {selectedMedia && (
+              selectedMedia.type === 'video' ? (
+                <video
+                  src={selectedMedia.url}
+                  controls
+                  className="max-w-full max-h-[70vh] rounded-lg"
+                  autoPlay
+                />
+              ) : (
+                <img
+                  src={selectedMedia.url}
+                  alt="Full size climb media"
+                  className="max-w-full max-h-[70vh] rounded-lg object-contain"
+                />
+              )
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
