@@ -99,44 +99,17 @@ export class DatabaseStorage implements IStorage {
       weeklyData[weekKey].add(dateStr);
     });
 
-    // Calculate current streak (count unique days in consecutive weeks from most recent)
-    const sortedWeeks = Object.keys(weeklyData).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-    
-    if (sortedWeeks.length === 0) return 0;
-    
-    let currentStreak = 0;
+    // Calculate current streak for the current week only (Sunday to Saturday)
     const today = new Date();
     const currentWeekStart = getSundayOfWeek(today.toISOString().split('T')[0]);
+    const currentWeekKey = currentWeekStart.toISOString().split('T')[0];
     
-    // Start from the most recent week and work backwards
-    for (let i = 0; i < sortedWeeks.length; i++) {
-      const weekKey = sortedWeeks[i];
-      const weekStart = new Date(weekKey);
-      
-      if (i === 0) {
-        // First week - check if it's current week or a recent past week
-        const weeksDiff = Math.floor((currentWeekStart.getTime() - weekStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
-        
-        if (weeksDiff >= 0 && weeksDiff <= 2) { // Allow current week or up to 2 weeks ago
-          currentStreak = weeklyData[weekKey].size;
-        } else {
-          break;
-        }
-      } else {
-        // Subsequent weeks - check if it's the immediate previous week
-        const previousWeekKey = sortedWeeks[i - 1];
-        const previousWeekStart = new Date(previousWeekKey);
-        const expectedWeekStart = new Date(previousWeekStart.getTime() - 7 * 24 * 60 * 60 * 1000);
-        
-        if (weekStart.getTime() === expectedWeekStart.getTime()) {
-          currentStreak += weeklyData[weekKey].size;
-        } else {
-          break;
-        }
-      }
+    // Return the number of unique days in the current week
+    if (weeklyData[currentWeekKey]) {
+      return weeklyData[currentWeekKey].size;
     }
-
-    return currentStreak;
+    
+    return 0;
   }
 
   async createClimb(climb: InsertClimb & { userId: number }): Promise<Climb> {
