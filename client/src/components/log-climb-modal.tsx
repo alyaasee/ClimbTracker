@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { format } from "date-fns";
+import { Camera, Video, X } from "lucide-react";
 
 interface LogClimbModalProps {
   open: boolean;
@@ -21,13 +22,26 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
   const queryClient = useQueryClient();
   
   const [formData, setFormData] = useState({
+    climbDate: climb?.climbDate || format(new Date(), 'yyyy-MM-dd'),
     gym: climb?.gym || "",
     routeType: climb?.routeType || "",
     grade: climb?.grade || "",
     outcome: climb?.outcome || "",
     notes: climb?.notes || "",
-    climbDate: climb?.climbDate || format(new Date(), 'yyyy-MM-dd'),
   });
+
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  const gymOptions = [
+    "Camp5 KL Eco",
+    "Camp5 KL East", 
+    "Camp5 1U",
+    "Camp5 Utro",
+    "Camp5 Jumpa",
+    "Batuu",
+    "Bump J1",
+    "Bump PBJ"
+  ];
 
   const createClimbMutation = useMutation({
     mutationFn: (data: any) => apiRequest("POST", "/api/climbs", data),
@@ -38,13 +52,14 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
       toast({ title: "Climb logged successfully!" });
       onOpenChange(false);
       setFormData({
+        climbDate: format(new Date(), 'yyyy-MM-dd'),
         gym: "",
         routeType: "",
         grade: "",
         outcome: "",
         notes: "",
-        climbDate: format(new Date(), 'yyyy-MM-dd'),
       });
+      setSelectedFiles([]);
     },
     onError: () => {
       toast({ title: "Failed to log climb", variant: "destructive" });
@@ -64,10 +79,22 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     },
   });
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const newFiles = Array.from(files);
+      setSelectedFiles(prev => [...prev, ...newFiles]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.gym || !formData.routeType || !formData.grade || !formData.outcome) {
+    if (!formData.climbDate || !formData.gym || !formData.routeType || !formData.grade || !formData.outcome) {
       toast({ title: "Please fill in all required fields", variant: "destructive" });
       return;
     }
@@ -84,18 +111,38 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{climb ? "Edit Climb" : "Log Climb"}</DialogTitle>
+          <DialogDescription>
+            {climb ? "Edit your climb details" : "Log your climbing session"}
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="gym">Gym *</Label>
+            <Label htmlFor="climbDate">Date *</Label>
             <Input
-              id="gym"
-              value={formData.gym}
-              onChange={(e) => setFormData({ ...formData, gym: e.target.value })}
-              placeholder="e.g., Camp5 - KL East"
+              id="climbDate"
+              type="date"
+              value={formData.climbDate}
+              onChange={(e) => setFormData({ ...formData, climbDate: e.target.value })}
               required
             />
+          </div>
+
+          <div>
+            <Label htmlFor="gym">Gym *</Label>
+            <Select
+              value={formData.gym}
+              onValueChange={(value) => setFormData({ ...formData, gym: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select gym" />
+              </SelectTrigger>
+              <SelectContent>
+                {gymOptions.map((gym) => (
+                  <SelectItem key={gym} value={gym}>{gym}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
@@ -161,14 +208,77 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
           </div>
 
           <div>
-            <Label htmlFor="climbDate">Date *</Label>
-            <Input
-              id="climbDate"
-              type="date"
-              value={formData.climbDate}
-              onChange={(e) => setFormData({ ...formData, climbDate: e.target.value })}
-              required
-            />
+            <Label htmlFor="media">Photos/Videos</Label>
+            <div className="space-y-2">
+              <div className="flex space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('photo-upload')?.click()}
+                  className="flex-1"
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  Add Photo
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('video-upload')?.click()}
+                  className="flex-1"
+                >
+                  <Video className="w-4 h-4 mr-2" />
+                  Add Video
+                </Button>
+              </div>
+              
+              <input
+                id="photo-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              
+              <input
+                id="video-upload"
+                type="file"
+                accept="video/*"
+                multiple
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+
+              {selectedFiles.length > 0 && (
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {selectedFiles.map((file, index) => (
+                    <div key={index} className="relative bg-gray-100 rounded-lg p-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          {file.type.startsWith('image/') ? (
+                            <Camera className="w-4 h-4 text-blue-600" />
+                          ) : (
+                            <Video className="w-4 h-4 text-purple-600" />
+                          )}
+                          <span className="text-sm text-gray-600 truncate">
+                            {file.name}
+                          </span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeFile(index)}
+                          className="p-1 h-6 w-6"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div>
