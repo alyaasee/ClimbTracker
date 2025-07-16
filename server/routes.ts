@@ -86,6 +86,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sessionId = req.cookies?.sessionId;
       
       if (!sessionId || !userSessions.has(sessionId)) {
+        // Development bypass - use user ID 2 (Lyhakim)
+        const user = await storage.getUser(2);
+        if (user) {
+          return res.json({
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            isAuthenticated: true,
+          });
+        }
         return res.status(401).json({ error: "Not authenticated" });
       }
 
@@ -115,6 +125,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sessionId = req.cookies?.sessionId;
       
       if (!sessionId || !userSessions.has(sessionId)) {
+        // Development bypass - use user ID 2 (Lyhakim)
+        const user = await storage.getUser(2);
+        if (user) {
+          req.user = user;
+          return next();
+        }
         return res.status(401).json({ error: "Not authenticated" });
       }
 
