@@ -42,8 +42,12 @@ Preferred communication style: Simple, everyday language.
 - `GET /api/user`: Retrieve or create demo user
 - `GET /api/climbs`: Get all climbs for the current user
 - `POST /api/climbs`: Create a new climb entry
+- `PUT /api/climbs/:id`: Update an existing climb
+- `DELETE /api/climbs/:id`: Delete a climb
 - `GET /api/stats/today`: Get today's climbing statistics
-- `GET /api/stats/monthly`: Get monthly climbing statistics
+- `GET /api/stats/monthly`: Get monthly climbing statistics with route breakdown
+- `GET /api/stats/available-months`: Get months with logged climbs
+- `GET /api/stats/grade-progression`: Get grade progression data up to selected month
 
 ### Frontend Pages
 - **Home**: Dashboard with today's climbing stats and quick actions
@@ -54,8 +58,12 @@ Preferred communication style: Simple, everyday language.
 - Climb logging with route type (Boulder, Top Rope, Lead, Auto Belay)
 - Grade tracking with climbing-specific grading system
 - Outcome tracking (Send, Flash, Project, Attempt)
-- Daily and monthly statistics
+- Daily and monthly statistics with visual charts
 - Streak tracking for consistent climbing
+- Photo/video upload for climb documentation
+- Gym-specific dropdown with predefined locations
+- Grade progression tracking with line charts
+- Route type breakdown with donut charts
 
 ## Data Flow
 

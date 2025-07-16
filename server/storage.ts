@@ -26,7 +26,18 @@ export interface IStorage {
     totalClimbs: number;
     maxGrade: string;
     successRate: number;
+    routeTypeBreakdown: { routeType: string; count: number; percentage: number }[];
   }>;
+  
+  getAvailableMonths(userId: number): Promise<{ year: number; month: number; monthName: string }[]>;
+  
+  getGradeProgressionData(userId: number, upToYear: number, upToMonth: number): Promise<{
+    month: string;
+    year: number;
+    monthNum: number;
+    maxGrade: string;
+    gradeValue: number;
+  }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -130,6 +141,7 @@ export class DatabaseStorage implements IStorage {
     totalClimbs: number;
     maxGrade: string;
     successRate: number;
+    routeTypeBreakdown: { routeType: string; count: number; percentage: number }[];
   }> {
     const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
     const endDate = `${year}-${month.toString().padStart(2, '0')}-31`;
@@ -142,6 +154,9 @@ export class DatabaseStorage implements IStorage {
     let maxGrade = '5a';
     let successfulClimbs = 0;
     
+    // Count route types
+    const routeTypeCounts: { [key: string]: number } = {};
+    
     monthlyClimbs.forEach(climb => {
       if (gradeOrder.indexOf(climb.grade) > gradeOrder.indexOf(maxGrade)) {
         maxGrade = climb.grade;
@@ -149,15 +164,98 @@ export class DatabaseStorage implements IStorage {
       if (climb.outcome === 'Send' || climb.outcome === 'Flash') {
         successfulClimbs++;
       }
+      
+      routeTypeCounts[climb.routeType] = (routeTypeCounts[climb.routeType] || 0) + 1;
     });
 
     const successRate = monthlyClimbs.length > 0 ? Math.round((successfulClimbs / monthlyClimbs.length) * 100) : 0;
+
+    // Create route type breakdown with percentages
+    const routeTypeBreakdown = Object.entries(routeTypeCounts)
+      .map(([routeType, count]) => ({
+        routeType,
+        count,
+        percentage: Math.round((count / monthlyClimbs.length) * 100)
+      }))
+      .filter(item => item.percentage >= 5) // Only show slices >= 5%
+      .sort((a, b) => b.count - a.count);
 
     return {
       totalClimbs: monthlyClimbs.length,
       maxGrade,
       successRate,
+      routeTypeBreakdown,
     };
+  }
+
+  async getAvailableMonths(userId: number): Promise<{ year: number; month: number; monthName: string }[]> {
+    const climbs = await this.getClimbsByUser(userId);
+    
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
+    const monthsSet = new Set<string>();
+    climbs.forEach(climb => {
+      const date = new Date(climb.climbDate);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      monthsSet.add(`${year}-${month}`);
+    });
+    
+    return Array.from(monthsSet)
+      .map(monthKey => {
+        const [year, month] = monthKey.split('-').map(Number);
+        return {
+          year,
+          month,
+          monthName: monthNames[month - 1]
+        };
+      })
+      .sort((a, b) => {
+        if (a.year !== b.year) return b.year - a.year;
+        return b.month - a.month;
+      });
+  }
+
+  async getGradeProgressionData(userId: number, upToYear: number, upToMonth: number): Promise<{
+    month: string;
+    year: number;
+    monthNum: number;
+    maxGrade: string;
+    gradeValue: number;
+  }[]> {
+    const availableMonths = await this.getAvailableMonths(userId);
+    const gradeOrder = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c'];
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    
+    const progressionData = [];
+    
+    for (const monthData of availableMonths) {
+      // Only include months up to the selected month
+      if (monthData.year > upToYear || (monthData.year === upToYear && monthData.month > upToMonth)) {
+        continue;
+      }
+      
+      const monthlyStats = await this.getMonthlyStats(userId, monthData.year, monthData.month);
+      
+      progressionData.push({
+        month: monthNames[monthData.month - 1],
+        year: monthData.year,
+        monthNum: monthData.month,
+        maxGrade: monthlyStats.maxGrade,
+        gradeValue: gradeOrder.indexOf(monthlyStats.maxGrade) + 1
+      });
+    }
+    
+    return progressionData.sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return a.monthNum - b.monthNum;
+    });
   }
 }
 

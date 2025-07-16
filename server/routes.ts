@@ -135,6 +135,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get available months with climbs
+  app.get("/api/stats/available-months", async (req, res) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const months = await storage.getAvailableMonths(user.id);
+      res.json(months);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get available months" });
+    }
+  });
+
+  // Get grade progression data
+  app.get("/api/stats/grade-progression", async (req, res) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const year = parseInt(req.query.year as string) || new Date().getFullYear();
+      const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
+      
+      const progressionData = await storage.getGradeProgressionData(user.id, year, month);
+      res.json(progressionData);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get grade progression data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
