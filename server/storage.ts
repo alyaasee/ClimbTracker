@@ -381,6 +381,7 @@ export class DatabaseStorage implements IStorage {
         
         try {
           const monthlyStats = await this.getMonthlyStats(userId, monthData.year, monthData.month);
+
           
           progressionData.push({
             month: monthNames[monthData.month - 1],
