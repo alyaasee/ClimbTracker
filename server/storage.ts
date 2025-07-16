@@ -14,6 +14,7 @@ export interface IStorage {
   createAuthUser(email: string, firstName?: string): Promise<User>;
   updateVerificationCode(email: string, code: string, expiresAt: Date): Promise<void>;
   verifyUser(email: string, code: string): Promise<User | null>;
+  updateLastLogin(userId: number): Promise<void>;
   
   createClimb(climb: InsertClimb & { userId: number }): Promise<Climb>;
   getClimbsByUser(userId: number): Promise<Climb[]>;
@@ -72,11 +73,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createAuthUser(email: string, firstName?: string): Promise<User> {
+    // Extract name from email if not provided
+    const nameFromEmail = firstName || email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    
     const [user] = await db
       .insert(users)
       .values({
         email,
-        firstName: firstName || 'Climber',
+        firstName: nameFromEmail,
         isVerified: false,
       })
       .returning();
@@ -119,6 +123,13 @@ export class DatabaseStorage implements IStorage {
       .returning();
 
     return verifiedUser;
+  }
+
+  async updateLastLogin(userId: number): Promise<void> {
+    await db
+      .update(users)
+      .set({ lastLoginAt: new Date() })
+      .where(eq(users.id, userId));
   }
 
   async updateUserStreak(userId: number, streak: number, lastClimbDate: string): Promise<void> {

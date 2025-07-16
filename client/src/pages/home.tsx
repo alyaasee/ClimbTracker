@@ -52,7 +52,10 @@ export default function Home() {
       {/* Welcome Section */}
       <div className="py-3 mb-4">
         <h2 className="text-2xl font-bold text-gray-900 mb-3">
-          Welcome back, {user?.firstName || "Climber"}!
+          {user?.lastLoginAt ? 
+            `Welcome back, ${user.firstName || "Climber"}!` : 
+            `Welcome, ${user.firstName || "Climber"}!`
+          }
         </h2>
         
         {/* Streak Section - Full Width */}

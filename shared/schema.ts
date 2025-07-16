@@ -14,6 +14,7 @@ export const users = pgTable("users", {
   codeExpiresAt: timestamp("code_expires_at"),
   currentStreak: integer("current_streak").default(0),
   lastClimbDate: date("last_climb_date"),
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

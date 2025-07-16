@@ -57,6 +57,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid or expired code" });
       }
 
+      // Update last login time
+      await storage.updateLastLogin(user.id);
+
       // Create session
       const sessionId = Math.random().toString(36).substring(2, 15);
       userSessions.set(sessionId, { userId: user.id, email: user.email || '' });
