@@ -240,13 +240,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get monthly stats
-  app.get("/api/stats/monthly", async (req, res) => {
+  app.get("/api/stats/monthly", requireAuth, async (req: any, res) => {
     try {
-      const user = await storage.getUserByUsername("demo");
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      
+      const user = req.user;
       const year = parseInt(req.query.year as string) || new Date().getFullYear();
       const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
       
