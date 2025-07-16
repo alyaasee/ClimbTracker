@@ -91,31 +91,144 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     },
   });
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = (file: File, maxSizeBytes: number = 5 * 1024 * 1024): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions (max 1920x1080)
+        const maxWidth = 1920;
+        const maxHeight = 1080;
+        let { width, height } = img;
+        
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width *= ratio;
+          height *= ratio;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Start with high quality and reduce until under size limit
+        let quality = 0.9;
+        const tryCompress = () => {
+          canvas.toBlob((blob) => {
+            if (blob && blob.size <= maxSizeBytes) {
+              const reader = new FileReader();
+              reader.onload = (e) => resolve(e.target?.result as string);
+              reader.readAsDataURL(blob);
+            } else if (quality > 0.1) {
+              quality -= 0.1;
+              tryCompress();
+            } else {
+              reject(new Error('Cannot compress image below 5MB'));
+            }
+          }, 'image/jpeg', quality);
+        };
+        
+        tryCompress();
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const compressVideo = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      video.onloadedmetadata = () => {
+        // Limit video dimensions
+        const maxWidth = 1280;
+        const maxHeight = 720;
+        let { videoWidth: width, videoHeight: height } = video;
+        
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width *= ratio;
+          height *= ratio;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Capture first frame as thumbnail
+        video.currentTime = 0;
+        video.onseeked = () => {
+          ctx?.drawImage(video, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const reader = new FileReader();
+              reader.onload = (e) => resolve(e.target?.result as string);
+              reader.readAsDataURL(blob);
+            } else {
+              reject(new Error('Failed to compress video'));
+            }
+          }, 'image/jpeg', 0.8);
+        };
+      };
+      
+      video.onerror = () => reject(new Error('Failed to load video'));
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
       const firstFile = files[0];
-      
-      // Check file size (max 5MB)
-      if (firstFile.size > 5 * 1024 * 1024) {
-        toast({ 
-          title: "File too large", 
-          description: "Please select a file smaller than 5MB",
-          variant: "destructive" 
-        });
-        return;
-      }
-      
       const newFiles = Array.from(files);
       setSelectedFiles(prev => [...prev, ...newFiles]);
       
-      // Convert first file to data URL for storage
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target?.result as string;
+      try {
+        let dataUrl: string;
+        
+        if (firstFile.size > 5 * 1024 * 1024) {
+          // File is too large, compress it
+          if (firstFile.type.startsWith('image/')) {
+            dataUrl = await compressImage(firstFile);
+            toast({ 
+              title: "Image compressed", 
+              description: "Large image was automatically compressed to reduce size"
+            });
+          } else if (firstFile.type.startsWith('video/')) {
+            dataUrl = await compressVideo(firstFile);
+            toast({ 
+              title: "Video compressed", 
+              description: "Large video was converted to a thumbnail image"
+            });
+          } else {
+            toast({ 
+              title: "File too large", 
+              description: "Please select an image or video smaller than 5MB",
+              variant: "destructive" 
+            });
+            return;
+          }
+        } else {
+          // File is within size limit, use as-is
+          const reader = new FileReader();
+          dataUrl = await new Promise((resolve) => {
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.readAsDataURL(firstFile);
+          });
+        }
+        
         setFormData(prev => ({ ...prev, mediaUrl: dataUrl }));
-      };
-      reader.readAsDataURL(firstFile);
+      } catch (error) {
+        toast({ 
+          title: "Compression failed", 
+          description: "Unable to process the file. Please try a different file.",
+          variant: "destructive" 
+        });
+      }
     }
   };
 
