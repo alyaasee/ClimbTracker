@@ -21,6 +21,7 @@ export const climbs = pgTable("climbs", {
   grade: text("grade").notNull(), // "5a", "5b", "5c", "6a", "6b", "6c", "7a", etc.
   outcome: text("outcome").notNull(), // "Send", "Flash", "Project", "Attempt"
   notes: text("notes"),
+  mediaUrl: text("media_url"), // URL for uploaded photo/video
   climbDate: date("climb_date").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -48,6 +49,7 @@ export const insertClimbSchema = createInsertSchema(climbs).pick({
   grade: true,
   outcome: true,
   notes: true,
+  mediaUrl: true,
   climbDate: true,
 });
 

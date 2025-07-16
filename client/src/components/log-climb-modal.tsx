@@ -28,6 +28,7 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     grade: climb?.grade || "",
     outcome: climb?.outcome || "",
     notes: climb?.notes || "",
+    mediaUrl: climb?.mediaUrl || "",
   });
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -58,6 +59,7 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
         grade: "",
         outcome: "",
         notes: "",
+        mediaUrl: "",
       });
       setSelectedFiles([]);
     },
@@ -81,14 +83,29 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
+    if (files && files.length > 0) {
       const newFiles = Array.from(files);
       setSelectedFiles(prev => [...prev, ...newFiles]);
+      
+      // Convert first file to data URL for storage
+      const firstFile = newFiles[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        setFormData(prev => ({ ...prev, mediaUrl: dataUrl }));
+      };
+      reader.readAsDataURL(firstFile);
     }
   };
 
   const removeFile = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setSelectedFiles(prev => {
+      const newFiles = prev.filter((_, i) => i !== index);
+      if (newFiles.length === 0) {
+        setFormData(prev => ({ ...prev, mediaUrl: "" }));
+      }
+      return newFiles;
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {

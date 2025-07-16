@@ -60,7 +60,7 @@ Preferred communication style: Simple, everyday language.
 - Outcome tracking (Send, Flash, Project, Attempt)
 - Daily and monthly statistics with visual charts
 - Weekly streak tracking (unique days within current week, Sunday-Saturday)
-- Photo/video upload for climb documentation
+- Photo/video upload for climb documentation (stored as base64 data URLs)
 - Gym-specific dropdown with predefined locations (Camp5 KL Eco, Camp5 KL East, Camp5 1U, Camp5 Utro, Camp5 Jumpa, Batuu, Bump J1, Bump PBJ)
 - Grade progression tracking with line charts
 - Route type breakdown with donut charts
