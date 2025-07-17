@@ -70,7 +70,15 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
       setSelectedFiles([]);
     },
     onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || error?.message || "Failed to log climb";
+      console.error("Create climb error:", error);
+      let errorMessage = "Failed to log climb";
+      
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({ 
         title: "Failed to log climb", 
         description: errorMessage,
@@ -94,7 +102,15 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
       onOpenChange(false);
     },
     onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || error?.message || "Failed to update climb";
+      console.error("Update climb error:", error);
+      let errorMessage = "Failed to update climb";
+      
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({ 
         title: "Failed to update climb", 
         description: errorMessage,
@@ -235,6 +251,7 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
         
         setFormData(prev => ({ ...prev, mediaUrl: dataUrl }));
       } catch (error) {
+        console.error("File compression error:", error);
         toast({ 
           title: "Compression failed", 
           description: "Unable to process the file. Please try a different file.",
@@ -257,15 +274,28 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate required fields
     if (!formData.climbDate || !formData.gym || !formData.routeType || !formData.grade || !formData.outcome) {
       toast({ title: "Please fill in all required fields", variant: "destructive" });
       return;
     }
 
-    if (climb) {
-      updateClimbMutation.mutate(formData);
-    } else {
-      createClimbMutation.mutate(formData);
+    // Validate date format
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(formData.climbDate)) {
+      toast({ title: "Invalid date format", variant: "destructive" });
+      return;
+    }
+
+    try {
+      if (climb) {
+        updateClimbMutation.mutate(formData);
+      } else {
+        createClimbMutation.mutate(formData);
+      }
+    } catch (error) {
+      console.error("Submit error:", error);
+      toast({ title: "Submission failed", description: "Please try again", variant: "destructive" });
     }
   };
 
