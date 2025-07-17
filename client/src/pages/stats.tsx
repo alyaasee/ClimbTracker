@@ -8,30 +8,32 @@ import { Mountain, TrendingUp, Target } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 export default function Stats() {
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
 
   // Get available months with climbs
   const { data: availableMonths = [] } = useQuery({
-    queryKey: ["stats", "available-months"],
+    queryKey: ["api", "stats", "available-months"],
   });
 
   // Set default selection to the most recent month with climbs
   useEffect(() => {
-    if (availableMonths.length > 0) {
+    if (availableMonths.length > 0 && selectedYear === null && selectedMonth === null) {
       setSelectedYear(availableMonths[0].year);
       setSelectedMonth(availableMonths[0].month);
     }
-  }, [availableMonths]);
+  }, [availableMonths, selectedYear, selectedMonth]);
 
-  const { data: monthlyStats } = useQuery({
-    queryKey: ["stats", "monthly", selectedYear, selectedMonth],
+  const { data: monthlyStats, isLoading: monthlyStatsLoading } = useQuery({
+    queryKey: ["api", "stats", "monthly", selectedYear, selectedMonth],
     queryFn: () => apiRequest(`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`),
+    enabled: selectedYear !== null && selectedMonth !== null,
   });
 
   const { data: gradeProgressionData = [] } = useQuery({
-    queryKey: ["stats", "grade-progression", selectedYear, selectedMonth],
+    queryKey: ["api", "stats", "grade-progression", selectedYear, selectedMonth],
     queryFn: () => apiRequest(`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`),
+    enabled: selectedYear !== null && selectedMonth !== null,
   });
 
   const formatMonthValue = (year: number, month: number) => {
@@ -52,7 +54,7 @@ export default function Stats() {
   };
 
   // Empty state check
-  const isEmpty = !monthlyStats || monthlyStats.totalClimbs === 0;
+  const isEmpty = selectedYear === null || selectedMonth === null || !monthlyStats || monthlyStats.totalClimbs === 0;
 
   return (
     <div className="py-4">
@@ -64,11 +66,13 @@ export default function Stats() {
           Select Month
         </Label>
         <Select
-          value={`${selectedYear}-${selectedMonth.toString().padStart(2, '0')}`}
+          value={selectedYear && selectedMonth ? `${selectedYear}-${selectedMonth.toString().padStart(2, '0')}` : undefined}
           onValueChange={(value) => {
-            const [year, month] = value.split('-');
-            setSelectedYear(parseInt(year));
-            setSelectedMonth(parseInt(month));
+            if (value) {
+              const [year, month] = value.split('-');
+              setSelectedYear(parseInt(year));
+              setSelectedMonth(parseInt(month));
+            }
           }}
         >
           <SelectTrigger className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg">
@@ -86,8 +90,12 @@ export default function Stats() {
 
       {isEmpty ? (
         <div className="text-center py-12">
-          <div className="text-gray-500 text-lg mb-2">No climbs yet—get on the wall!</div>
-          <div className="text-gray-400 text-sm">Select a month with logged climbs to see your stats</div>
+          <div className="text-gray-500 text-lg mb-2">
+            {availableMonths.length === 0 ? "No climbs yet—get on the wall!" : "Select a month to see your stats"}
+          </div>
+          <div className="text-gray-400 text-sm">
+            {availableMonths.length === 0 ? "Start logging climbs to see your progress" : "Choose a month with logged climbs from the dropdown above"}
+          </div>
         </div>
       ) : (
         <>
