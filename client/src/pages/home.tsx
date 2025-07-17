@@ -9,11 +9,11 @@ export default function Home() {
   const [showLogModal, setShowLogModal] = useState(false);
 
   const { data: user, isLoading: userLoading } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["api", "user"],
   });
 
   const { data: todayStats } = useQuery({
-    queryKey: ["stats", "today"],
+    queryKey: ["api", "stats", "today"],
   });
 
   if (userLoading) {

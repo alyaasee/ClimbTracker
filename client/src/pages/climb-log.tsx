@@ -24,23 +24,19 @@ export default function ClimbLog() {
   const queryClient = useQueryClient();
 
   const { data: climbs = [], isLoading, error } = useQuery({
-    queryKey: ["climbs"],
+    queryKey: ["api", "climbs"],
   });
 
-  // Debug logging
-  console.log('Climbs data:', climbs);
-  console.log('Climbs length:', climbs.length);
-  console.log('Query loading:', isLoading);
-  console.log('Query error:', error);
+
 
   const deleteClimbMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/climbs/${id}`, { method: "DELETE" }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["climbs"] });
-      queryClient.invalidateQueries({ queryKey: ["stats", "today"] });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "stats" && query.queryKey[1] === "monthly" });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "stats" && query.queryKey[1] === "grade-progression" });
-      queryClient.invalidateQueries({ queryKey: ["stats", "available-months"] });
+      queryClient.invalidateQueries({ queryKey: ["api", "climbs"] });
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today"] });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "api" && query.queryKey[1] === "stats" && query.queryKey[2] === "monthly" });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "api" && query.queryKey[1] === "stats" && query.queryKey[2] === "grade-progression" });
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", "available-months"] });
       toast({ title: "Climb deleted successfully!" });
     },
     onError: () => {
