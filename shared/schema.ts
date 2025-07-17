@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   password: text("password"),
   email: text("email").unique(),
   firstName: text("first_name"),
+  profileImageUrl: text("profile_image_url"),
   isVerified: boolean("is_verified").default(false),
   verificationCode: text("verification_code"),
   codeExpiresAt: timestamp("code_expires_at"),

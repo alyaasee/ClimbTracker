@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import ClimbLog from "@/pages/climb-log";
 import Stats from "@/pages/stats";
+import Profile from "@/pages/profile";
 import Login from "@/pages/auth/login";
 import Verify from "@/pages/auth/verify";
 import BottomNav from "@/components/bottom-nav";
@@ -46,6 +47,7 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/climb-log" component={ClimbLog} />
           <Route path="/stats" component={Stats} />
+          <Route path="/profile" component={Profile} />
           <Route component={NotFound} />
         </Switch>
       </main>

@@ -17,6 +17,7 @@ export interface IStorage {
   verifyUser(email: string, code: string): Promise<User | null>;
   updateLastLogin(userId: number): Promise<void>;
   updateUserName(userId: number, firstName: string): Promise<void>;
+  updateUserProfile(userId: number, profileData: { firstName?: string; profileImageUrl?: string }): Promise<User>;
   
   // Session methods
   createSession(userId: number, email: string): Promise<Session>;
@@ -145,6 +146,15 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ firstName })
       .where(eq(users.id, userId));
+  }
+
+  async updateUserProfile(userId: number, profileData: { firstName?: string; profileImageUrl?: string }): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(profileData)
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
   }
 
   async getUserByEmailOrCreate(email: string, firstName?: string): Promise<User> {

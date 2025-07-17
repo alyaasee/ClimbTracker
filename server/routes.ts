@@ -144,6 +144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: user.id,
         email: user.email,
         firstName: user.firstName,
+        profileImageUrl: user.profileImageUrl,
         isAuthenticated: true,
       });
     } catch (error) {
@@ -364,6 +365,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Grade progression error:", error);
       res.status(500).json({ error: "Failed to get grade progression data" });
+    }
+  });
+
+  // Update user profile
+  app.put("/api/profile", requireAuth, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const { firstName, profileImageUrl } = req.body;
+      
+      const profileData: { firstName?: string; profileImageUrl?: string } = {};
+      
+      if (firstName !== undefined) {
+        profileData.firstName = firstName.trim();
+      }
+      
+      if (profileImageUrl !== undefined) {
+        profileData.profileImageUrl = profileImageUrl;
+      }
+      
+      const updatedUser = await storage.updateUserProfile(user.id, profileData);
+      
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Profile update error:", error);
+      res.status(500).json({ error: "Failed to update profile" });
     }
   });
 
