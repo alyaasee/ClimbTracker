@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
+import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -12,7 +13,7 @@ export default function Stats() {
 
   // Get available months with climbs
   const { data: availableMonths = [] } = useQuery({
-    queryKey: ["/api/stats/available-months"],
+    queryKey: ["stats", "available-months"],
   });
 
   // Set default selection to the most recent month with climbs
@@ -24,11 +25,13 @@ export default function Stats() {
   }, [availableMonths]);
 
   const { data: monthlyStats } = useQuery({
-    queryKey: [`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`],
+    queryKey: ["stats", "monthly", selectedYear, selectedMonth],
+    queryFn: () => apiRequest(`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`),
   });
 
   const { data: gradeProgressionData = [] } = useQuery({
-    queryKey: [`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`],
+    queryKey: ["stats", "grade-progression", selectedYear, selectedMonth],
+    queryFn: () => apiRequest(`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`),
   });
 
   const formatMonthValue = (year: number, month: number) => {

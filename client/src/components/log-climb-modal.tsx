@@ -47,12 +47,12 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
   const createClimbMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/climbs", { method: "POST", body: data }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0]?.toString().startsWith("/api/stats/monthly") });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0]?.toString().startsWith("/api/stats/grade-progression") });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/available-months"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["climbs"] });
+      queryClient.invalidateQueries({ queryKey: ["stats", "today"] });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "stats" && query.queryKey[1] === "monthly" });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "stats" && query.queryKey[1] === "grade-progression" });
+      queryClient.invalidateQueries({ queryKey: ["stats", "available-months"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
       toast({ title: "Climb logged successfully!" });
       onOpenChange(false);
       setFormData({
@@ -79,11 +79,11 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
   const updateClimbMutation = useMutation({
     mutationFn: (data: any) => apiRequest(`/api/climbs/${climb?.id}`, { method: "PUT", body: data }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0]?.toString().startsWith("/api/stats/monthly") });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0]?.toString().startsWith("/api/stats/grade-progression") });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/available-months"] });
+      queryClient.invalidateQueries({ queryKey: ["climbs"] });
+      queryClient.invalidateQueries({ queryKey: ["stats", "today"] });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "stats" && query.queryKey[1] === "monthly" });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "stats" && query.queryKey[1] === "grade-progression" });
+      queryClient.invalidateQueries({ queryKey: ["stats", "available-months"] });
       toast({ title: "Climb updated successfully!" });
       onOpenChange(false);
     },

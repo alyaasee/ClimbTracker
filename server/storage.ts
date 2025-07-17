@@ -1,4 +1,4 @@
-import { users, climbs, type User, type InsertUser, type Climb, type InsertClimb } from "@shared/schema";
+import { users, climbs, sessions, type User, type InsertUser, type Climb, type InsertClimb, type Session } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
 
@@ -16,6 +16,12 @@ export interface IStorage {
   verifyUser(email: string, code: string): Promise<User | null>;
   updateLastLogin(userId: number): Promise<void>;
   updateUserName(userId: number, firstName: string): Promise<void>;
+  
+  // Session methods
+  createSession(userId: number, email: string): Promise<Session>;
+  getSession(sessionId: string): Promise<Session | null>;
+  deleteSession(sessionId: string): Promise<void>;
+  deleteExpiredSessions(): Promise<void>;
   
   createClimb(climb: InsertClimb & { userId: number }): Promise<Climb>;
   getClimbsByUser(userId: number): Promise<Climb[]>;
@@ -403,6 +409,53 @@ export class DatabaseStorage implements IStorage {
       console.error("Error in getGradeProgressionData:", error);
       throw error;
     }
+  }
+
+  // Session management methods
+  async createSession(userId: number, email: string): Promise<Session> {
+    const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    const [session] = await db
+      .insert(sessions)
+      .values({
+        id: sessionId,
+        userId,
+        email,
+        expiresAt,
+      })
+      .returning();
+
+    return session;
+  }
+
+  async getSession(sessionId: string): Promise<Session | null> {
+    const [session] = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.id, sessionId));
+
+    if (!session) return null;
+
+    // Check if session has expired
+    if (new Date() > session.expiresAt) {
+      await this.deleteSession(sessionId);
+      return null;
+    }
+
+    return session;
+  }
+
+  async deleteSession(sessionId: string): Promise<void> {
+    await db
+      .delete(sessions)
+      .where(eq(sessions.id, sessionId));
+  }
+
+  async deleteExpiredSessions(): Promise<void> {
+    await db
+      .delete(sessions)
+      .where(sql`expires_at < NOW()`);
   }
 }
 

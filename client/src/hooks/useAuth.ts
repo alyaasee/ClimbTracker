@@ -9,7 +9,7 @@ export interface AuthUser {
 
 export function useAuth() {
   const { data: user, isLoading, error } = useQuery({
-    queryKey: ["/api/auth/user"],
+    queryKey: ["auth", "user"],
     queryFn: async () => {
       try {
         const response = await apiRequest("/api/auth/user");

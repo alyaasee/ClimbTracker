@@ -5,8 +5,14 @@ import { insertClimbSchema } from "@shared/schema";
 import { format } from "date-fns";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Simple in-memory session store for demo purposes
-  const userSessions = new Map<string, { userId: number; email: string }>();
+  // Clean up expired sessions periodically
+  setInterval(async () => {
+    try {
+      await storage.deleteExpiredSessions();
+    } catch (error) {
+      console.error("Error cleaning up expired sessions:", error);
+    }
+  }, 60 * 60 * 1000); // Run every hour
 
   // Generate a 6-digit verification code
   function generateVerificationCode(): string {
@@ -64,11 +70,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update last login time
       await storage.updateLastLogin(user.id);
 
-      // Create session
-      const sessionId = Math.random().toString(36).substring(2, 15);
-      userSessions.set(sessionId, { userId: user.id, email: user.email || '' });
+      // Create persistent session
+      const session = await storage.createSession(user.id, user.email || '');
 
-      res.cookie('sessionId', sessionId, { 
+      res.cookie('sessionId', session.id, { 
         httpOnly: true, 
         secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
@@ -85,25 +90,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const sessionId = req.cookies?.sessionId;
       
-      if (!sessionId || !userSessions.has(sessionId)) {
-        // Development bypass - use user ID 2 (Lyhakim)
-        const user = await storage.getUser(2);
-        if (user) {
-          return res.json({
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName,
-            isAuthenticated: true,
-          });
+      if (!sessionId) {
+        // Development-only bypass - strictly gated
+        if (process.env.NODE_ENV === 'development') {
+          const user = await storage.getUser(2);
+          if (user) {
+            return res.json({
+              id: user.id,
+              email: user.email,
+              firstName: user.firstName,
+              isAuthenticated: true,
+            });
+          }
         }
         return res.status(401).json({ error: "Not authenticated" });
       }
 
-      const session = userSessions.get(sessionId);
-      const user = await storage.getUser(session!.userId);
-      
+      const session = await storage.getSession(sessionId);
+      if (!session) {
+        // Development-only bypass - strictly gated
+        if (process.env.NODE_ENV === 'development') {
+          const user = await storage.getUser(2);
+          if (user) {
+            return res.json({
+              id: user.id,
+              email: user.email,
+              firstName: user.firstName,
+              isAuthenticated: true,
+            });
+          }
+        }
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const user = await storage.getUser(session.userId);
       if (!user) {
-        userSessions.delete(sessionId);
+        await storage.deleteSession(sessionId);
         return res.status(401).json({ error: "User not found" });
       }
 
@@ -124,21 +146,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const sessionId = req.cookies?.sessionId;
       
-      if (!sessionId || !userSessions.has(sessionId)) {
-        // Development bypass - use user ID 2 (Lyhakim)
-        const user = await storage.getUser(2);
-        if (user) {
-          req.user = user;
-          return next();
+      if (!sessionId) {
+        // Development-only bypass - strictly gated
+        if (process.env.NODE_ENV === 'development') {
+          const user = await storage.getUser(2);
+          if (user) {
+            req.user = user;
+            return next();
+          }
         }
         return res.status(401).json({ error: "Not authenticated" });
       }
 
-      const session = userSessions.get(sessionId);
-      const user = await storage.getUser(session!.userId);
-      
+      const session = await storage.getSession(sessionId);
+      if (!session) {
+        // Development-only bypass - strictly gated
+        if (process.env.NODE_ENV === 'development') {
+          const user = await storage.getUser(2);
+          if (user) {
+            req.user = user;
+            return next();
+          }
+        }
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const user = await storage.getUser(session.userId);
       if (!user) {
-        userSessions.delete(sessionId);
+        await storage.deleteSession(sessionId);
         return res.status(401).json({ error: "User not found" });
       }
 
@@ -175,6 +210,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       const climbs = await storage.getClimbsByUser(user.id);
+      
+      // Secure cache headers
+      res.set('Cache-Control', 'private, max-age=300');
+      res.set('Vary', 'Authorization');
+      
       res.json(climbs);
     } catch (error) {
       res.status(500).json({ error: "Failed to get climbs" });
@@ -249,6 +289,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       const today = format(new Date(), 'yyyy-MM-dd');
       const stats = await storage.getTodayStats(user.id, today);
+      
+      // Secure cache headers
+      res.set('Cache-Control', 'private, max-age=60');
+      res.set('Vary', 'Authorization');
+      
       res.json(stats);
     } catch (error) {
       res.status(500).json({ error: "Failed to get today's stats" });
@@ -264,10 +309,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const stats = await storage.getMonthlyStats(user.id, year, month);
       
-      // Prevent caching to ensure fresh data
-      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.set('Pragma', 'no-cache');
-      res.set('Expires', '0');
+      // Secure cache headers
+      res.set('Cache-Control', 'private, max-age=300');
+      res.set('Vary', 'Authorization');
       
       res.json(stats);
     } catch (error) {
@@ -281,6 +325,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       const months = await storage.getAvailableMonths(user.id);
+      
+      // Secure cache headers
+      res.set('Cache-Control', 'private, max-age=300');
+      res.set('Vary', 'Authorization');
+      
       res.json(months);
     } catch (error) {
       res.status(500).json({ error: "Failed to get available months" });
@@ -296,10 +345,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const progressionData = await storage.getGradeProgressionData(user.id, year, month);
       
-      // Prevent caching to ensure fresh data
-      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.set('Pragma', 'no-cache');
-      res.set('Expires', '0');
+      // Secure cache headers
+      res.set('Cache-Control', 'private, max-age=300');
+      res.set('Vary', 'Authorization');
       
       res.json(progressionData);
     } catch (error) {

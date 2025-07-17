@@ -31,13 +31,29 @@ export const climbs = pgTable("climbs", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  email: text("email").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const userRelations = relations(users, ({ many }) => ({
   climbs: many(climbs),
+  sessions: many(sessions),
 }));
 
 export const climbRelations = relations(climbs, ({ one }) => ({
   user: one(users, {
     fields: [climbs.userId],
+    references: [users.id],
+  }),
+}));
+
+export const sessionRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
     references: [users.id],
   }),
 }));
@@ -69,3 +85,4 @@ export type AuthUser = z.infer<typeof authUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertClimb = z.infer<typeof insertClimbSchema>;
 export type Climb = typeof climbs.$inferSelect;
+export type Session = typeof sessions.$inferSelect;
