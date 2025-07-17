@@ -33,10 +33,13 @@ export default function ClimbLog() {
     mutationFn: (id: number) => apiRequest(`/api/climbs/${id}`, { method: "DELETE" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["api", "climbs"] });
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today"] });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "api" && query.queryKey[1] === "stats" && query.queryKey[2] === "monthly" });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "api" && query.queryKey[1] === "stats" && query.queryKey[2] === "grade-progression" });
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "available-months"] });
+      // Invalidate all stats queries
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey;
+          return key[0] === "api" && key[1] === "stats";
+        }
+      });
       toast({ title: "Climb deleted successfully!" });
     },
     onError: () => {

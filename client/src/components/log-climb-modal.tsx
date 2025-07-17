@@ -48,11 +48,14 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     mutationFn: (data: any) => apiRequest("/api/climbs", { method: "POST", body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["api", "climbs"] });
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today"] });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "api" && query.queryKey[1] === "stats" && query.queryKey[2] === "monthly" });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "api" && query.queryKey[1] === "stats" && query.queryKey[2] === "grade-progression" });
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "available-months"] });
       queryClient.invalidateQueries({ queryKey: ["api", "user"] });
+      // Invalidate all stats queries
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey;
+          return key[0] === "api" && key[1] === "stats";
+        }
+      });
       toast({ title: "Climb logged successfully!" });
       onOpenChange(false);
       setFormData({
@@ -80,10 +83,13 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     mutationFn: (data: any) => apiRequest(`/api/climbs/${climb?.id}`, { method: "PUT", body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["api", "climbs"] });
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today"] });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "api" && query.queryKey[1] === "stats" && query.queryKey[2] === "monthly" });
-      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === "api" && query.queryKey[1] === "stats" && query.queryKey[2] === "grade-progression" });
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "available-months"] });
+      // Invalidate all stats queries
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey;
+          return key[0] === "api" && key[1] === "stats";
+        }
+      });
       toast({ title: "Climb updated successfully!" });
       onOpenChange(false);
     },
