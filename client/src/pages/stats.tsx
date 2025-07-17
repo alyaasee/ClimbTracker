@@ -155,16 +155,16 @@ export default function Stats() {
                         tick={{ fontSize: 12 }}
                       />
                       <YAxis 
-                        domain={[1, 12]}
+                        domain={[1, 10]}
                         tick={{ fontSize: 12 }}
                         tickFormatter={(value) => {
-                          const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c'];
+                          const grades = ['5c', '6a', '6a+', '6b', '6b+', '6c', '6c+', '7a', '7b', '7c'];
                           return grades[value - 1] || value;
                         }}
                       />
                       <Tooltip 
                         formatter={(value, name) => {
-                          const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c'];
+                          const grades = ['5c', '6a', '6a+', '6b', '6b+', '6c', '6c+', '7a', '7b', '7c'];
                           return [grades[value - 1] || value, 'Max Grade'];
                         }}
                       />
