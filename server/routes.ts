@@ -19,6 +19,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
+  // Helper function for development user lookup
+  async function getDevelopmentUser(email?: string): Promise<User | null> {
+    if (process.env.NODE_ENV !== 'development') {
+      return null;
+    }
+    
+    // Priority: passed email > environment variable > default
+    const userEmail = email || process.env.DEV_USER_EMAIL || 'lyhakim@gmail.com';
+    return await storage.getUserByEmail(userEmail);
+  }
+
   // Auth routes
   app.post("/api/auth/send-code", async (req, res) => {
     try {
@@ -93,7 +104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!sessionId) {
         // Development-only bypass - strictly gated
         if (process.env.NODE_ENV === 'development') {
-          const user = await storage.getUser(2);
+          const user = await getDevelopmentUser();
           if (user) {
             return res.json({
               id: user.id,
@@ -110,7 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!session) {
         // Development-only bypass - strictly gated
         if (process.env.NODE_ENV === 'development') {
-          const user = await storage.getUser(2);
+          const user = await getDevelopmentUser();
           if (user) {
             return res.json({
               id: user.id,
@@ -149,7 +160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!sessionId) {
         // Development-only bypass - strictly gated
         if (process.env.NODE_ENV === 'development') {
-          const user = await storage.getUser(2);
+          const user = await getDevelopmentUser();
           if (user) {
             req.user = user;
             return next();
@@ -162,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!session) {
         // Development-only bypass - strictly gated
         if (process.env.NODE_ENV === 'development') {
-          const user = await storage.getUser(2);
+          const user = await getDevelopmentUser();
           if (user) {
             req.user = user;
             return next();

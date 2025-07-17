@@ -8,6 +8,15 @@ This is a full-stack climbing tracking application built with React, Express, an
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+### Email-Based User Identification (July 17, 2025)
+- Updated authentication system to use email-based user identification instead of hardcoded user IDs
+- Created `getDevelopmentUser()` helper function for flexible development testing
+- Added `DEV_USER_EMAIL` environment variable for customizable development user
+- Enhanced `getUserByEmailOrCreate()` method for user lookup and creation
+- All security fixes maintained: environment-gated bypass, secure cache headers, user-specific query keys, persistent sessions
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -103,6 +112,7 @@ Preferred communication style: Simple, everyday language.
 ### Environment Requirements
 - **DATABASE_URL**: PostgreSQL connection string (required)
 - **NODE_ENV**: Environment setting (development/production)
+- **DEV_USER_EMAIL**: Email for development user bypass (optional, defaults to 'lyhakim@gmail.com')
 
 ### Scripts
 - `npm run dev`: Start development server with hot reload

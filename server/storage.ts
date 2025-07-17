@@ -12,6 +12,7 @@ export interface IStorage {
   
   // Auth methods
   createAuthUser(email: string, firstName?: string): Promise<User>;
+  getUserByEmailOrCreate(email: string, firstName?: string): Promise<User>;
   updateVerificationCode(email: string, code: string, expiresAt: Date): Promise<void>;
   verifyUser(email: string, code: string): Promise<User | null>;
   updateLastLogin(userId: number): Promise<void>;
@@ -80,14 +81,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createAuthUser(email: string, firstName?: string): Promise<User> {
-    // Extract name from email if not provided
-    const nameFromEmail = firstName || email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    // Use provided firstName or keep email as the primary identifier
+    const userFirstName = firstName || email.split('@')[0];
     
     const [user] = await db
       .insert(users)
       .values({
         email,
-        firstName: nameFromEmail,
+        firstName: userFirstName,
         isVerified: false,
       })
       .returning();
@@ -144,6 +145,17 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ firstName })
       .where(eq(users.id, userId));
+  }
+
+  async getUserByEmailOrCreate(email: string, firstName?: string): Promise<User> {
+    // Try to find existing user by email
+    const existingUser = await this.getUserByEmail(email);
+    if (existingUser) {
+      return existingUser;
+    }
+    
+    // If not found, create new user
+    return await this.createAuthUser(email, firstName);
   }
 
   async updateUserStreak(userId: number, streak: number, lastClimbDate: string): Promise<void> {
