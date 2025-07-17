@@ -33,8 +33,16 @@ export default function MobileHeader() {
     }
   };
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout");
+      // Clear any cached data and redirect to login
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Force redirect even if logout fails
+      window.location.href = "/";
+    }
   };
 
   return (

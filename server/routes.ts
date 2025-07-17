@@ -198,6 +198,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   };
 
+  // Logout route
+  app.get("/api/logout", async (req, res) => {
+    try {
+      const sessionId = req.cookies?.sessionId;
+      if (sessionId) {
+        await storage.deleteSession(sessionId);
+        res.clearCookie('sessionId');
+      }
+      res.json({ message: "Logged out successfully" });
+    } catch (error) {
+      console.error("Logout error:", error);
+      res.status(500).json({ error: "Failed to logout" });
+    }
+  });
+
   // Get current user data
   app.get("/api/user", requireAuth, async (req: any, res) => {
     try {
