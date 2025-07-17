@@ -61,22 +61,15 @@ export default function MobileHeader() {
             <DropdownMenuContent align="start" className="w-64">
               <DropdownMenuLabel>Profile</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex items-center space-x-3 p-3">
+              <DropdownMenuItem className="flex items-center space-x-3 p-3 cursor-pointer">
                 <User className="w-4 h-4 text-gray-500" />
                 <div className="flex flex-col">
                   <span className="text-sm font-medium text-gray-900">
                     {user?.firstName || "User"}
                   </span>
-                  <span className="text-xs text-gray-500">Name</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center space-x-3 p-3">
-                <Mail className="w-4 h-4 text-gray-500" />
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-xs text-gray-500">
                     {user?.email || "user@example.com"}
                   </span>
-                  <span className="text-xs text-gray-500">Email</span>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
