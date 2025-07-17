@@ -41,6 +41,13 @@ Preferred communication style: Simple, everyday language.
 - Fixed cache invalidation to ensure name updates reflect immediately on home page
 - Profile images are stored as base64 data URLs for seamless integration
 
+### Profile Data Persistence Fix (July 17, 2025)
+- Fixed profile photo persistence - uploaded photos now save and display when returning to profile page
+- Enhanced home page to immediately reflect name changes after profile updates
+- Added profile image display in hamburger menu dropdown with proper fallback
+- Updated server responses to include profileImageUrl in all authentication endpoints
+- Improved cache invalidation to sync profile changes across all app components
+
 ## System Architecture
 
 ### Frontend Architecture
