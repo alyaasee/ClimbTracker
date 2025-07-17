@@ -40,7 +40,9 @@ export default function Profile() {
   const updateProfileMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/profile", { method: "PUT", body: data }),
     onSuccess: () => {
+      // Invalidate all user-related queries to ensure updates are reflected everywhere
       queryClient.invalidateQueries({ queryKey: ["api", "auth", "user"] });
+      queryClient.invalidateQueries({ queryKey: ["api", "user"] });
       toast({ title: "Profile updated successfully!" });
     },
     onError: (error: any) => {

@@ -32,6 +32,15 @@ Preferred communication style: Simple, everyday language.
 - Added logout functionality with red styling for clear user action
 - Responsive dropdown design that fits mobile-first interface
 
+### Profile Page with Photo Upload (July 17, 2025)
+- Created dedicated profile page accessible from hamburger menu
+- Added name editing functionality with immediate updates across the app
+- Implemented profile photo upload with automatic image compression
+- Added profile image persistence - photos are saved and displayed when returning
+- Enhanced mobile header to show profile photos in dropdown menu
+- Fixed cache invalidation to ensure name updates reflect immediately on home page
+- Profile images are stored as base64 data URLs for seamless integration
+
 ## System Architecture
 
 ### Frontend Architecture

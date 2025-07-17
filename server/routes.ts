@@ -110,6 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               id: user.id,
               email: user.email,
               firstName: user.firstName,
+              profileImageUrl: user.profileImageUrl,
               isAuthenticated: true,
             });
           }
@@ -127,6 +128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               id: user.id,
               email: user.email,
               firstName: user.firstName,
+              profileImageUrl: user.profileImageUrl,
               isAuthenticated: true,
             });
           }

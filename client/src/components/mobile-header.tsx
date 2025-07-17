@@ -65,7 +65,19 @@ export default function MobileHeader() {
                 onClick={() => setLocation("/profile")}
                 className="flex items-center space-x-3 p-3 cursor-pointer"
               >
-                <User className="w-4 h-4 text-gray-500" />
+                <div className="w-8 h-8 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                  {user?.profileImageUrl ? (
+                    <img 
+                      src={user.profileImageUrl} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                      <User className="w-4 h-4 text-gray-500" />
+                    </div>
+                  )}
+                </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium text-gray-900">
                     {user?.firstName || "User"}
