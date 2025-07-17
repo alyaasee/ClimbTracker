@@ -23,9 +23,15 @@ export default function ClimbLog() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: climbs = [] } = useQuery({
+  const { data: climbs = [], isLoading, error } = useQuery({
     queryKey: ["climbs"],
   });
+
+  // Debug logging
+  console.log('Climbs data:', climbs);
+  console.log('Climbs length:', climbs.length);
+  console.log('Query loading:', isLoading);
+  console.log('Query error:', error);
 
   const deleteClimbMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/climbs/${id}`, { method: "DELETE" }),
