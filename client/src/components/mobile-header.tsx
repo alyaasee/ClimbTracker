@@ -1,9 +1,25 @@
 import { useLocation } from "wouter";
-import { Menu } from "lucide-react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Menu, User, Mail, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function MobileHeader() {
   const [location] = useLocation();
+  const [profileOpen, setProfileOpen] = useState(false);
   
+  const { data: user } = useQuery({
+    queryKey: ["api", "auth", "user"],
+  });
+
   const getTitle = () => {
     switch (location) {
       case "/":
@@ -15,6 +31,10 @@ export default function MobileHeader() {
       default:
         return "Home";
     }
+  };
+
+  const handleLogout = () => {
+    window.location.href = "/api/logout";
   };
 
   return (
@@ -32,9 +52,43 @@ export default function MobileHeader() {
       {/* Navigation Header */}
       <header className="px-4 py-4 bg-white border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <button className="p-2 -ml-2">
-            <Menu className="w-5 h-5 text-gray-600" />
-          </button>
+          <DropdownMenu open={profileOpen} onOpenChange={setProfileOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="p-2 -ml-2">
+                <Menu className="w-5 h-5 text-gray-600" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-64">
+              <DropdownMenuLabel>Profile</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="flex items-center space-x-3 p-3">
+                <User className="w-4 h-4 text-gray-500" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-gray-900">
+                    {user?.firstName || "User"}
+                  </span>
+                  <span className="text-xs text-gray-500">Name</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center space-x-3 p-3">
+                <Mail className="w-4 h-4 text-gray-500" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-gray-900">
+                    {user?.email || "user@example.com"}
+                  </span>
+                  <span className="text-xs text-gray-500">Email</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={handleLogout}
+                className="flex items-center space-x-3 p-3 text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="text-sm font-medium">Log Out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <h1 className="text-lg font-semibold text-gray-900">{getTitle()}</h1>
           <div className="w-8"></div>
         </div>

@@ -25,6 +25,13 @@ Preferred communication style: Simple, everyday language.
 - Enhanced `getUserByEmailOrCreate()` method for user lookup and creation
 - All security fixes maintained: environment-gated bypass, secure cache headers, user-specific query keys, persistent sessions
 
+### Hamburger Menu Profile Dropdown (July 17, 2025)
+- Made hamburger menu (three horizontal bars) clickable in mobile header
+- Added dropdown menu displaying user profile information (name and email)
+- Included profile icons for better visual hierarchy
+- Added logout functionality with red styling for clear user action
+- Responsive dropdown design that fits mobile-first interface
+
 ## System Architecture
 
 ### Frontend Architecture
