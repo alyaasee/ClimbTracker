@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Data Display and Stats Fixes (July 17, 2025)
+- Fixed climb log display issue by updating query keys to use correct API paths ("/api/climbs")
+- Resolved stats page month selection - dropdown now properly shows available months with logged climbs
+- Fixed grade progression chart mapping issue - chart now correctly displays grades (6c+ instead of 7a)
+- Updated frontend grade array to match backend system: ['5c', '6a', '6a+', '6b', '6b+', '6c', '6c+', '7a', '7b', '7c']
+- Stats cards now only display when a month is selected, proper empty state handling
+- Fixed cache invalidation across all components to use consistent "api" prefix in query keys
+
 ### Email-Based User Identification (July 17, 2025)
 - Updated authentication system to use email-based user identification instead of hardcoded user IDs
 - Created `getDevelopmentUser()` helper function for flexible development testing
