@@ -113,59 +113,7 @@ export default function ClimbLog() {
 
   return (
     <div className="py-4">
-      <div className="flex items-center justify-end mb-6">
-        <div className="flex items-center space-x-3">
-          <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className={`p-2 ${dateRange?.from ? 'text-blue-600 hover:text-blue-700' : 'text-gray-600 hover:text-gray-900'}`}
-              >
-                <Filter className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <div className="p-3 border-b">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-medium">Filter by date</h4>
-                  {dateRange?.from && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setDateRange(undefined)}
-                      className="text-xs"
-                    >
-                      Clear
-                    </Button>
-                  )}
-                </div>
-                {dateRange?.from && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    {dateRange.to 
-                      ? `${format(dateRange.from, 'MMM d')} - ${format(dateRange.to, 'MMM d, yyyy')}`
-                      : format(dateRange.from, 'MMM d, yyyy')
-                    }
-                  </p>
-                )}
-              </div>
-              <Calendar
-                mode="range"
-                selected={dateRange}
-                onSelect={setDateRange}
-                numberOfMonths={1}
-                className="rounded-md"
-              />
-            </PopoverContent>
-          </Popover>
-          <Button
-            onClick={() => setShowLogModal(true)}
-            className="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center p-0"
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
+
 
       {Object.keys(groupedClimbs).length === 0 ? (
         <div className="text-center py-12">
@@ -181,11 +129,66 @@ export default function ClimbLog() {
         </div>
       ) : (
         <div className="space-y-6">
-          {Object.entries(groupedClimbs).map(([date, dateClimbs]: [string, any[]]) => (
+          {Object.entries(groupedClimbs).map(([date, dateClimbs]: [string, any[]], index) => (
             <div key={date} className="space-y-3">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {formatDate(date)}
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {formatDate(date)}
+                </h3>
+                {index === 0 && (
+                  <div className="flex items-center space-x-3">
+                    <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
+                      <PopoverTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className={`p-2 ${dateRange?.from ? 'text-blue-600 hover:text-blue-700' : 'text-gray-600 hover:text-gray-900'}`}
+                        >
+                          <Filter className="w-4 h-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="end">
+                        <div className="p-3 border-b">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium">Filter by date</h4>
+                            {dateRange?.from && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDateRange(undefined)}
+                                className="text-xs"
+                              >
+                                Clear
+                              </Button>
+                            )}
+                          </div>
+                          {dateRange?.from && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {dateRange.to 
+                                ? `${format(dateRange.from, 'MMM d')} - ${format(dateRange.to, 'MMM d, yyyy')}`
+                                : format(dateRange.from, 'MMM d, yyyy')
+                              }
+                            </p>
+                          )}
+                        </div>
+                        <Calendar
+                          mode="range"
+                          selected={dateRange}
+                          onSelect={setDateRange}
+                          numberOfMonths={1}
+                          className="rounded-md"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <Button
+                      onClick={() => setShowLogModal(true)}
+                      className="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center p-0"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
               <div className="space-y-2">
                 {dateClimbs.map((climb: any) => (
                   <Card key={climb.id} className="bg-white shadow-sm border border-gray-100">
