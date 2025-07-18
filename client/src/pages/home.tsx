@@ -89,7 +89,7 @@ export default function Home() {
       {/* Log Climb CTA */}
       <Button
         onClick={() => setShowLogModal(true)}
-        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-6 px-6 rounded-xl font-semibold text-lg mb-4 flex items-center justify-center space-x-2 shadow-lg"
+        className="w-full bg-gradient-to-r from-[#BCCFF2] to-[#F0FECC] hover:from-[#A8BFE8] hover:to-[#E6F7B8] text-gray-800 py-6 px-6 rounded-xl font-semibold text-lg mb-4 flex items-center justify-center space-x-2 shadow-lg"
       >
         <Plus className="w-5 h-5" />
         <span>Log Climb</span>

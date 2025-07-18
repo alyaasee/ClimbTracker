@@ -182,7 +182,7 @@ export default function ClimbLog() {
                     </Popover>
                     <Button
                       onClick={() => setShowLogModal(true)}
-                      className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full flex items-center justify-center p-0 shadow-lg"
+                      className="w-10 h-10 bg-gradient-to-r from-[#BCCFF2] to-[#F0FECC] hover:from-[#A8BFE8] hover:to-[#E6F7B8] text-gray-800 rounded-full flex items-center justify-center p-0 shadow-lg"
                     >
                       <Plus className="w-4 h-4" />
                     </Button>
