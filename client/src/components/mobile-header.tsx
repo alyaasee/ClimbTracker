@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { User, Mail, LogOut } from "lucide-react";
+import { User, Mail, LogOut, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,13 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Lottie from "lottie-react";
-import burgerAnimation from "@/assets/burger-animation.json";
 
 export default function MobileHeader() {
   const [location, setLocation] = useLocation();
   const [profileOpen, setProfileOpen] = useState(false);
-  const [animationTrigger, setAnimationTrigger] = useState(0);
   
   const { data: user } = useQuery({
     queryKey: ["api", "auth", "user"],
@@ -50,9 +47,6 @@ export default function MobileHeader() {
 
   const handleDropdownChange = (open: boolean) => {
     setProfileOpen(open);
-    if (open) {
-      setAnimationTrigger(prev => prev + 1);
-    }
   };
 
   return (
@@ -73,15 +67,7 @@ export default function MobileHeader() {
           <DropdownMenu open={profileOpen} onOpenChange={handleDropdownChange}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="p-2 -ml-2">
-                <div className="w-6 h-6 flex items-center justify-center">
-                  <Lottie 
-                    key={animationTrigger}
-                    animationData={burgerAnimation} 
-                    loop={false}
-                    autoplay={false}
-                    style={{ width: '24px', height: '24px' }}
-                  />
-                </div>
+                <Menu className="w-6 h-6 text-gray-600" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-64">
