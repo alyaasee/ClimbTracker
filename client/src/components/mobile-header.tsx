@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Menu, User, Mail, LogOut } from "lucide-react";
+import { User, Mail, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,10 +11,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Lottie from "lottie-react";
+import burgerAnimation from "@/assets/burger-animation.json";
 
 export default function MobileHeader() {
   const [location, setLocation] = useLocation();
   const [profileOpen, setProfileOpen] = useState(false);
+  const lottieRef = useRef<any>(null);
   
   const { data: user } = useQuery({
     queryKey: ["api", "auth", "user"],
@@ -45,6 +48,13 @@ export default function MobileHeader() {
     }
   };
 
+  const handleDropdownChange = (open: boolean) => {
+    setProfileOpen(open);
+    if (open && lottieRef.current) {
+      lottieRef.current.play();
+    }
+  };
+
   return (
     <>
       {/* Status Bar */}
@@ -60,10 +70,18 @@ export default function MobileHeader() {
       {/* Navigation Header */}
       <header className="px-4 py-4 bg-white/80 backdrop-blur-sm border-b border-white/20">
         <div className="flex items-center justify-between">
-          <DropdownMenu open={profileOpen} onOpenChange={setProfileOpen}>
+          <DropdownMenu open={profileOpen} onOpenChange={handleDropdownChange}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="p-2 -ml-2">
-                <Menu className="w-5 h-5 text-gray-600" />
+                <div className="w-6 h-6">
+                  <Lottie 
+                    ref={lottieRef}
+                    animationData={burgerAnimation} 
+                    loop={false}
+                    autoplay={false}
+                    style={{ width: '24px', height: '24px' }}
+                  />
+                </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-64">
