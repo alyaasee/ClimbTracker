@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { User, Mail, LogOut, Menu } from "lucide-react";
+import { User, Mail, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import burgerIcon from "@assets/burger_877951_1752826463530.png";
 
 export default function MobileHeader() {
   const [location, setLocation] = useLocation();
@@ -67,7 +68,11 @@ export default function MobileHeader() {
           <DropdownMenu open={profileOpen} onOpenChange={handleDropdownChange}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="p-2 -ml-2">
-                <Menu className="w-6 h-6 text-gray-600" />
+                <img 
+                  src={burgerIcon} 
+                  alt="Menu" 
+                  className="w-6 h-6"
+                />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-64">
