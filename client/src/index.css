@@ -39,9 +39,9 @@
   --radius: 0.5rem;
   
   /* Custom gradient colors */
-  --perano: #BCCFF2;
-  --chiffon: #F0FECC;
-  --gradient-bg: linear-gradient(135deg, #BCCFF2 0%, #F0FECC 100%);
+  --surf-crest: #CEE4D2;
+  --tango: #EF7326;
+  --gradient-bg: linear-gradient(135deg, #CEE4D2 0%, #EF7326 100%);
 }
 
 .dark {
