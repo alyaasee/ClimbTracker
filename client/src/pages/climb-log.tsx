@@ -114,9 +114,8 @@ export default function ClimbLog() {
   return (
     <div className="py-4">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex-1"></div>
-        <h2 className="text-2xl font-bold text-gray-900 text-center">Climb Log</h2>
-        <div className="flex-1 flex items-center justify-end space-x-3">
+        <h2 className="text-2xl font-bold text-gray-900 pl-2">Climb Log</h2>
+        <div className="flex items-center space-x-3">
           <Popover open={showDateFilter} onOpenChange={setShowDateFilter}>
             <PopoverTrigger asChild>
               <Button 

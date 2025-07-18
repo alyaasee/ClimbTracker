@@ -105,8 +105,7 @@ export default function MobileHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <h1 className="text-lg font-semibold text-gray-900 flex-1 text-center">{getTitle()}</h1>
-          <div className="w-8"></div>
+
         </div>
       </header>
     </>
