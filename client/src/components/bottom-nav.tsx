@@ -12,7 +12,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-11/12 max-w-sm bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg">
+    <nav className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-11/12 max-w-sm bg-white backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg">
       <div className="flex justify-around py-3">
         {navItems.map((item) => {
           const isActive = location === item.href;
