@@ -2,16 +2,16 @@
 
 /* Custom Font */
 @font-face {
-  font-family: 'TestMartinaPlantijn';
-  src: url('./assets/TestMartinaPlantijn-Medium.otf') format('opentype');
-  font-weight: 500;
+  font-family: 'Inter';
+  src: url('./assets/Inter.ttc') format('truetype-collection');
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
 /* Custom header title font class */
 .header-title {
-  font-family: 'TestMartinaPlantijn', serif;
+  font-family: 'Inter', sans-serif;
 }
 
 @tailwind base;
