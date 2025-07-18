@@ -45,12 +45,12 @@ export default function Stats() {
     return `${monthName.slice(0, 3)} ${year}`;
   };
 
-  // Route type colors
+  // Route type colors using Surf Crest and Tango gradient system
   const routeTypeColors = {
-    'Boulder': '#3B82F6',
-    'Top Rope': '#EF4444', 
-    'Lead': '#10B981',
-    'Auto Belay': '#F59E0B'
+    'Boulder': '#CEE4D2',      // Surf Crest
+    'Top Rope': '#EF7326',     // Tango
+    'Lead': '#B8D4BE',         // Darker Surf Crest
+    'Auto Belay': '#E5631A'    // Darker Tango
   };
 
   // Empty state check
@@ -171,9 +171,9 @@ export default function Stats() {
                       <Line 
                         type="monotone" 
                         dataKey="gradeValue" 
-                        stroke="#3B82F6" 
+                        stroke="#EF7326" 
                         strokeWidth={2}
-                        dot={{ r: 4 }}
+                        dot={{ r: 4, fill: '#CEE4D2', stroke: '#EF7326' }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
