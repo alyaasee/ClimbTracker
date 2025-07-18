@@ -107,7 +107,7 @@ export default function Stats() {
                   <Mountain className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div className="text-sm text-gray-600 mb-1 h-5 flex items-center">Max Grade</div>
-                <div className="text-2xl font-bold gradient-text h-8 flex items-center">
+                <div className="text-2xl font-bold text-gray-900 h-8 flex items-center">
                   {monthlyStats?.maxGrade || '5a'}
                 </div>
               </CardContent>
@@ -119,7 +119,7 @@ export default function Stats() {
                   <TrendingUp className="w-5 h-5 text-blue-600" />
                 </div>
                 <div className="text-sm text-gray-600 mb-1 h-5 flex items-center">Total Climbs</div>
-                <div className="text-2xl font-bold gradient-text h-8 flex items-center">
+                <div className="text-2xl font-bold text-gray-900 h-8 flex items-center">
                   {monthlyStats?.totalClimbs || 0}
                 </div>
               </CardContent>
@@ -131,7 +131,7 @@ export default function Stats() {
                   <Target className="w-5 h-5 text-purple-600" />
                 </div>
                 <div className="text-sm text-gray-600 mb-1 h-5 flex items-center">Success Rate</div>
-                <div className="text-2xl font-bold gradient-text h-8 flex items-center">
+                <div className="text-2xl font-bold text-gray-900 h-8 flex items-center">
                   {monthlyStats?.successRate || 0}%
                 </div>
               </CardContent>
@@ -141,7 +141,7 @@ export default function Stats() {
           {/* Grade Progression Chart */}
           <Card className="bg-white/70 backdrop-blur-sm shadow-sm border border-white/30 mb-6">
             <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-perano mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Grade Progression
               </h3>
               
@@ -189,7 +189,7 @@ export default function Stats() {
           {/* Route Type Breakdown */}
           <Card className="bg-white/70 backdrop-blur-sm shadow-sm border border-white/30">
             <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-chiffon mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Route Type Breakdown
               </h3>
               
