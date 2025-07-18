@@ -3,9 +3,9 @@
 /* Custom Font */
 @font-face {
   font-family: 'TestMartinaPlantijn';
-  src: url('./assets/TestMartinaPlantijn-MediumItalic.otf') format('opentype');
+  src: url('./assets/TestMartinaPlantijn-Medium.otf') format('opentype');
   font-weight: 500;
-  font-style: italic;
+  font-style: normal;
   font-display: swap;
 }
 
