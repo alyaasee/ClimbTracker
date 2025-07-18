@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { User, Mail, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import burgerAnimation from "@/assets/burger-animation.json";
 export default function MobileHeader() {
   const [location, setLocation] = useLocation();
   const [profileOpen, setProfileOpen] = useState(false);
-  const lottieRef = useRef<any>(null);
+  const [animationTrigger, setAnimationTrigger] = useState(0);
   
   const { data: user } = useQuery({
     queryKey: ["api", "auth", "user"],
@@ -50,8 +50,8 @@ export default function MobileHeader() {
 
   const handleDropdownChange = (open: boolean) => {
     setProfileOpen(open);
-    if (open && lottieRef.current) {
-      lottieRef.current.play();
+    if (open) {
+      setAnimationTrigger(prev => prev + 1);
     }
   };
 
@@ -73,9 +73,9 @@ export default function MobileHeader() {
           <DropdownMenu open={profileOpen} onOpenChange={handleDropdownChange}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="p-2 -ml-2">
-                <div className="w-6 h-6">
+                <div className="w-6 h-6 flex items-center justify-center">
                   <Lottie 
-                    ref={lottieRef}
+                    key={animationTrigger}
                     animationData={burgerAnimation} 
                     loop={false}
                     autoplay={false}
