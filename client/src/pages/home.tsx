@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mountain, Zap, Flame, Target, Plus } from "lucide-react";
 import LogClimbModal from "@/components/log-climb-modal";
-import fireImage from "@assets/image_1752830931967.png";
 
 export default function Home() {
   const [showLogModal, setShowLogModal] = useState(false);
@@ -84,9 +83,13 @@ export default function Home() {
             <span className="text-base font-medium">-day streak!</span>
             {(user?.currentStreak || 0) >= 1 && (
               <img 
-                src={fireImage} 
+                src="/fire-icon.png" 
                 alt="Fire" 
-                className="w-8 h-8 object-contain"
+                className="w-8 h-8 object-contain animate-pulse"
+                onError={(e) => {
+                  // Fallback to emoji if image fails to load
+                  e.currentTarget.outerHTML = '<span class="text-2xl animate-pulse">🔥</span>';
+                }}
               />
             )}
           </div>
