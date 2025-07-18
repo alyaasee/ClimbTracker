@@ -19,7 +19,7 @@ function Router() {
 
   if (isLoading) {
     return (
-      <div className="max-w-sm mx-auto min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #CEE4D2 0%, #CEE4D2 75%, #EF7326 100%)' }}>
+      <div className="max-w-sm mx-auto min-h-screen flex items-center justify-center dynamic-gradient">
         <div className="text-center">
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 mx-auto">
             <span className="text-white font-bold text-xl">🧗</span>
@@ -40,7 +40,7 @@ function Router() {
   }
 
   return (
-    <div className="max-w-sm mx-auto min-h-screen relative" style={{ background: 'linear-gradient(135deg, #CEE4D2 0%, #CEE4D2 75%, #EF7326 100%)' }}>
+    <div className="max-w-sm mx-auto min-h-screen relative dynamic-gradient">
       <MobileHeader />
       <main className="pb-20 px-3">
         <Switch>
