@@ -30,6 +30,9 @@
   --perano: #BCCFF2;
   --chiffon: #F0FECC;
   --gradient-bg: linear-gradient(135deg, #BCCFF2 0%, #F0FECC 100%);
+  --gradient-text: linear-gradient(135deg, #4A90E2 0%, #7CB342 100%);
+  --perano-dark: #4A90E2;
+  --chiffon-dark: #7CB342;
 }
 
 .dark {
@@ -68,5 +71,22 @@
     @apply font-sans antialiased text-foreground;
     background: var(--gradient-bg);
     min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .gradient-text {
+    background: var(--gradient-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-perano {
+    color: var(--perano-dark);
+  }
+  
+  .text-chiffon {
+    color: var(--chiffon-dark);
   }
 }

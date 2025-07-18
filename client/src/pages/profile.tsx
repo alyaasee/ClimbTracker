@@ -224,7 +224,7 @@ export default function Profile() {
           />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold gradient-text">
             {formData.firstName || "User"}
           </h2>
           <p className="text-gray-500">{user?.email}</p>
@@ -234,7 +234,7 @@ export default function Profile() {
       {/* Edit Profile Form */}
       <Card>
         <CardHeader>
-          <CardTitle>Edit Profile</CardTitle>
+          <CardTitle className="gradient-text">Edit Profile</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
