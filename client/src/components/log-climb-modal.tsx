@@ -311,23 +311,24 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="climbDate">Date *</Label>
+            <Label htmlFor="climbDate" className="form-label">Date</Label>
             <Input
               id="climbDate"
               type="date"
               value={formData.climbDate}
               onChange={(e) => setFormData({ ...formData, climbDate: e.target.value })}
               required
+              className="form-input"
             />
           </div>
 
           <div>
-            <Label htmlFor="gym">Gym *</Label>
+            <Label htmlFor="gym" className="form-label">Location</Label>
             <Select
               value={formData.gym}
               onValueChange={(value) => setFormData({ ...formData, gym: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="form-input">
                 <SelectValue placeholder="Select gym" />
               </SelectTrigger>
               <SelectContent>
@@ -339,12 +340,12 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
           </div>
 
           <div>
-            <Label htmlFor="routeType">Route Type *</Label>
+            <Label htmlFor="routeType" className="form-label">Style</Label>
             <Select
               value={formData.routeType}
               onValueChange={(value) => setFormData({ ...formData, routeType: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="form-input">
                 <SelectValue placeholder="Select route type" />
               </SelectTrigger>
               <SelectContent>
@@ -357,12 +358,12 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
           </div>
 
           <div>
-            <Label htmlFor="grade">Grade *</Label>
+            <Label htmlFor="grade" className="form-label">Grade</Label>
             <Select
               value={formData.grade}
               onValueChange={(value) => setFormData({ ...formData, grade: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="form-input">
                 <SelectValue placeholder="Select grade" />
               </SelectTrigger>
               <SelectContent>
@@ -381,12 +382,12 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
           </div>
 
           <div>
-            <Label htmlFor="outcome">Outcome *</Label>
+            <Label htmlFor="outcome" className="form-label">Outcome</Label>
             <Select
               value={formData.outcome}
               onValueChange={(value) => setFormData({ ...formData, outcome: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="form-input">
                 <SelectValue placeholder="Select outcome" />
               </SelectTrigger>
               <SelectContent>
@@ -399,7 +400,7 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
           </div>
 
           <div>
-            <Label htmlFor="media">Photos/Videos</Label>
+            <Label htmlFor="media" className="form-label">Photos/Videos</Label>
             <div className="space-y-2">
               <div className="flex space-x-2">
                 <Button

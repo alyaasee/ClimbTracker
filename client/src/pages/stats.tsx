@@ -62,7 +62,7 @@ export default function Stats() {
       
       {/* Month Selector */}
       <div className="mb-6">
-        <Label className="block text-sm font-medium text-gray-700 mb-2">
+        <Label className="block text-sm font-medium text-gray-700 mb-2 form-label">
           Select Month
         </Label>
         <Select

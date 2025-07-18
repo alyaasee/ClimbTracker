@@ -239,7 +239,7 @@ export default function Profile() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="firstName">Name *</Label>
+              <Label htmlFor="firstName" className="form-label">Name</Label>
               <Input
                 id="firstName"
                 type="text"
@@ -247,6 +247,7 @@ export default function Profile() {
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 placeholder="Enter your name"
                 required
+                className="form-input"
               />
             </div>
 
