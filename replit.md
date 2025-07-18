@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Real-time Home Page Updates Fix (July 18, 2025)
+- Fixed home page summary tiles not updating dynamically when logging new climbs
+- Added explicit cache invalidation for today's stats query (`["api", "stats", "today"]`)
+- Updated both create and update climb mutations to properly invalidate today's stats
+- Updated delete climb mutation to also invalidate today's stats for consistency
+- Home page now reflects new climb data immediately after logging without requiring refresh
+
 ### Data Display and Stats Fixes (July 17, 2025)
 - Fixed climb log display issue by updating query keys to use correct API paths ("/api/climbs")
 - Resolved stats page month selection - dropdown now properly shows available months with logged climbs

@@ -49,7 +49,8 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["api", "climbs"] });
       queryClient.invalidateQueries({ queryKey: ["api", "user"] });
-      // Invalidate all stats queries
+      // Invalidate all stats queries including today's stats
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today"] });
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const key = query.queryKey;
@@ -91,7 +92,8 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     mutationFn: (data: any) => apiRequest(`/api/climbs/${climb?.id}`, { method: "PUT", body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["api", "climbs"] });
-      // Invalidate all stats queries
+      // Invalidate all stats queries including today's stats
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today"] });
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const key = query.queryKey;

@@ -33,7 +33,8 @@ export default function ClimbLog() {
     mutationFn: (id: number) => apiRequest(`/api/climbs/${id}`, { method: "DELETE" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["api", "climbs"] });
-      // Invalidate all stats queries
+      // Invalidate all stats queries including today's stats
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today"] });
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const key = query.queryKey;
