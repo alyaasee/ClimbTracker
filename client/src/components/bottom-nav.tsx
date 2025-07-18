@@ -12,18 +12,18 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-white border-t border-gray-200">
-      <div className="flex justify-around py-2">
+    <nav className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-11/12 max-w-sm bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg">
+      <div className="flex justify-around py-3">
         {navItems.map((item) => {
           const isActive = location === item.href;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center py-2 px-4 ${
+              className={`flex flex-col items-center py-2 px-4 rounded-xl transition-all duration-200 ${
                 isActive
-                  ? "text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "text-blue-600 bg-white/30"
+                  : "text-gray-700 hover:text-gray-900 hover:bg-white/20"
               }`}
             >
               <item.icon className="w-5 h-5 mb-1" />
