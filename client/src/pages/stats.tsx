@@ -58,7 +58,7 @@ export default function Stats() {
 
   return (
     <div className="py-4">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 pl-2">Stats</h2>
+
       
       {/* Month Selector */}
       <div className="mb-6">

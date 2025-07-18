@@ -68,7 +68,7 @@ export default function Home() {
     <div className="py-2 px-0">
       {/* Welcome Section */}
       <div className="py-3 mb-4">
-        <h2 className="text-2xl font-bold text-gray-900 mb-3 pl-2">
+        <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
           {user?.lastLoginAt ? 
             `Welcome back, ${authUser?.firstName || user?.firstName || "Climber"}!` : 
             `Welcome, ${authUser?.firstName || user?.firstName || "Climber"}!`
