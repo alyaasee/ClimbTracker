@@ -1,5 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
 
+/* Custom Font */
+@font-face {
+  font-family: 'TestMartinaPlantijn';
+  src: url('./assets/TestMartinaPlantijn-MediumItalic.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Custom header title font class */
+.header-title {
+  font-family: 'TestMartinaPlantijn', serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
