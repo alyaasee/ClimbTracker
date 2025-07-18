@@ -75,7 +75,7 @@ export default function Stats() {
             }
           }}
         >
-          <SelectTrigger className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg">
+          <SelectTrigger className="w-full px-3 py-3 bg-gray-100 border border-gray-200 rounded-lg">
             <SelectValue placeholder="Select month" />
           </SelectTrigger>
           <SelectContent>

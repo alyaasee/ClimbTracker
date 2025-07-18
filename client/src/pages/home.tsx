@@ -65,7 +65,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="py-2 px-0">
+    <div className="py-2">
       {/* Welcome Section */}
       <div className="py-3 mb-4">
         <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">

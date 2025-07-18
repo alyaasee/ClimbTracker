@@ -167,7 +167,7 @@ export default function Profile() {
 
   if (isLoading) {
     return (
-      <div className="py-2 px-4 flex items-center justify-center min-h-[50vh]">
+      <div className="py-2 flex items-center justify-center min-h-[50vh]">
         <div className="text-center">
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 mx-auto">
             <span className="text-white font-bold text-xl">🧗</span>
@@ -179,7 +179,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="py-2 px-4 space-y-6">
+    <div className="py-2 space-y-6">
       {/* Back Button */}
       <Button
         variant="ghost"
