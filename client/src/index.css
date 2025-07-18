@@ -25,6 +25,11 @@
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
+  
+  /* Custom gradient colors */
+  --perano: #BCCFF2;
+  --chiffon: #F0FECC;
+  --gradient-bg: linear-gradient(135deg, #BCCFF2 0%, #F0FECC 100%);
 }
 
 .dark {
@@ -60,6 +65,8 @@
   }
 
   body {
-    @apply font-sans antialiased bg-gray-50 text-foreground;
+    @apply font-sans antialiased text-foreground;
+    background: var(--gradient-bg);
+    min-height: 100vh;
   }
 }

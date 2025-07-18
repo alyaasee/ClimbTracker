@@ -76,8 +76,8 @@ export default function Home() {
         </h2>
         
         {/* Streak Section - Full Width */}
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200">
-          <div className="flex items-center justify-center space-x-2 text-amber-700">
+        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/30">
+          <div className="flex items-center justify-center space-x-2 text-gray-800">
             <span className="text-base font-medium">You're on a </span>
             <span className="text-2xl font-bold">{user?.currentStreak || 0}</span>
             <span className="text-base font-medium">-day streak!</span>
@@ -89,14 +89,14 @@ export default function Home() {
       {/* Log Climb CTA */}
       <Button
         onClick={() => setShowLogModal(true)}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 px-6 rounded-xl font-semibold text-lg mb-4 flex items-center justify-center space-x-2"
+        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-6 px-6 rounded-xl font-semibold text-lg mb-4 flex items-center justify-center space-x-2 shadow-lg"
       >
         <Plus className="w-5 h-5" />
         <span>Log Climb</span>
       </Button>
 
       {/* Today's Summary - Full Width */}
-      <Card className="bg-white rounded-xl shadow-sm border border-gray-100 mx-0">
+      <Card className="bg-white/70 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0">
         <CardContent className="p-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Summary</h3>
           

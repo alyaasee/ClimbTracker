@@ -48,7 +48,7 @@ export default function MobileHeader() {
   return (
     <>
       {/* Status Bar */}
-      <div className="flex justify-between items-center px-4 py-2 bg-white text-black text-sm font-medium">
+      <div className="flex justify-between items-center px-4 py-2 bg-white/80 backdrop-blur-sm text-black text-sm font-medium">
         <span>11:41</span>
         <div className="flex items-center space-x-1">
           <div className="w-4 h-2 bg-black rounded-sm"></div>
@@ -58,7 +58,7 @@ export default function MobileHeader() {
       </div>
 
       {/* Navigation Header */}
-      <header className="px-4 py-4 bg-white border-b border-gray-100">
+      <header className="px-4 py-4 bg-white/80 backdrop-blur-sm border-b border-white/20">
         <div className="flex items-center justify-between">
           <DropdownMenu open={profileOpen} onOpenChange={setProfileOpen}>
             <DropdownMenuTrigger asChild>

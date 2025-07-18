@@ -182,7 +182,7 @@ export default function ClimbLog() {
                     </Popover>
                     <Button
                       onClick={() => setShowLogModal(true)}
-                      className="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center p-0"
+                      className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full flex items-center justify-center p-0 shadow-lg"
                     >
                       <Plus className="w-4 h-4" />
                     </Button>
@@ -191,7 +191,7 @@ export default function ClimbLog() {
               </div>
               <div className="space-y-2">
                 {dateClimbs.map((climb: any) => (
-                  <Card key={climb.id} className="bg-white shadow-sm border border-gray-100">
+                  <Card key={climb.id} className="bg-white/70 backdrop-blur-sm shadow-sm border border-white/30">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
