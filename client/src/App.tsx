@@ -19,7 +19,7 @@ function Router() {
 
   if (isLoading) {
     return (
-      <div className="max-w-sm mx-auto min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(228deg, rgba(206, 228, 210, 1) 0%, rgba(239, 115, 38, 1) 100%)' }}>
+      <div className="min-h-screen w-full flex items-center justify-center" style={{ background: 'linear-gradient(228deg, rgba(206, 228, 210, 1) 0%, rgba(239, 115, 38, 1) 100%)' }}>
         <div className="text-center">
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 mx-auto">
             <span className="text-white font-bold text-xl">🧗</span>
@@ -40,18 +40,20 @@ function Router() {
   }
 
   return (
-    <div className="max-w-sm mx-auto min-h-screen relative" style={{ background: 'linear-gradient(228deg, rgba(206, 228, 210, 1) 0%, rgba(239, 115, 38, 1) 100%)' }}>
-      <MobileHeader />
-      <main className="pb-20 px-3">
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/climb-log" component={ClimbLog} />
-          <Route path="/stats" component={Stats} />
-          <Route path="/profile" component={Profile} />
-          <Route component={NotFound} />
-        </Switch>
-      </main>
-      <BottomNav />
+    <div className="min-h-screen w-full relative" style={{ background: 'linear-gradient(228deg, rgba(206, 228, 210, 1) 0%, rgba(239, 115, 38, 1) 100%)' }}>
+      <div className="max-w-sm mx-auto min-h-screen relative">
+        <MobileHeader />
+        <main className="pb-20 px-3">
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/climb-log" component={ClimbLog} />
+            <Route path="/stats" component={Stats} />
+            <Route path="/profile" component={Profile} />
+            <Route component={NotFound} />
+          </Switch>
+        </main>
+        <BottomNav />
+      </div>
     </div>
   );
 }
