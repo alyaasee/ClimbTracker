@@ -41,7 +41,7 @@
   /* Custom gradient colors */
   --surf-crest: #CEE4D2;
   --tango: #EF7326;
-  --gradient-bg: linear-gradient(135deg, #CEE4D2 0%, #EF7326 100%);
+  --gradient-bg: linear-gradient(135deg, #CEE4D2 0%, #CEE4D2 65%, #EF7326 100%);
 }
 
 .dark {
