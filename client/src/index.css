@@ -138,17 +138,20 @@
     background-color: var(--overlay-strong);
   }
   
-  /* Text contrast helpers */
+  /* Text contrast helpers - Enhanced for maximum readability */
   .text-aa-dark {
-    color: #1f2937; /* Ensures 4.5:1 contrast on light backgrounds */
+    color: #000000; /* Pure black for maximum contrast */
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.3);
   }
   
   .text-aa-medium {
-    color: #4b5563; /* Medium gray for 3:1 contrast on large text */
+    color: #1a1a1a; /* Near black for strong contrast */
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.2);
   }
   
   .text-aa-light {
-    color: #6b7280; /* Light gray for secondary text */
+    color: #333333; /* Dark gray with enhanced contrast */
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
   }
 
   /* WCAG 2.2 Compliant Animations */
@@ -200,11 +203,22 @@
     }
   }
   
-  .text-aa-medium {
-    color: #374151; /* Ensures good contrast on medium backgrounds */
+  .text-aa-large {
+    color: #000000; /* Pure black for large text maximum contrast */
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.3);
   }
   
-  .text-aa-large {
-    color: #4b5563; /* For large text (3:1 minimum) */
+  /* Navigation text enhancement */
+  .nav-text {
+    color: #000000;
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+  }
+  
+  /* Button text enhancement */
+  .btn-text {
+    color: #000000 !important;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+    font-weight: 600;
   }
 }

@@ -26,12 +26,12 @@ export default function BottomNav() {
                 href={item.href}
                 className={`flex flex-col items-center justify-center py-2 px-2 rounded-xl nav-transition flex-1 ${
                   isActive
-                    ? "text-blue-600 bg-white/30 scale-105"
-                    : "text-aa-medium hover:text-aa-dark hover:bg-white/20 hover:scale-102"
+                    ? "text-aa-dark bg-white/30 scale-105"
+                    : "text-aa-dark hover:text-aa-dark hover:bg-white/20 hover:scale-102"
                 }`}
               >
-                <item.icon className="w-5 h-5 mb-1" />
-                <span className="text-[11.5px] font-medium text-center leading-tight whitespace-nowrap">{item.label}</span>
+                <item.icon className="w-5 h-5 mb-1" style={{filter: 'drop-shadow(0 0 1px rgba(255,255,255,0.8))'}} />
+                <span className="text-[11.5px] font-semibold text-center leading-tight whitespace-nowrap nav-text">{item.label}</span>
               </Link>
             );
           })}
@@ -39,10 +39,10 @@ export default function BottomNav() {
           {/* Log Climb Button */}
           <button
             onClick={() => setShowLogModal(true)}
-            className="flex flex-col items-center justify-center py-2 px-2 rounded-xl nav-transition flex-1 bg-gradient-to-r from-[#CEE4D2] to-[#EF7326] hover:from-[#B8D4BE] hover:to-[#E5631A] text-gray-800 hover:scale-102 shadow-md"
+            className="flex flex-col items-center justify-center py-2 px-2 rounded-xl nav-transition flex-1 bg-gradient-to-r from-[#CEE4D2] to-[#EF7326] hover:from-[#B8D4BE] hover:to-[#E5631A] hover:scale-102 shadow-md"
           >
-            <Plus className="w-5 h-5 mb-1" />
-            <span className="text-[11.5px] font-medium text-center leading-tight whitespace-nowrap">Log</span>
+            <Plus className="w-5 h-5 mb-1" style={{filter: 'drop-shadow(0 0 1px rgba(255,255,255,0.8))'}} />
+            <span className="text-[11.5px] font-semibold text-center leading-tight whitespace-nowrap btn-text">Log</span>
           </button>
         </div>
       </nav>
