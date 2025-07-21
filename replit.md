@@ -20,6 +20,13 @@ Preferred communication style: Simple, everyday language.
 - Quote section moved below summary and enhanced with stronger overlay (85% opacity) for optimal readability
 - Applied consistent AA contrast text colors throughout all components
 
+### Climb Log Pagination Implementation (July 21, 2025)
+- Added pagination functionality to climb log page with maximum 20 logs per page
+- Implemented responsive pagination controls with Previous/Next buttons and page numbers
+- Added climb count display showing current range (e.g., "Showing 1 to 20 of 35 climbs")
+- Pagination automatically resets to page 1 when date filters are applied
+- Maintains date grouping within paginated results for better organization
+
 ### Real-time Home Page Updates Fix (July 18, 2025)
 - Fixed home page summary tiles not updating dynamically when logging new climbs
 - Added explicit cache invalidation for today's stats query (`["api", "stats", "today"]`)

@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Filter, Plus, MoreVertical, Edit, Trash2, CalendarDays, Mountain } from "lucide-react";
+import { Filter, Plus, MoreVertical, Edit, Trash2, CalendarDays, Mountain, ChevronLeft, ChevronRight } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -20,8 +20,11 @@ export default function ClimbLog() {
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<{ url: string; type: 'image' | 'video' } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const LOGS_PER_PAGE = 20;
 
   const { data: climbs = [], isLoading, error } = useQuery({
     queryKey: ["api", "climbs"],
@@ -66,8 +69,21 @@ export default function ClimbLog() {
     }
   });
 
-  // Group filtered climbs by date
-  const groupedClimbs = filteredClimbs.reduce((groups: any, climb: any) => {
+  // Sort climbs by date (newest first) and apply pagination
+  const sortedClimbs = [...filteredClimbs].sort((a, b) => 
+    new Date(b.climbDate).getTime() - new Date(a.climbDate).getTime()
+  );
+  
+  const totalClimbs = sortedClimbs.length;
+  const totalPages = Math.ceil(totalClimbs / LOGS_PER_PAGE);
+  
+  // Get climbs for current page
+  const startIndex = (currentPage - 1) * LOGS_PER_PAGE;
+  const endIndex = startIndex + LOGS_PER_PAGE;
+  const paginatedClimbsArray = sortedClimbs.slice(startIndex, endIndex);
+  
+  // Group paginated climbs by date
+  const paginatedClimbs = paginatedClimbsArray.reduce((groups: any, climb: any) => {
     const date = climb.climbDate;
     if (!groups[date]) {
       groups[date] = [];
@@ -85,6 +101,12 @@ export default function ClimbLog() {
     if (window.confirm("Are you sure you want to delete this climb?")) {
       deleteClimbMutation.mutate(id);
     }
+  };
+
+  // Reset to page 1 when date range filter changes
+  const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
+    setDateRange(newDateRange);
+    setCurrentPage(1);
   };
 
   const handleMediaClick = (mediaUrl: string) => {
@@ -116,7 +138,7 @@ export default function ClimbLog() {
     <div className="py-4">
 
 
-      {Object.keys(groupedClimbs).length === 0 ? (
+      {Object.keys(paginatedClimbs).length === 0 ? (
         <div className="text-center py-12">
           <div className="bg-white/15 backdrop-blur-sm rounded-xl p-6 border border-white/20">
             <p className="text-gray-800 mb-4 font-medium">
@@ -132,7 +154,7 @@ export default function ClimbLog() {
         </div>
       ) : (
         <div className="space-y-6">
-          {Object.entries(groupedClimbs).map(([date, dateClimbs]: [string, any[]], index) => (
+          {Object.entries(paginatedClimbs).map(([date, dateClimbs]: [string, any[]], index) => (
             <div key={date} className="space-y-3">
               <div className="flex items-center justify-between bg-white/15 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                 <h3 className="text-lg font-semibold text-gray-900">
@@ -158,7 +180,7 @@ export default function ClimbLog() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setDateRange(undefined)}
+                                onClick={() => handleDateRangeChange(undefined)}
                                 className="text-xs"
                               >
                                 Clear
@@ -177,7 +199,7 @@ export default function ClimbLog() {
                         <Calendar
                           mode="range"
                           selected={dateRange}
-                          onSelect={setDateRange}
+                          onSelect={handleDateRangeChange}
                           numberOfMonths={1}
                           className="rounded-md"
                         />
@@ -287,6 +309,55 @@ export default function ClimbLog() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/20">
+          <div className="aa-overlay-medium backdrop-blur-sm rounded-lg px-4 py-2">
+            <span className="text-sm text-aa-medium">
+              Showing {Math.min(startIndex + 1, totalClimbs)} to {Math.min(endIndex, totalClimbs)} of {totalClimbs} climbs
+            </span>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="aa-overlay-medium backdrop-blur-sm"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Previous
+            </Button>
+            
+            <div className="flex items-center space-x-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
+                <Button
+                  key={pageNum}
+                  variant={currentPage === pageNum ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`w-8 h-8 p-0 ${currentPage === pageNum ? 'bg-blue-600 text-white' : 'aa-overlay-medium backdrop-blur-sm'}`}
+                >
+                  {pageNum}
+                </Button>
+              ))}
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="aa-overlay-medium backdrop-blur-sm"
+            >
+              Next
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
         </div>
       )}
 
