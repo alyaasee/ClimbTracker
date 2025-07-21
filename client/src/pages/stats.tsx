@@ -62,9 +62,10 @@ export default function Stats() {
       
       {/* Month Selector */}
       <div className="mb-6">
-        <Label className="block text-sm font-medium text-gray-700 mb-2 form-label">
-          Select Month
-        </Label>
+        <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+          <Label className="block text-sm font-medium text-gray-900 mb-2 form-label">
+            Select Month
+          </Label>
         <Select
           value={selectedYear && selectedMonth ? `${selectedYear}-${selectedMonth.toString().padStart(2, '0')}` : undefined}
           onValueChange={(value) => {
@@ -86,22 +87,25 @@ export default function Stats() {
             ))}
           </SelectContent>
         </Select>
+        </div>
       </div>
 
       {isEmpty ? (
         <div className="text-center py-12">
-          <div className="text-gray-500 text-lg mb-2">
-            {availableMonths.length === 0 ? "No climbs yet—get on the wall!" : "Select a month to see your stats"}
-          </div>
-          <div className="text-gray-400 text-sm">
-            {availableMonths.length === 0 ? "Start logging climbs to see your progress" : "Choose a month with logged climbs from the dropdown above"}
+          <div className="bg-white/15 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+            <div className="text-gray-800 text-lg mb-2 font-medium">
+              {availableMonths.length === 0 ? "No climbs yet—get on the wall!" : "Select a month to see your stats"}
+            </div>
+            <div className="text-gray-700 text-sm">
+              {availableMonths.length === 0 ? "Start logging climbs to see your progress" : "Choose a month with logged climbs from the dropdown above"}
+            </div>
           </div>
         </div>
       ) : (
         <>
           {/* Key Metrics */}
           <div className="grid grid-cols-3 gap-4 mb-8">
-            <Card className="bg-white/70 backdrop-blur-sm shadow-sm border border-white/30">
+            <Card className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30">
               <CardContent className="p-4 text-center flex flex-col items-center min-h-[100px]">
                 <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center mx-auto mb-2">
                   <Mountain className="w-5 h-5 text-emerald-600" />
@@ -113,7 +117,7 @@ export default function Stats() {
               </CardContent>
             </Card>
             
-            <Card className="bg-white/70 backdrop-blur-sm shadow-sm border border-white/30">
+            <Card className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30">
               <CardContent className="p-4 text-center flex flex-col items-center min-h-[100px]">
                 <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-2">
                   <TrendingUp className="w-5 h-5 text-blue-600" />
@@ -125,7 +129,7 @@ export default function Stats() {
               </CardContent>
             </Card>
             
-            <Card className="bg-white/70 backdrop-blur-sm shadow-sm border border-white/30">
+            <Card className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30">
               <CardContent className="p-4 text-center flex flex-col items-center min-h-[100px]">
                 <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center mx-auto mb-2">
                   <Target className="w-5 h-5 text-purple-600" />
@@ -139,7 +143,7 @@ export default function Stats() {
           </div>
 
           {/* Grade Progression Chart */}
-          <Card className="bg-white/70 backdrop-blur-sm shadow-sm border border-white/30 mb-6">
+          <Card className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30 mb-6">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Grade Progression
@@ -187,7 +191,7 @@ export default function Stats() {
           </Card>
 
           {/* Route Type Breakdown */}
-          <Card className="bg-white/70 backdrop-blur-sm shadow-sm border border-white/30">
+          <Card className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30">
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Route Type Breakdown

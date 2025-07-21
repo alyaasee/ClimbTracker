@@ -68,22 +68,32 @@ export default function Home() {
     <div className="py-2">
       {/* Welcome Section */}
       <div className="py-3 mb-4">
-        <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
-          {user?.lastLoginAt ? 
-            `Welcome back, ${authUser?.firstName || user?.firstName || "Climber"}!` : 
-            `Welcome, ${authUser?.firstName || user?.firstName || "Climber"}!`
-          }
-        </h2>
+        <div className="bg-white/15 backdrop-blur-sm rounded-xl p-3 border border-white/20">
+          <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+            {user?.lastLoginAt ? 
+              `Welcome back, ${authUser?.firstName || user?.firstName || "Climber"}!` : 
+              `Welcome, ${authUser?.firstName || user?.firstName || "Climber"}!`
+            }
+          </h2>
+        </div>
         
         {/* Streak Section - Full Width */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/30">
+        <div className="bg-white/75 backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
           <div className="flex items-center justify-center space-x-2 text-gray-800">
             <span className="text-base font-medium">You're on a </span>
             <span className="text-2xl font-bold">{user?.currentStreak || 0}</span>
             <span className="text-base font-medium">-day streak!</span>
 
             {(user?.currentStreak || 0) >= 1 && (
-              <span className="text-2xl animate-pulse">🔥</span>
+              <img 
+                src="/fire-icon.png" 
+                alt="Fire" 
+                className="w-8 h-8 object-contain animate-pulse"
+                onError={(e) => {
+                  // Fallback to emoji if image fails to load
+                  e.currentTarget.outerHTML = '<span class="text-2xl animate-pulse">🔥</span>';
+                }}
+              />
             )}
           </div>
         </div>
@@ -99,7 +109,7 @@ export default function Home() {
       </Button>
 
       {/* Today's Summary - Full Width */}
-      <Card className="bg-white/70 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0">
+      <Card className="bg-white/85 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0">
         <CardContent className="p-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Summary</h3>
           

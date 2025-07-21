@@ -118,21 +118,23 @@ export default function ClimbLog() {
 
       {Object.keys(groupedClimbs).length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">
-            {dateRange?.from ? "No climbs found for selected date range" : "No climbs logged yet"}
-          </p>
+          <div className="bg-white/15 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+            <p className="text-gray-800 mb-4 font-medium">
+              {dateRange?.from ? "No climbs found for selected date range" : "No climbs logged yet"}
+            </p>
           {!dateRange?.from && (
             <Button onClick={() => setShowLogModal(true)} className="bg-blue-600 hover:bg-blue-700">
               <Plus className="w-4 h-4 mr-2" />
               Log your first climb
             </Button>
           )}
+          </div>
         </div>
       ) : (
         <div className="space-y-6">
           {Object.entries(groupedClimbs).map(([date, dateClimbs]: [string, any[]], index) => (
             <div key={date} className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between bg-white/15 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                 <h3 className="text-lg font-semibold text-gray-900">
                   {formatDate(date)}
                 </h3>
@@ -192,7 +194,7 @@ export default function ClimbLog() {
               </div>
               <div className="space-y-2">
                 {dateClimbs.map((climb: any) => (
-                  <Card key={climb.id} className="bg-white/70 backdrop-blur-sm shadow-sm border border-white/30">
+                  <Card key={climb.id} className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
