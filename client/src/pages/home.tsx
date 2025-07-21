@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mountain, Zap, Flame, Target, Plus } from "lucide-react";
+import { Mountain, MountainSnow, Zap, Flame, Target, Plus } from "lucide-react";
 import LogClimbModal from "@/components/log-climb-modal";
 
 export default function Home() {
@@ -122,7 +122,7 @@ export default function Home() {
                   {item.label === "Sends Today:" ? 
                     <Flame size={32} className={item.iconColor} /> : 
                     item.label === "Climbs Today:" ?
-                    <Mountain size={32} className={item.iconColor} /> :
+                    <MountainSnow size={32} className={item.iconColor} /> :
                     item.label === "Flashes Today:" ?
                     <Zap size={32} className={item.iconColor} /> :
                     item.label === "Project Today:" ?
