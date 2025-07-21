@@ -67,9 +67,9 @@ export default function Home() {
   ];
 
   return (
-    <div className="py-2 page-transition">
+    <div className="py-2 page-transition space-y-3">
       {/* Welcome Section */}
-      <div className="py-3 mb-0">
+      <div>
         <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-3 border border-white/20">
           <h2 className="text-2xl font-bold text-aa-dark mb-3 text-center">
             {user?.lastLoginAt ? 
@@ -104,7 +104,7 @@ export default function Home() {
       </div>
 
       {/* Today's Summary - Full Width */}
-      <Card className="aa-overlay-strong backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0 card-transition mt-3">
+      <Card className="aa-overlay-strong backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0 card-transition">
         <CardContent className="p-4">
           <h3 className="text-lg font-semibold text-aa-dark mb-4">Your Summary</h3>
           
@@ -135,7 +135,7 @@ export default function Home() {
 
       {/* Daily Quote Section */}
       {dailyQuote && (
-        <div className="aa-overlay-strong backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
+        <div className="aa-overlay-strong backdrop-blur-sm rounded-xl p-4 border border-white/30">
           <div className="text-center">
             <p className="text-sm font-medium text-aa-dark italic">
               "{dailyQuote.quote}"
