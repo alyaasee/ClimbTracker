@@ -24,14 +24,14 @@ export default function BottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center py-2 px-3 rounded-xl nav-transition flex-1 ${
+                className={`flex flex-col items-center justify-center py-2 px-2 rounded-xl nav-transition flex-1 ${
                   isActive
                     ? "text-blue-600 bg-white/30 scale-105"
                     : "text-aa-medium hover:text-aa-dark hover:bg-white/20 hover:scale-102"
                 }`}
               >
                 <item.icon className="w-5 h-5 mb-1" />
-                <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
+                <span className="text-[10px] font-medium text-center leading-tight whitespace-nowrap">{item.label}</span>
               </Link>
             );
           })}
@@ -39,10 +39,10 @@ export default function BottomNav() {
           {/* Log Climb Button */}
           <button
             onClick={() => setShowLogModal(true)}
-            className="flex flex-col items-center justify-center py-2 px-3 rounded-xl nav-transition flex-1 bg-gradient-to-r from-[#CEE4D2] to-[#EF7326] hover:from-[#B8D4BE] hover:to-[#E5631A] text-gray-800 hover:scale-102 shadow-md"
+            className="flex flex-col items-center justify-center py-2 px-2 rounded-xl nav-transition flex-1 bg-gradient-to-r from-[#CEE4D2] to-[#EF7326] hover:from-[#B8D4BE] hover:to-[#E5631A] text-gray-800 hover:scale-102 shadow-md"
           >
             <Plus className="w-5 h-5 mb-1" />
-            <span className="text-xs font-medium text-center leading-tight">Log</span>
+            <span className="text-[10px] font-medium text-center leading-tight whitespace-nowrap">Log</span>
           </button>
         </div>
       </nav>
