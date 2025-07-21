@@ -423,49 +423,51 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
             </div>
           </div>
 
-          {/* Outcome - Horizontal Bar */}
-          <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-4 border border-white/20">
-            <Label htmlFor="outcome" className="text-sm font-semibold text-aa-dark mb-3 block">Outcome</Label>
-            <Select
-              value={formData.outcome}
-              onValueChange={(value) => setFormData({ ...formData, outcome: value })}
-            >
-              <SelectTrigger className="w-full text-sm border border-white/30 bg-white/20 p-2 text-aa-dark font-medium">
-                <SelectValue placeholder="Select outcome" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Flash">Flash</SelectItem>
-                <SelectItem value="Send">Send</SelectItem>
-                <SelectItem value="Project">Project</SelectItem>
-                <SelectItem value="Attempt">Attempt</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Outcome and Photos/Videos - 2-Tile Card Layout */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Outcome Card */}
+            <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-3 border border-white/20">
+              <Label htmlFor="outcome" className="text-xs font-semibold text-aa-dark mb-2 block">Outcome</Label>
+              <Select
+                value={formData.outcome}
+                onValueChange={(value) => setFormData({ ...formData, outcome: value })}
+              >
+                <SelectTrigger className="text-sm border-0 bg-transparent p-1 h-auto text-aa-dark font-medium">
+                  <SelectValue placeholder="Select outcome" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Flash">Flash</SelectItem>
+                  <SelectItem value="Send">Send</SelectItem>
+                  <SelectItem value="Project">Project</SelectItem>
+                  <SelectItem value="Attempt">Attempt</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Photos/Videos - Horizontal Bar */}
-          <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-4 border border-white/20">
-            <Label htmlFor="media" className="text-sm font-semibold text-aa-dark mb-3 block">Photos/Videos</Label>
-            <div className="space-y-3">
-              <div className="flex space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => document.getElementById('photo-upload')?.click()}
-                  className="flex-1 border-white/30 bg-white/20 text-aa-dark hover:bg-white/30"
-                >
-                  <Camera className="w-4 h-4 mr-2" />
-                  Add Photo
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => document.getElementById('video-upload')?.click()}
-                  className="flex-1 border-white/30 bg-white/20 text-aa-dark hover:bg-white/30"
-                >
-                  <Video className="w-4 h-4 mr-2" />
-                  Add Video
-                </Button>
-              </div>
+            {/* Photos/Videos Card */}
+            <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-3 border border-white/20">
+              <Label htmlFor="media" className="text-xs font-semibold text-aa-dark mb-2 block">Photos/Videos</Label>
+              <div className="space-y-2">
+                <div className="flex space-x-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('photo-upload')?.click()}
+                    className="flex-1 text-xs px-2 py-1 h-auto border-white/30 bg-white/20 text-aa-dark hover:bg-white/30"
+                  >
+                    <Camera className="w-3 h-3 mr-1" />
+                    Photo
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('video-upload')?.click()}
+                    className="flex-1 text-xs px-2 py-1 h-auto border-white/30 bg-white/20 text-aa-dark hover:bg-white/30"
+                  >
+                    <Video className="w-3 h-3 mr-1" />
+                    Video
+                  </Button>
+                </div>
               
               <input
                 id="photo-upload"
@@ -485,18 +487,17 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
                 className="hidden"
               />
 
-              {selectedFiles.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 mt-2">
-                  {selectedFiles.map((file, index) => (
-                    <div key={index} className="relative bg-gray-100 rounded-lg p-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
+                {selectedFiles.length > 0 && (
+                  <div className="space-y-1">
+                    {selectedFiles.slice(0, 2).map((file, index) => (
+                      <div key={index} className="flex items-center justify-between bg-white/20 rounded p-1">
+                        <div className="flex items-center space-x-1">
                           {file.type.startsWith('image/') ? (
-                            <Camera className="w-4 h-4 text-blue-600" />
+                            <Camera className="w-3 h-3 text-aa-dark" />
                           ) : (
-                            <Video className="w-4 h-4 text-purple-600" />
+                            <Video className="w-3 h-3 text-aa-dark" />
                           )}
-                          <span className="text-sm text-gray-600 truncate">
+                          <span className="text-xs text-aa-dark truncate max-w-[60px]">
                             {file.name}
                           </span>
                         </div>
@@ -505,15 +506,18 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
                           variant="ghost"
                           size="sm"
                           onClick={() => removeFile(index)}
-                          className="p-1 h-6 w-6"
+                          className="p-0 h-4 w-4"
                         >
-                          <X className="w-3 h-3" />
+                          <X className="w-2 h-2 text-aa-dark" />
                         </Button>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                    {selectedFiles.length > 2 && (
+                      <div className="text-xs text-aa-medium">+{selectedFiles.length - 2} more</div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
