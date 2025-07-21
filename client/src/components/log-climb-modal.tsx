@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,21 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // Fetch today's climbs to prefill date and location
+  const { data: todaysClimbs } = useQuery({
+    queryKey: ["api", "climbs"],
+    enabled: open && !climb, // Only fetch when modal is open and not editing
+  });
+
+  const getTodaysFirstClimb = () => {
+    if (!todaysClimbs || !Array.isArray(todaysClimbs)) return null;
+    
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const todaysClimbsData = todaysClimbs.filter((c: any) => c.climbDate === today);
+    
+    return todaysClimbsData.length > 0 ? todaysClimbsData[0] : null;
+  };
+
   const [formData, setFormData] = useState({
     climbDate: climb?.climbDate || format(new Date(), 'yyyy-MM-dd'),
     gym: climb?.gym || "",
@@ -30,6 +45,32 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     notes: climb?.notes || "",
     mediaUrl: climb?.mediaUrl || "",
   });
+
+  // Update form data when modal opens with smart prefilling
+  useEffect(() => {
+    if (open && !climb) {
+      const firstClimb = getTodaysFirstClimb();
+      setFormData({
+        climbDate: format(new Date(), 'yyyy-MM-dd'),
+        gym: firstClimb?.gym || "",
+        routeType: "",
+        grade: "",
+        outcome: "",
+        notes: "",
+        mediaUrl: "",
+      });
+    } else if (climb) {
+      setFormData({
+        climbDate: climb.climbDate || format(new Date(), 'yyyy-MM-dd'),
+        gym: climb.gym || "",
+        routeType: climb.routeType || "",
+        grade: climb.grade || "",
+        outcome: climb.outcome || "",
+        notes: climb.notes || "",
+        mediaUrl: climb.mediaUrl || "",
+      });
+    }
+  }, [open, climb, todaysClimbs]);
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
@@ -59,15 +100,7 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
       });
       toast({ title: "Climb logged successfully!" });
       onOpenChange(false);
-      setFormData({
-        climbDate: format(new Date(), 'yyyy-MM-dd'),
-        gym: "",
-        routeType: "",
-        grade: "",
-        outcome: "",
-        notes: "",
-        mediaUrl: "",
-      });
+      // Reset form - this will be handled by useEffect when modal opens again
       setSelectedFiles([]);
     },
     onError: (error: any) => {
