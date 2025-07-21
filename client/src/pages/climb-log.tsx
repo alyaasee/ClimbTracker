@@ -135,7 +135,7 @@ export default function ClimbLog() {
   };
 
   return (
-    <div className="py-4">
+    <div className="py-4 page-transition">
 
 
       {Object.keys(paginatedClimbs).length === 0 ? (
@@ -216,7 +216,7 @@ export default function ClimbLog() {
               </div>
               <div className="space-y-2">
                 {dateClimbs.map((climb: any) => (
-                  <Card key={climb.id} className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30">
+                  <Card key={climb.id} className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30 card-transition">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">

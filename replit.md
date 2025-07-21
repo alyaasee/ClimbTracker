@@ -27,6 +27,13 @@ Preferred communication style: Simple, everyday language.
 - Pagination automatically resets to page 1 when date filters are applied
 - Maintains date grouping within paginated results for better organization
 
+### WCAG 2.2 Compliant Subtle Animations (July 21, 2025)
+- Added 200-300ms scale and fade-in animations for tab switches and page transitions
+- Implemented responsive navigation transitions with subtle scale effects for active states
+- Applied card hover animations with minimal transform (translateY -1px) for enhanced interactivity
+- All animations respect prefers-reduced-motion setting per WCAG 2.2 guidelines
+- Used cubic-bezier easing for natural, non-jarring motion that enhances perceived performance
+
 ### Real-time Home Page Updates Fix (July 18, 2025)
 - Fixed home page summary tiles not updating dynamically when logging new climbs
 - Added explicit cache invalidation for today's stats query (`["api", "stats", "today"]`)

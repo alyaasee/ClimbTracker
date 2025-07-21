@@ -144,6 +144,63 @@
   }
   
   .text-aa-medium {
+    color: #4b5563; /* Medium gray for 3:1 contrast on large text */
+  }
+  
+  .text-aa-light {
+    color: #6b7280; /* Light gray for secondary text */
+  }
+
+  /* WCAG 2.2 Compliant Animations */
+  @media (prefers-reduced-motion: no-preference) {
+    .page-transition {
+      animation: fadeInScale 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    
+    .nav-transition {
+      transition: all 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .card-transition {
+      transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .card-transition:hover {
+      transform: translateY(-1px);
+    }
+    
+    .scale-102:hover {
+      transform: scale(1.02);
+    }
+    
+    .scale-105 {
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .page-transition,
+    .nav-transition,
+    .card-transition {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+  
+  .text-aa-medium {
     color: #374151; /* Ensures good contrast on medium backgrounds */
   }
   

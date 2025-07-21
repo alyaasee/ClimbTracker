@@ -71,7 +71,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="py-2">
+    <div className="py-2 page-transition">
       {/* Welcome Section */}
       <div className="py-3 mb-4">
         <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-3 border border-white/20">
@@ -117,7 +117,7 @@ export default function Home() {
       </Button>
 
       {/* Today's Summary - Full Width */}
-      <Card className="aa-overlay-strong backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0">
+      <Card className="aa-overlay-strong backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0 card-transition">
         <CardContent className="p-4">
           <h3 className="text-lg font-semibold text-aa-dark mb-4">Your Summary</h3>
           

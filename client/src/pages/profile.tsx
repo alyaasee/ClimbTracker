@@ -179,7 +179,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="py-2 space-y-6">
+    <div className="py-2 space-y-6 page-transition">
       {/* Back Button */}
       <Button
         variant="ghost"

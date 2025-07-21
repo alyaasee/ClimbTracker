@@ -20,10 +20,10 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200 flex-1 ${
+              className={`flex flex-col items-center py-2 px-3 rounded-xl nav-transition flex-1 ${
                 isActive
-                  ? "text-blue-600 bg-white/30"
-                  : "text-aa-medium hover:text-aa-dark hover:bg-white/20"
+                  ? "text-blue-600 bg-white/30 scale-105"
+                  : "text-aa-medium hover:text-aa-dark hover:bg-white/20 hover:scale-102"
               }`}
             >
               <item.icon className="w-5 h-5 mb-1" />

@@ -57,7 +57,7 @@ export default function Stats() {
   const isEmpty = selectedYear === null || selectedMonth === null || !monthlyStats || monthlyStats.totalClimbs === 0;
 
   return (
-    <div className="py-4">
+    <div className="py-4 page-transition">
 
       
       {/* Month Selector */}
