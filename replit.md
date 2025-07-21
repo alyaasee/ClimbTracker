@@ -27,6 +27,12 @@ Preferred communication style: Simple, everyday language.
 - Pagination automatically resets to page 1 when date filters are applied
 - Maintains date grouping within paginated results for better organization
 
+### Navigation Enhancement - Log Button in Bottom Bar (July 21, 2025)
+- Moved "Log Climb" button from home page to bottom navigation bar as "+" icon
+- Maintained the distinctive peach-green gradient (CEE4D2 to EF7326) for visual consistency
+- Enhanced mobile navigation with 4-tab layout: Home, Climb Log, Stats, and Log
+- Improved accessibility by keeping logging function always visible in navigation
+
 ### Smart Prefilling for Faster Logging (July 21, 2025)
 - Implemented intelligent prefilling for Date and Location when logging subsequent climbs on the same day
 - Automatically detects first climb of the day and prefills gym location for faster follow-up entries

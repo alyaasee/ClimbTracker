@@ -1,13 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mountain, MountainSnow, Zap, Flame, Target, Plus } from "lucide-react";
-import LogClimbModal from "@/components/log-climb-modal";
+import { Mountain, MountainSnow, Zap, Flame, Target } from "lucide-react";
 import type { User, TodayStatsResponse, DailyQuoteResponse, AuthUserResponse } from "@shared/schema";
 
 export default function Home() {
-  const [showLogModal, setShowLogModal] = useState(false);
 
   const { data: authUser, isLoading: authLoading } = useQuery<AuthUserResponse>({
     queryKey: ["api", "auth", "user"],
@@ -107,15 +103,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Log Climb CTA */}
-      <Button
-        onClick={() => setShowLogModal(true)}
-        className="w-full bg-gradient-to-r from-[#CEE4D2] to-[#EF7326] hover:from-[#B8D4BE] hover:to-[#E5631A] text-gray-800 py-6 px-6 rounded-xl font-semibold text-lg mb-4 flex items-center justify-center space-x-2 shadow-lg"
-      >
-        <Plus className="w-5 h-5" />
-        <span>Log Climb</span>
-      </Button>
-
       {/* Today's Summary - Full Width */}
       <Card className="aa-overlay-strong backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0 card-transition">
         <CardContent className="p-4">
@@ -160,10 +147,6 @@ export default function Home() {
         </div>
       )}
 
-      <LogClimbModal
-        open={showLogModal}
-        onOpenChange={setShowLogModal}
-      />
     </div>
   );
 }
