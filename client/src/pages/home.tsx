@@ -71,7 +71,12 @@ export default function Home() {
       {/* Welcome Section */}
       <div>
         <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-3 border border-white/20">
-          <h2 className="text-2xl font-bold text-aa-dark mb-3 text-center whitespace-nowrap overflow-hidden text-ellipsis">
+          <h2 
+            className="font-bold text-aa-dark mb-3 text-center whitespace-nowrap"
+            style={{
+              fontSize: `clamp(1rem, ${Math.max(1, 2.5 - ((authUser?.firstName || user?.firstName || "Climber").length * 0.1))}rem, 2rem)`
+            }}
+          >
             {user?.lastLoginAt ? 
               `Welcome back, ${authUser?.firstName || user?.firstName || "Climber"}!` : 
               `Welcome, ${authUser?.firstName || user?.firstName || "Climber"}!`
