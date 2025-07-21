@@ -87,3 +87,24 @@ export type User = typeof users.$inferSelect;
 export type InsertClimb = z.infer<typeof insertClimbSchema>;
 export type Climb = typeof climbs.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
+
+// API Response Types
+export interface TodayStatsResponse {
+  climbs: number;
+  flashes: number;
+  sends: number;
+  projects: number;
+}
+
+export interface DailyQuoteResponse {
+  quote: string;
+  fallback: boolean;
+}
+
+export interface AuthUserResponse {
+  id: number;
+  email: string;
+  firstName: string;
+  profileImageUrl?: string;
+  isAuthenticated: boolean;
+}

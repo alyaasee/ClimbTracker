@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertClimbSchema } from "@shared/schema";
+import { insertClimbSchema, type User } from "@shared/schema";
 import { format } from "date-fns";
 import OpenAI from "openai";
 

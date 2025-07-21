@@ -4,23 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mountain, MountainSnow, Zap, Flame, Target, Plus } from "lucide-react";
 import LogClimbModal from "@/components/log-climb-modal";
+import type { User, TodayStatsResponse, DailyQuoteResponse, AuthUserResponse } from "@shared/schema";
 
 export default function Home() {
   const [showLogModal, setShowLogModal] = useState(false);
 
-  const { data: authUser, isLoading: authLoading } = useQuery({
+  const { data: authUser, isLoading: authLoading } = useQuery<AuthUserResponse>({
     queryKey: ["api", "auth", "user"],
   });
 
-  const { data: user, isLoading: userLoading } = useQuery({
+  const { data: user, isLoading: userLoading } = useQuery<User>({
     queryKey: ["api", "user"],
   });
 
-  const { data: todayStats } = useQuery({
+  const { data: todayStats } = useQuery<TodayStatsResponse>({
     queryKey: ["api", "stats", "today"],
   });
 
-  const { data: dailyQuote } = useQuery({
+  const { data: dailyQuote } = useQuery<DailyQuoteResponse>({
     queryKey: ["api", "daily-quote"],
     staleTime: 24 * 60 * 60 * 1000, // 24 hours
   });
@@ -106,20 +107,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Daily Quote Section */}
-      {dailyQuote && (
-        <div className="bg-white/75 backdrop-blur-sm rounded-xl p-4 border border-white/30 mb-3">
-          <div className="text-center">
-            <p className="text-sm font-medium text-gray-700 italic">
-              "{dailyQuote.quote}"
-            </p>
-            {dailyQuote.fallback && (
-              <p className="text-xs text-gray-500 mt-1">📱 Offline mode</p>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Log Climb CTA */}
       <Button
         onClick={() => setShowLogModal(true)}
@@ -158,6 +145,20 @@ export default function Home() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Daily Quote Section */}
+      {dailyQuote && (
+        <div className="bg-white/75 backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
+          <div className="text-center">
+            <p className="text-sm font-medium text-gray-700 italic">
+              "{dailyQuote.quote}"
+            </p>
+            {dailyQuote.fallback && (
+              <p className="text-xs text-gray-500 mt-1">📱 Offline mode</p>
+            )}
+          </div>
+        </div>
+      )}
 
       <LogClimbModal
         open={showLogModal}
