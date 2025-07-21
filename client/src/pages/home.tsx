@@ -123,6 +123,10 @@ export default function Home() {
                     <Flame size={32} className={item.iconColor} /> : 
                     item.label === "Climbs Today:" ?
                     <Mountain size={32} className={item.iconColor} /> :
+                    item.label === "Flashes Today:" ?
+                    <Zap size={32} className={item.iconColor} /> :
+                    item.label === "Project Today:" ?
+                    <Target size={32} className={item.iconColor} /> :
                     <item.icon className={`w-6 h-6 ${item.iconColor}`} />
                   }
                 </div>
