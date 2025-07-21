@@ -119,7 +119,10 @@ export default function Home() {
             {summaryItems.map((item, index) => (
               <div key={index} className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
                 <div className={`w-12 h-12 ${item.bgColor} rounded-lg flex items-center justify-center mb-2`}>
-                  <item.icon className={`w-6 h-6 ${item.iconColor}`} />
+                  {item.label === "Sends Today:" ? 
+                    <Flame size={32} className={item.iconColor} /> : 
+                    <item.icon className={`w-6 h-6 ${item.iconColor}`} />
+                  }
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900 mb-1">{item.value}</div>
