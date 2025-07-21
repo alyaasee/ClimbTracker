@@ -85,12 +85,14 @@ export default function Home() {
             <span className="text-base font-medium">-day streak!</span>
 
             {(user?.currentStreak || 0) >= 1 && (
-              <img 
-                src="/fire-icon.png" 
-                alt="Fire" 
-                className="w-8 h-8 object-contain animate-pulse"
+              <video 
+                src="/fire-animation.webm" 
+                autoPlay 
+                loop 
+                muted
+                className="w-8 h-8 object-contain"
                 onError={(e) => {
-                  // Fallback to emoji if image fails to load
+                  // Fallback to emoji if video fails to load
                   e.currentTarget.outerHTML = '<span class="text-2xl animate-pulse">🔥</span>';
                 }}
               />
