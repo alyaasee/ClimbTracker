@@ -31,7 +31,7 @@ export default function BottomNav() {
                 }`}
               >
                 <item.icon className="w-5 h-5 mb-1" />
-                <span className="text-[10px] font-medium text-center leading-tight whitespace-nowrap">{item.label}</span>
+                <span className="text-[11.5px] font-medium text-center leading-tight whitespace-nowrap">{item.label}</span>
               </Link>
             );
           })}
@@ -42,7 +42,7 @@ export default function BottomNav() {
             className="flex flex-col items-center justify-center py-2 px-2 rounded-xl nav-transition flex-1 bg-gradient-to-r from-[#CEE4D2] to-[#EF7326] hover:from-[#B8D4BE] hover:to-[#E5631A] text-gray-800 hover:scale-102 shadow-md"
           >
             <Plus className="w-5 h-5 mb-1" />
-            <span className="text-[10px] font-medium text-center leading-tight whitespace-nowrap">Log</span>
+            <span className="text-[11.5px] font-medium text-center leading-tight whitespace-nowrap">Log</span>
           </button>
         </div>
       </nav>
