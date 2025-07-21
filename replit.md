@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Animated Fire Icon and AA Contrast Implementation (July 21, 2025)
+- Successfully implemented animated fire icon using WebM video format for streak display
+- Fire animation shows for streaks >= 1 day with auto-play, looping, and muted attributes
+- Applied 10-15% translucent white overlays across all pages for AA contrast compliance
+- Enhanced contrast ratios: 15% overlay for headers/backgrounds, 75-85% for content cards
+- Achieved AA standard compliance with 4.5:1 contrast for normal text and 3:1 for large text
+- Fire video implementation includes fallback to fire emoji if video fails to load
+
 ### Real-time Home Page Updates Fix (July 18, 2025)
 - Fixed home page summary tiles not updating dynamically when logging new climbs
 - Added explicit cache invalidation for today's stats query (`["api", "stats", "today"]`)
