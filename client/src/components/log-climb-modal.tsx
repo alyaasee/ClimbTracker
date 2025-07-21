@@ -344,85 +344,93 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="climbDate" className="form-label">Date</Label>
-            <Input
-              id="climbDate"
-              type="date"
-              value={formData.climbDate}
-              onChange={(e) => setFormData({ ...formData, climbDate: e.target.value })}
-              required
-              className="form-input"
-            />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* 4-Tile Card Layout */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Date Card */}
+            <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-3 border border-white/20">
+              <Label htmlFor="climbDate" className="text-xs font-semibold text-aa-dark mb-2 block">Date</Label>
+              <Input
+                id="climbDate"
+                type="date"
+                value={formData.climbDate}
+                onChange={(e) => setFormData({ ...formData, climbDate: e.target.value })}
+                required
+                className="text-sm border-0 bg-transparent p-1 text-aa-dark font-medium"
+              />
+            </div>
+
+            {/* Location Card */}
+            <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-3 border border-white/20">
+              <Label className="text-xs font-semibold text-aa-dark mb-2 block">Location</Label>
+              <Select
+                value={formData.gym}
+                onValueChange={(value) => setFormData({ ...formData, gym: value })}
+              >
+                <SelectTrigger className="text-sm border-0 bg-transparent p-1 h-auto text-aa-dark font-medium">
+                  <SelectValue placeholder="Select gym" />
+                </SelectTrigger>
+                <SelectContent>
+                  {gymOptions.map((gym) => (
+                    <SelectItem key={gym} value={gym}>{gym}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Style Card */}
+            <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-3 border border-white/20">
+              <Label className="text-xs font-semibold text-aa-dark mb-2 block">Style</Label>
+              <Select
+                value={formData.routeType}
+                onValueChange={(value) => setFormData({ ...formData, routeType: value })}
+              >
+                <SelectTrigger className="text-sm border-0 bg-transparent p-1 h-auto text-aa-dark font-medium">
+                  <SelectValue placeholder="Select route type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Boulder">Boulder</SelectItem>
+                  <SelectItem value="Top Rope">Top Rope</SelectItem>
+                  <SelectItem value="Lead">Lead</SelectItem>
+                  <SelectItem value="Auto Belay">Auto Belay</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Grade Card */}
+            <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-3 border border-white/20">
+              <Label className="text-xs font-semibold text-aa-dark mb-2 block">Grade</Label>
+              <Select
+                value={formData.grade}
+                onValueChange={(value) => setFormData({ ...formData, grade: value })}
+              >
+                <SelectTrigger className="text-sm border-0 bg-transparent p-1 h-auto text-aa-dark font-medium">
+                  <SelectValue placeholder="Select grade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5c">5c</SelectItem>
+                  <SelectItem value="6a">6a</SelectItem>
+                  <SelectItem value="6a+">6a+</SelectItem>
+                  <SelectItem value="6b">6b</SelectItem>
+                  <SelectItem value="6b+">6b+</SelectItem>
+                  <SelectItem value="6c">6c</SelectItem>
+                  <SelectItem value="6c+">6c+</SelectItem>
+                  <SelectItem value="7a">7a</SelectItem>
+                  <SelectItem value="7b">7b</SelectItem>
+                  <SelectItem value="7c">7c</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="gym" className="form-label">Location</Label>
-            <Select
-              value={formData.gym}
-              onValueChange={(value) => setFormData({ ...formData, gym: value })}
-            >
-              <SelectTrigger className="form-input">
-                <SelectValue placeholder="Select gym" />
-              </SelectTrigger>
-              <SelectContent>
-                {gymOptions.map((gym) => (
-                  <SelectItem key={gym} value={gym}>{gym}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="routeType" className="form-label">Style</Label>
-            <Select
-              value={formData.routeType}
-              onValueChange={(value) => setFormData({ ...formData, routeType: value })}
-            >
-              <SelectTrigger className="form-input">
-                <SelectValue placeholder="Select route type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Boulder">Boulder</SelectItem>
-                <SelectItem value="Top Rope">Top Rope</SelectItem>
-                <SelectItem value="Lead">Lead</SelectItem>
-                <SelectItem value="Auto Belay">Auto Belay</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="grade" className="form-label">Grade</Label>
-            <Select
-              value={formData.grade}
-              onValueChange={(value) => setFormData({ ...formData, grade: value })}
-            >
-              <SelectTrigger className="form-input">
-                <SelectValue placeholder="Select grade" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5c">5c</SelectItem>
-                <SelectItem value="6a">6a</SelectItem>
-                <SelectItem value="6a+">6a+</SelectItem>
-                <SelectItem value="6b">6b</SelectItem>
-                <SelectItem value="6b+">6b+</SelectItem>
-                <SelectItem value="6c">6c</SelectItem>
-                <SelectItem value="6c+">6c+</SelectItem>
-                <SelectItem value="7a">7a</SelectItem>
-                <SelectItem value="7b">7b</SelectItem>
-                <SelectItem value="7c">7c</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="outcome" className="form-label">Outcome</Label>
+          {/* Outcome - Horizontal Bar */}
+          <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-4 border border-white/20">
+            <Label htmlFor="outcome" className="text-sm font-semibold text-aa-dark mb-3 block">Outcome</Label>
             <Select
               value={formData.outcome}
               onValueChange={(value) => setFormData({ ...formData, outcome: value })}
             >
-              <SelectTrigger className="form-input">
+              <SelectTrigger className="w-full text-sm border border-white/30 bg-white/20 p-2 text-aa-dark font-medium">
                 <SelectValue placeholder="Select outcome" />
               </SelectTrigger>
               <SelectContent>
@@ -434,15 +442,16 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
             </Select>
           </div>
 
-          <div>
-            <Label htmlFor="media" className="form-label">Photos/Videos</Label>
-            <div className="space-y-2">
+          {/* Photos/Videos - Horizontal Bar */}
+          <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-4 border border-white/20">
+            <Label htmlFor="media" className="text-sm font-semibold text-aa-dark mb-3 block">Photos/Videos</Label>
+            <div className="space-y-3">
               <div className="flex space-x-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => document.getElementById('photo-upload')?.click()}
-                  className="flex-1"
+                  className="flex-1 border-white/30 bg-white/20 text-aa-dark hover:bg-white/30"
                 >
                   <Camera className="w-4 h-4 mr-2" />
                   Add Photo
@@ -451,7 +460,7 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
                   type="button"
                   variant="outline"
                   onClick={() => document.getElementById('video-upload')?.click()}
-                  className="flex-1"
+                  className="flex-1 border-white/30 bg-white/20 text-aa-dark hover:bg-white/30"
                 >
                   <Video className="w-4 h-4 mr-2" />
                   Add Video
@@ -508,14 +517,16 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="notes">Notes</Label>
+          {/* Notes - Horizontal Bar */}
+          <div className="aa-overlay-content backdrop-blur-sm rounded-lg p-4 border border-white/20">
+            <Label htmlFor="notes" className="text-sm font-semibold text-aa-dark mb-3 block">Notes</Label>
             <Textarea
               id="notes"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="Optional notes about the climb"
               rows={3}
+              className="w-full border border-white/30 bg-white/20 text-aa-dark placeholder:text-aa-medium resize-none"
             />
           </div>
 
