@@ -74,8 +74,8 @@ export default function Home() {
     <div className="py-2">
       {/* Welcome Section */}
       <div className="py-3 mb-4">
-        <div className="bg-white/15 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-          <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+        <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-3 border border-white/20">
+          <h2 className="text-2xl font-bold text-aa-dark mb-3 text-center">
             {user?.lastLoginAt ? 
               `Welcome back, ${authUser?.firstName || user?.firstName || "Climber"}!` : 
               `Welcome, ${authUser?.firstName || user?.firstName || "Climber"}!`
@@ -84,8 +84,8 @@ export default function Home() {
         </div>
         
         {/* Streak Section - Full Width */}
-        <div className="bg-white/75 backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
-          <div className="flex items-center justify-center space-x-2 text-gray-800">
+        <div className="aa-overlay-content backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
+          <div className="flex items-center justify-center space-x-2 text-aa-dark">
             <span className="text-base font-medium">You're on a </span>
             <span className="text-2xl font-bold">{user?.currentStreak || 0}</span>
             <span className="text-base font-medium">-day streak!</span>
@@ -117,9 +117,9 @@ export default function Home() {
       </Button>
 
       {/* Today's Summary - Full Width */}
-      <Card className="bg-white/85 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0">
+      <Card className="aa-overlay-strong backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0">
         <CardContent className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Summary</h3>
+          <h3 className="text-lg font-semibold text-aa-dark mb-4">Your Summary</h3>
           
           <div className="grid grid-cols-2 gap-3">
             {summaryItems.map((item, index) => (
@@ -137,8 +137,8 @@ export default function Home() {
                   }
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900 mb-1">{item.value}</div>
-                  <div className="text-sm text-gray-600 font-medium">{item.label.replace(':', '')}</div>
+                  <div className="text-2xl font-bold text-aa-dark mb-1">{item.value}</div>
+                  <div className="text-sm text-aa-medium font-medium">{item.label.replace(':', '')}</div>
                 </div>
               </div>
             ))}
@@ -148,13 +148,13 @@ export default function Home() {
 
       {/* Daily Quote Section */}
       {dailyQuote && (
-        <div className="bg-white/75 backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
+        <div className="aa-overlay-content backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
           <div className="text-center">
-            <p className="text-sm font-medium text-gray-700 italic">
+            <p className="text-sm font-medium text-aa-dark italic">
               "{dailyQuote.quote}"
             </p>
             {dailyQuote.fallback && (
-              <p className="text-xs text-gray-500 mt-1">📱 Offline mode</p>
+              <p className="text-xs text-aa-medium mt-1">📱 Offline mode</p>
             )}
           </div>
         </div>

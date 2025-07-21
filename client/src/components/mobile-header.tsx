@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { User, Mail, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { AuthUserResponse } from "@shared/schema";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +18,7 @@ export default function MobileHeader() {
   const [location, setLocation] = useLocation();
   const [profileOpen, setProfileOpen] = useState(false);
   
-  const { data: user } = useQuery({
+  const { data: user } = useQuery<AuthUserResponse>({
     queryKey: ["api", "auth", "user"],
   });
 
@@ -53,17 +54,17 @@ export default function MobileHeader() {
   return (
     <>
       {/* Status Bar */}
-      <div className="flex justify-between items-center px-3 py-2 bg-white/80 backdrop-blur-sm text-black text-sm font-medium">
+      <div className="flex justify-between items-center px-3 py-2 aa-overlay-content backdrop-blur-sm text-aa-dark text-sm font-medium">
         <span>11:41</span>
         <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-black rounded-sm"></div>
-          <div className="w-4 h-2 bg-black rounded-sm"></div>
-          <div className="w-4 h-2 bg-black rounded-sm"></div>
+          <div className="w-4 h-2 bg-gray-800 rounded-sm"></div>
+          <div className="w-4 h-2 bg-gray-800 rounded-sm"></div>
+          <div className="w-4 h-2 bg-gray-800 rounded-sm"></div>
         </div>
       </div>
 
       {/* Navigation Header */}
-      <header className="px-3 py-4 bg-white/80 backdrop-blur-sm border-b border-white/20">
+      <header className="px-3 py-4 aa-overlay-content backdrop-blur-sm border-b border-white/20">
         <div className="flex items-center justify-between">
           <DropdownMenu open={profileOpen} onOpenChange={handleDropdownChange}>
             <DropdownMenuTrigger asChild>
@@ -114,7 +115,7 @@ export default function MobileHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <h1 className="text-xl font-semibold text-gray-900 flex-1 text-center header-title">{getTitle()}</h1>
+          <h1 className="text-xl font-semibold text-aa-dark flex-1 text-center header-title">{getTitle()}</h1>
           <div className="w-8"></div>
         </div>
       </header>

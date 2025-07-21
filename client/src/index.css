@@ -73,6 +73,12 @@
   --surf-crest: #CEE4D2;
   --tango: #EF7326;
   --gradient-bg: linear-gradient(135deg, #CEE4D2 0%, #CEE4D2 75%, #EF7326 100%);
+  
+  /* AA Contrast overlays */
+  --overlay-light: rgba(255, 255, 255, 0.10);
+  --overlay-medium: rgba(255, 255, 255, 0.15);
+  --overlay-content: rgba(255, 255, 255, 0.75);
+  --overlay-strong: rgba(255, 255, 255, 0.85);
 }
 
 .dark {
@@ -111,5 +117,37 @@
     @apply font-sans antialiased text-foreground;
     background: var(--gradient-bg);
     min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  /* AA Contrast utility classes */
+  .aa-overlay-light {
+    background-color: var(--overlay-light);
+  }
+  
+  .aa-overlay-medium {
+    background-color: var(--overlay-medium);
+  }
+  
+  .aa-overlay-content {
+    background-color: var(--overlay-content);
+  }
+  
+  .aa-overlay-strong {
+    background-color: var(--overlay-strong);
+  }
+  
+  /* Text contrast helpers */
+  .text-aa-dark {
+    color: #1f2937; /* Ensures 4.5:1 contrast on light backgrounds */
+  }
+  
+  .text-aa-medium {
+    color: #374151; /* Ensures good contrast on medium backgrounds */
+  }
+  
+  .text-aa-large {
+    color: #4b5563; /* For large text (3:1 minimum) */
   }
 }

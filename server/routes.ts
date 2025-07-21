@@ -33,7 +33,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     // Priority: passed email > environment variable > default
     const userEmail = email || process.env.DEV_USER_EMAIL || 'lyhakim@gmail.com';
-    return await storage.getUserByEmail(userEmail);
+    const user = await storage.getUserByEmail(userEmail);
+    return user || null;
   }
 
   // Auth routes

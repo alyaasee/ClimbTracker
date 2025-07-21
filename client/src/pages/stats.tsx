@@ -62,8 +62,8 @@ export default function Stats() {
       
       {/* Month Selector */}
       <div className="mb-6">
-        <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-          <Label className="block text-sm font-medium text-gray-900 mb-2 form-label">
+        <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-4 border border-white/20">
+          <Label className="block text-sm font-medium text-aa-dark mb-2 form-label">
             Select Month
           </Label>
         <Select
@@ -92,11 +92,11 @@ export default function Stats() {
 
       {isEmpty ? (
         <div className="text-center py-12">
-          <div className="bg-white/15 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-            <div className="text-gray-800 text-lg mb-2 font-medium">
+          <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-6 border border-white/20">
+            <div className="text-aa-dark text-lg mb-2 font-medium">
               {availableMonths.length === 0 ? "No climbs yet—get on the wall!" : "Select a month to see your stats"}
             </div>
-            <div className="text-gray-700 text-sm">
+            <div className="text-aa-medium text-sm">
               {availableMonths.length === 0 ? "Start logging climbs to see your progress" : "Choose a month with logged climbs from the dropdown above"}
             </div>
           </div>
