@@ -69,7 +69,7 @@ export default function Home() {
   return (
     <div className="py-2 page-transition">
       {/* Welcome Section */}
-      <div className="py-3 mb-4">
+      <div className="py-3 mb-2">
         <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-3 border border-white/20">
           <h2 className="text-2xl font-bold text-aa-dark mb-3 text-center">
             {user?.lastLoginAt ? 
@@ -135,7 +135,7 @@ export default function Home() {
 
       {/* Daily Quote Section */}
       {dailyQuote && (
-        <div className="aa-overlay-strong backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
+        <div className="aa-overlay-strong backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-2">
           <div className="text-center">
             <p className="text-sm font-medium text-aa-dark italic">
               "{dailyQuote.quote}"
