@@ -121,6 +121,8 @@ export default function Home() {
                 <div className={`w-12 h-12 ${item.bgColor} rounded-lg flex items-center justify-center mb-2`}>
                   {item.label === "Sends Today:" ? 
                     <Flame size={32} className={item.iconColor} /> : 
+                    item.label === "Climbs Today:" ?
+                    <Mountain size={32} className={item.iconColor} /> :
                     <item.icon className={`w-6 h-6 ${item.iconColor}`} />
                   }
                 </div>
