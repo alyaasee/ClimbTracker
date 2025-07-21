@@ -20,6 +20,11 @@ export default function Home() {
     queryKey: ["api", "stats", "today"],
   });
 
+  const { data: dailyQuote } = useQuery({
+    queryKey: ["api", "daily-quote"],
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+  });
+
   if (userLoading || authLoading) {
     return (
       <div className="py-2 px-0 flex items-center justify-center min-h-[50vh]">
@@ -100,6 +105,20 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Daily Quote Section */}
+      {dailyQuote && (
+        <div className="bg-white/75 backdrop-blur-sm rounded-xl p-4 border border-white/30 mb-3">
+          <div className="text-center">
+            <p className="text-sm font-medium text-gray-700 italic">
+              "{dailyQuote.quote}"
+            </p>
+            {dailyQuote.fallback && (
+              <p className="text-xs text-gray-500 mt-1">📱 Offline mode</p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Log Climb CTA */}
       <Button

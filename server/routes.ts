@@ -3,8 +3,14 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertClimbSchema } from "@shared/schema";
 import { format } from "date-fns";
+import OpenAI from "openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize OpenAI
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
   // Clean up expired sessions periodically
   setInterval(async () => {
     try {
@@ -407,6 +413,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Profile update error:", error);
       res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
+
+  // Get daily motivational quote
+  app.get("/api/daily-quote", requireAuth, async (req: any, res) => {
+    try {
+      if (!process.env.OPENAI_API_KEY) {
+        return res.json({ 
+          quote: "Oh great, another day of pretending gravity doesn't exist. How wonderfully delusional of us climbers.",
+          fallback: true 
+        });
+      }
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "You are a sarcastic motivational coach for rock climbers. Generate a short, witty, and sarcastically motivational quote about climbing. Keep it under 50 words and make it actually motivating despite the sarcasm."
+          },
+          {
+            role: "user",
+            content: "Give me a sarcastic motivational climbing quote for today."
+          }
+        ],
+        max_tokens: 100,
+        temperature: 0.9,
+      });
+
+      const quote = completion.choices[0]?.message?.content || 
+        "Congratulations! You've chosen a hobby where success is measured by how high you can go before gravity reminds you who's boss.";
+
+      // Cache for 24 hours
+      res.set('Cache-Control', 'private, max-age=86400');
+      res.json({ quote, fallback: false });
+    } catch (error) {
+      console.error("Daily quote error:", error);
+      // Fallback quotes if API fails
+      const fallbackQuotes = [
+        "Oh wonderful, another day of voluntarily fighting gravity. Because that always ends well.",
+        "Today's forecast: 100% chance of falling with a slight possibility of not hitting the ground.",
+        "Remember, every expert was once a beginner who refused to give up. How annoyingly persistent of them.",
+        "Climbing: Because apparently walking on flat ground is too mainstream for some people.",
+        "Today you'll either reach new heights or discover new ways to embrace the ground. Either way, it's progress!"
+      ];
+      const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+      res.json({ quote: randomQuote, fallback: true });
     }
   });
 
