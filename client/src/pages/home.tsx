@@ -148,7 +148,7 @@ export default function Home() {
 
       {/* Daily Quote Section */}
       {dailyQuote && (
-        <div className="aa-overlay-content backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
+        <div className="aa-overlay-strong backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
           <div className="text-center">
             <p className="text-sm font-medium text-aa-dark italic">
               "{dailyQuote.quote}"

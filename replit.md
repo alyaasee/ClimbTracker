@@ -17,6 +17,8 @@ Preferred communication style: Simple, everyday language.
 - Enhanced contrast ratios: 15% overlay for headers/backgrounds, 75-85% for content cards
 - Achieved AA standard compliance with 4.5:1 contrast for normal text and 3:1 for large text
 - Fire video implementation includes fallback to fire emoji if video fails to load
+- Quote section moved below summary and enhanced with stronger overlay (85% opacity) for optimal readability
+- Applied consistent AA contrast text colors throughout all components
 
 ### Real-time Home Page Updates Fix (July 18, 2025)
 - Fixed home page summary tiles not updating dynamically when logging new climbs
