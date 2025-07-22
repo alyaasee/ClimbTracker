@@ -1,6 +1,7 @@
 import { users, climbs, sessions, type User, type InsertUser, type Climb, type InsertClimb, type Session } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
+import { storageService } from "./supabase";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
