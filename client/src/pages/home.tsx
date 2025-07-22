@@ -72,9 +72,9 @@ export default function Home() {
       <div>
         <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-3 border border-white/20">
           <h2 
-            className="font-bold text-aa-dark mb-3 text-center whitespace-nowrap overflow-hidden"
+            className="font-bold text-aa-dark mb-3 text-center whitespace-nowrap"
             style={{
-              fontSize: `clamp(0.875rem, ${Math.max(0.875, 2.2 - ((authUser?.firstName || user?.firstName || "Climber").length * 0.08))}rem, 2.2rem)`
+              fontSize: `clamp(0.75rem, ${Math.max(0.75, 2.0 - ((authUser?.firstName || user?.firstName || "Climber").length * 0.1))}rem, 2.0rem)`
             }}
           >
             {user?.lastLoginAt ? 
