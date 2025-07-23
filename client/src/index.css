@@ -1,3 +1,4 @@
+
 /* Custom Font */
 @font-face {
   font-family: 'Space Mono';
@@ -7,40 +8,104 @@
   font-display: swap;
 }
 
-/* Custom header title font class */
-.header-title {
+/* Retro-arcade typography classes */
+.retro-title {
   font-family: 'Space Mono', monospace;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #EF7326;
+  text-shadow: 3px 3px 0px #1F1F1F, -1px -1px 0px #1F1F1F, 1px -1px 0px #1F1F1F, -1px 1px 0px #1F1F1F;
 }
 
-/* Form and label styling */
-.form-label {
+.retro-heading {
   font-family: 'Space Mono', monospace;
-  font-weight: 400;
-  letter-spacing: 0;
-  color: #6B7280;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #1F1F1F;
+  text-shadow: 2px 2px 0px #FCFCF9;
 }
 
-.form-input {
+.retro-body {
   font-family: 'Space Mono', monospace;
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: 600;
+  color: #1F1F1F;
 }
 
-/* Body text styling */
-.body-text {
+.retro-label {
   font-family: 'Space Mono', monospace;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1.5;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: #1F1F1F;
 }
 
-/* Button text styling */
-.button-text {
+/* Retro container styles */
+.retro-container {
+  background: #FCFCF9;
+  border: 4px solid #1F1F1F;
+  border-radius: 12px;
+  box-shadow: 4px 4px 0px #9BA0A5;
+}
+
+.retro-container-primary {
+  background: linear-gradient(135deg, #CEE4D2 0%, #EF7326 100%);
+  border: 4px solid #1F1F1F;
+  border-radius: 12px;
+  box-shadow: 4px 4px 0px #9BA0A5;
+}
+
+.retro-container-accent {
+  background: #CEE4D2;
+  border: 3px solid #1F1F1F;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0px #9BA0A5;
+}
+
+/* Retro button styles */
+.retro-button {
   font-family: 'Space Mono', monospace;
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #EF7326;
+  color: #FCFCF9;
+  border: 3px solid #1F1F1F;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0px #1F1F1F;
+  transition: all 0.1s ease;
+}
+
+.retro-button:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px #1F1F1F;
+}
+
+.retro-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #1F1F1F;
+}
+
+.retro-button-secondary {
+  background: #CEE4D2;
+  color: #1F1F1F;
+}
+
+.retro-input {
+  font-family: 'Space Mono', monospace;
+  font-weight: 600;
+  background: #FCFCF9;
+  border: 3px solid #1F1F1F;
+  border-radius: 6px;
+  color: #1F1F1F;
+}
+
+.retro-input:focus {
+  outline: none;
+  border-color: #EF7326;
+  box-shadow: 0 0 0 2px rgba(239, 115, 38, 0.2);
 }
 
 @tailwind base;
@@ -48,60 +113,64 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(221, 83%, 53%);
-  --primary-foreground: hsl(210, 40%, 98%);
-  --secondary: hsl(210, 40%, 96%);
-  --secondary-foreground: hsl(222, 84%, 5%);
-  --accent: hsl(210, 40%, 96%);
-  --accent-foreground: hsl(222, 84%, 5%);
-  --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
-  --radius: 0.5rem;
+  --background: #FCFCF9;
+  --foreground: #1F1F1F;
+  --muted: #9BA0A5;
+  --muted-foreground: #1F1F1F;
+  --popover: #FCFCF9;
+  --popover-foreground: #1F1F1F;
+  --card: #FCFCF9;
+  --card-foreground: #1F1F1F;
+  --border: #1F1F1F;
+  --input: #FCFCF9;
+  --primary: #EF7326;
+  --primary-foreground: #FCFCF9;
+  --secondary: #CEE4D2;
+  --secondary-foreground: #1F1F1F;
+  --accent: #CEE4D2;
+  --accent-foreground: #1F1F1F;
+  --destructive: #EF7326;
+  --destructive-foreground: #FCFCF9;
+  --ring: #EF7326;
+  --radius: 0.75rem;
   
-  /* Custom gradient colors */
-  --surf-crest: #CEE4D2;
-  --tango: #EF7326;
-  --gradient-bg: linear-gradient(135deg, #CEE4D2 0%, #CEE4D2 75%, #EF7326 100%);
+  /* CLIMB-CADE Brand Colors */
+  --climb-mint: #CEE4D2;
+  --climb-orange: #EF7326;
+  --climb-gradient-light: #C8DFA8;
+  --climb-gradient-peach: #F5B060;
+  --climb-off-white: #FCFCF9;
+  --climb-dark: #1F1F1F;
+  --climb-gray: #9BA0A5;
+  --climb-purple: #B96BFF;
+  --climb-blue: #2F9BFF;
+  --climb-green: #50E29F;
   
-  /* AA Contrast overlays */
-  --overlay-light: rgba(255, 255, 255, 0.10);
-  --overlay-medium: rgba(255, 255, 255, 0.15);
-  --overlay-content: rgba(255, 255, 255, 0.75);
-  --overlay-strong: rgba(255, 255, 255, 0.85);
+  /* Retro gradient backgrounds */
+  --retro-gradient-primary: linear-gradient(135deg, #CEE4D2 0%, #EF7326 100%);
+  --retro-gradient-soft: linear-gradient(135deg, #C8DFA8 0%, #F5B060 100%);
 }
 
 .dark {
-  --background: hsl(240, 10%, 3.9%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 3.9%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(221, 83%, 53%);
-  --primary-foreground: hsl(210, 40%, 98%);
-  --secondary: hsl(240, 3.7%, 15.9%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 3.7%, 15.9%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
-  --radius: 0.5rem;
+  --background: #1F1F1F;
+  --foreground: #FCFCF9;
+  --muted: #9BA0A5;
+  --muted-foreground: #FCFCF9;
+  --popover: #1F1F1F;
+  --popover-foreground: #FCFCF9;
+  --card: #1F1F1F;
+  --card-foreground: #FCFCF9;
+  --border: #9BA0A5;
+  --input: #1F1F1F;
+  --primary: #EF7326;
+  --primary-foreground: #FCFCF9;
+  --secondary: #CEE4D2;
+  --secondary-foreground: #1F1F1F;
+  --accent: #CEE4D2;
+  --accent-foreground: #1F1F1F;
+  --destructive: #EF7326;
+  --destructive-foreground: #FCFCF9;
+  --ring: #EF7326;
 }
 
 @layer base {
@@ -111,114 +180,80 @@
   
   body {
     font-family: 'Space Mono', monospace;
+    font-weight: 600;
   }
 
   body {
-    @apply font-sans antialiased text-foreground;
-    background: var(--gradient-bg);
+    @apply antialiased text-foreground;
+    background: var(--retro-gradient-soft);
     min-height: 100vh;
   }
 }
 
 @layer utilities {
-  /* AA Contrast utility classes */
-  .aa-overlay-light {
-    background-color: var(--overlay-light);
+  /* CLIMB-CADE Brand Utilities */
+  .climb-mint {
+    background-color: var(--climb-mint);
   }
   
-  .aa-overlay-medium {
-    background-color: var(--overlay-medium);
+  .climb-orange {
+    background-color: var(--climb-orange);
   }
   
-  .aa-overlay-content {
-    background-color: var(--overlay-content);
+  .climb-gradient-primary {
+    background: var(--retro-gradient-primary);
   }
   
-  .aa-overlay-strong {
-    background-color: var(--overlay-strong);
+  .climb-gradient-soft {
+    background: var(--retro-gradient-soft);
   }
   
-  /* Text contrast helpers - Enhanced for maximum readability */
-  .text-aa-dark {
-    color: #000000; /* Pure black for maximum contrast */
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.3);
+  .text-climb-dark {
+    color: var(--climb-dark);
   }
   
-  .text-aa-medium {
-    color: #1a1a1a; /* Near black for strong contrast */
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.2);
+  .text-climb-orange {
+    color: var(--climb-orange);
   }
   
-  .text-aa-light {
-    color: #333333; /* Dark gray with enhanced contrast */
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
+  .text-climb-mint {
+    color: var(--climb-mint);
   }
 
-  /* WCAG 2.2 Compliant Animations */
+  /* Retro animations */
   @media (prefers-reduced-motion: no-preference) {
-    .page-transition {
-      animation: fadeInScale 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    .retro-bounce:hover {
+      animation: retroBounce 0.3s ease-in-out;
     }
     
-    .nav-transition {
-      transition: all 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-    
-    .card-transition {
-      transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                  opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-    
-    .card-transition:hover {
-      transform: translateY(-1px);
-    }
-    
-    .scale-102:hover {
-      transform: scale(1.02);
-    }
-    
-    .scale-105 {
-      transform: scale(1.05);
+    .retro-pulse {
+      animation: retroPulse 2s infinite;
     }
   }
 
-  @keyframes fadeInScale {
-    from {
-      opacity: 0;
-      transform: scale(0.98);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+  @keyframes retroBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  @keyframes retroPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
   }
 
   /* Respect reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
-    .page-transition,
-    .nav-transition,
-    .card-transition {
+    .retro-bounce,
+    .retro-pulse {
       animation: none !important;
-      transition: none !important;
     }
   }
   
-  .text-aa-large {
-    color: #000000; /* Pure black for large text maximum contrast */
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.3);
-  }
-  
-  /* Navigation text enhancement */
-  .nav-text {
-    color: #000000;
-    text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
-    font-weight: 600;
-  }
-  
-  /* Button text enhancement */
-  .btn-text {
-    color: #000000 !important;
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
-    font-weight: 600;
+  /* Retro pixel art helpers */
+  .pixel-art {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
   }
 }

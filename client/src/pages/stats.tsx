@@ -1,252 +1,215 @@
+import { useState } from 'react';
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
-import { apiRequest } from "@/lib/queryClient";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Mountain, TrendingUp, Target } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Trophy, TrendingUp, Target, Calendar } from "lucide-react";
 
 export default function Stats() {
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const currentDate = new Date();
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
 
-  // Get available months with climbs
   const { data: availableMonths = [] } = useQuery({
     queryKey: ["api", "stats", "available-months"],
   });
 
-  // Set default selection to the most recent month with climbs
-  useEffect(() => {
-    if (availableMonths.length > 0 && selectedYear === null && selectedMonth === null) {
-      setSelectedYear(availableMonths[0].year);
-      setSelectedMonth(availableMonths[0].month);
-    }
-  }, [availableMonths, selectedYear, selectedMonth]);
-
-  const { data: monthlyStats, isLoading: monthlyStatsLoading } = useQuery({
+  const { data: monthlyStats } = useQuery({
     queryKey: ["api", "stats", "monthly", selectedYear, selectedMonth],
-    queryFn: () => apiRequest(`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`),
-    enabled: selectedYear !== null && selectedMonth !== null,
   });
 
-  const { data: gradeProgressionData = [] } = useQuery({
+  const { data: gradeProgression = [] } = useQuery({
     queryKey: ["api", "stats", "grade-progression", selectedYear, selectedMonth],
-    queryFn: () => apiRequest(`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`),
-    enabled: selectedYear !== null && selectedMonth !== null,
   });
 
-  const formatMonthValue = (year: number, month: number) => {
-    const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-    const monthName = monthNames[month - 1];
-    return `${monthName.slice(0, 3)} ${year}`;
-  };
+  const COLORS = ['#CEE4D2', '#EF7326', '#B96BFF', '#2F9BFF', '#50E29F'];
 
-  // Route type colors using Surf Crest and Tango gradient system
-  const routeTypeColors = {
-    'Boulder': '#CEE4D2',      // Surf Crest
-    'Top Rope': '#EF7326',     // Tango
-    'Lead': '#B8D4BE',         // Darker Surf Crest
-    'Auto Belay': '#E5631A'    // Darker Tango
+  const formatMonth = (year: number, month: number) => {
+    return new Date(year, month - 1).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long' 
+    });
   };
-
-  // Empty state check
-  const isEmpty = selectedYear === null || selectedMonth === null || !monthlyStats || monthlyStats.totalClimbs === 0;
 
   return (
-    <div className="py-4 page-transition">
+    <div className="py-4 space-y-4">
+      {/* Header */}
+      <div className="retro-container-primary p-4">
+        <h1 className="retro-title text-xl text-center">Climbing Stats</h1>
+      </div>
 
-      
       {/* Month Selector */}
-      <div className="mb-6">
-        <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-4 border border-white/20">
-          <Label className="block text-sm font-medium text-aa-dark mb-2 form-label">
-            Select Month
-          </Label>
+      <div className="retro-container p-4">
+        <div className="retro-label mb-3">Select Month</div>
         <Select
-          value={selectedYear && selectedMonth ? `${selectedYear}-${selectedMonth.toString().padStart(2, '0')}` : undefined}
+          value={`${selectedYear}-${selectedMonth}`}
           onValueChange={(value) => {
-            if (value) {
-              const [year, month] = value.split('-');
-              setSelectedYear(parseInt(year));
-              setSelectedMonth(parseInt(month));
-            }
+            const [year, month] = value.split('-').map(Number);
+            setSelectedYear(year);
+            setSelectedMonth(month);
           }}
         >
-          <SelectTrigger className="w-full px-3 py-3 bg-gray-100 border border-gray-200 rounded-lg">
-            <SelectValue placeholder="Select month" />
+          <SelectTrigger className="retro-input">
+            <SelectValue />
           </SelectTrigger>
-          <SelectContent>
-            {availableMonths.map(({ year, month }) => (
-              <SelectItem key={`${year}-${month}`} value={`${year}-${month.toString().padStart(2, '0')}`}>
-                {formatMonthValue(year, month)}
+          <SelectContent className="retro-container">
+            {availableMonths.map((month: any) => (
+              <SelectItem 
+                key={`${month.year}-${month.month}`} 
+                value={`${month.year}-${month.month}`}
+                className="retro-body"
+              >
+                {month.monthName} {month.year}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        </div>
       </div>
 
-      {isEmpty ? (
-        <div className="text-center py-12">
-          <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-6 border border-white/20">
-            <div className="text-aa-dark text-lg mb-2 font-medium">
-              {availableMonths.length === 0 ? "No climbs yet—get on the wall!" : "Select a month to see your stats"}
-            </div>
-            <div className="text-aa-medium text-sm">
-              {availableMonths.length === 0 ? "Start logging climbs to see your progress" : "Choose a month with logged climbs from the dropdown above"}
-            </div>
-          </div>
-        </div>
-      ) : (
+      {monthlyStats && (
         <>
-          {/* Key Metrics */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
-            <Card className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30">
-              <CardContent className="p-4 text-center flex flex-col items-center min-h-[100px]">
-                <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <Mountain className="w-5 h-5 text-emerald-600" />
-                </div>
-                <div className="text-sm text-gray-600 mb-1 h-5 flex items-center">Max Grade</div>
-                <div className="text-2xl font-bold text-gray-900 h-8 flex items-center">
-                  {monthlyStats?.maxGrade || '5a'}
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30">
-              <CardContent className="p-4 text-center flex flex-col items-center min-h-[100px]">
-                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
-                </div>
-                <div className="text-sm text-gray-600 mb-1 h-5 flex items-center">Total Climbs</div>
-                <div className="text-2xl font-bold text-gray-900 h-8 flex items-center">
-                  {monthlyStats?.totalClimbs || 0}
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30">
-              <CardContent className="p-4 text-center flex flex-col items-center min-h-[100px]">
-                <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <Target className="w-5 h-5 text-purple-600" />
-                </div>
-                <div className="text-sm text-gray-600 mb-1 h-5 flex items-center">Success Rate</div>
-                <div className="text-2xl font-bold text-gray-900 h-8 flex items-center">
-                  {monthlyStats?.successRate || 0}%
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Monthly Summary Cards */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="retro-container-accent p-4 text-center">
+              <Trophy className="w-8 h-8 mx-auto mb-2 text-climb-orange" strokeWidth={3} />
+              <div className="retro-title text-2xl mb-1">{monthlyStats.totalClimbs}</div>
+              <div className="retro-label">Total Climbs</div>
+            </div>
 
-          {/* Grade Progression Chart */}
-          <Card className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30 mb-6">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Grade Progression
-              </h3>
-              
-              {gradeProgressionData.length > 0 ? (
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={gradeProgressionData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="month"
-                        tick={{ fontSize: 12 }}
-                      />
-                      <YAxis 
-                        domain={[1, 10]}
-                        tick={{ fontSize: 12 }}
-                        tickFormatter={(value) => {
-                          const grades = ['5c', '6a', '6a+', '6b', '6b+', '6c', '6c+', '7a', '7b', '7c'];
-                          return grades[value - 1] || value;
-                        }}
-                      />
-                      <Tooltip 
-                        formatter={(value, name) => {
-                          const grades = ['5c', '6a', '6a+', '6b', '6b+', '6c', '6c+', '7a', '7b', '7c'];
-                          return [grades[value - 1] || value, 'Max Grade'];
-                        }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="gradeValue" 
-                        stroke="#EF7326" 
-                        strokeWidth={2}
-                        dot={{ r: 4, fill: '#CEE4D2', stroke: '#EF7326' }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  Not enough data for progression chart
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            <div className="retro-container-accent p-4 text-center">
+              <TrendingUp className="w-8 h-8 mx-auto mb-2 text-climb-blue" strokeWidth={3} />
+              <div className="retro-title text-2xl mb-1">{monthlyStats.maxGrade}</div>
+              <div className="retro-label">Max Grade</div>
+            </div>
+
+            <div className="retro-container-accent p-4 text-center">
+              <Target className="w-8 h-8 mx-auto mb-2 text-climb-green" strokeWidth={3} />
+              <div className="retro-title text-2xl mb-1">{monthlyStats.successRate}%</div>
+              <div className="retro-label">Success Rate</div>
+            </div>
+
+            <div className="retro-container-accent p-4 text-center">
+              <Calendar className="w-8 h-8 mx-auto mb-2 text-climb-purple" strokeWidth={3} />
+              <div className="retro-title text-lg mb-1">{formatMonth(selectedYear, selectedMonth).split(' ')[0]}</div>
+              <div className="retro-label">Selected</div>
+            </div>
+          </div>
 
           {/* Route Type Breakdown */}
-          <Card className="bg-white/85 backdrop-blur-sm shadow-sm border border-white/30">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Route Type Breakdown
-              </h3>
-              
-              {monthlyStats?.routeTypeBreakdown && monthlyStats.routeTypeBreakdown.length > 0 ? (
-                <div>
-                  <div className="h-64 mb-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={monthlyStats.routeTypeBreakdown}
-                          cx="50%"
-                          cy="50%"
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="count"
-                          label={({ percentage }) => `${percentage}%`}
-                          labelLine={false}
-                        >
-                          {monthlyStats.routeTypeBreakdown.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={routeTypeColors[entry.routeType] || '#8884d8'} />
-                          ))}
-                        </Pie>
-                        <Tooltip 
-                          formatter={(value, name) => [value, 'Climbs']}
-                          labelFormatter={(label) => `Route Type: ${label}`}
+          {monthlyStats.routeTypeBreakdown.length > 0 && (
+            <div className="retro-container p-4">
+              <h3 className="retro-heading text-lg mb-4">Route Type Breakdown</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={monthlyStats.routeTypeBreakdown}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="count"
+                      stroke="#1F1F1F"
+                      strokeWidth={3}
+                    >
+                      {monthlyStats.routeTypeBreakdown.map((entry: any, index: number) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={COLORS[index % COLORS.length]} 
                         />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  
-                  {/* Custom Legend for Mobile */}
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    {monthlyStats.routeTypeBreakdown.map((entry, index) => (
-                      <div key={index} className="flex items-center space-x-2">
-                        <div 
-                          className="w-3 h-3 rounded-sm flex-shrink-0"
-                          style={{ backgroundColor: routeTypeColors[entry.routeType] || '#8884d8' }}
-                        />
-                        <span className="text-gray-700 truncate">
-                          {entry.routeType} ({entry.count})
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  No route type data available
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: '#FCFCF9',
+                        border: '3px solid #1F1F1F',
+                        borderRadius: '8px',
+                        fontFamily: 'Space Mono, monospace',
+                        fontWeight: '600'
+                      }}
+                    />
+                    <Legend 
+                      wrapperStyle={{
+                        fontFamily: 'Space Mono, monospace',
+                        fontWeight: '600',
+                        fontSize: '12px'
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
         </>
+      )}
+
+      {/* Grade Progression */}
+      {gradeProgression.length > 0 && (
+        <div className="retro-container p-4">
+          <h3 className="retro-heading text-lg mb-4">Grade Progression</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={gradeProgression}>
+                <CartesianGrid 
+                  strokeDasharray="3 3" 
+                  stroke="#9BA0A5"
+                  strokeWidth={2}
+                />
+                <XAxis 
+                  dataKey="month" 
+                  stroke="#1F1F1F"
+                  strokeWidth={2}
+                  style={{ 
+                    fontFamily: 'Space Mono, monospace',
+                    fontWeight: '600',
+                    fontSize: '12px'
+                  }}
+                />
+                <YAxis 
+                  stroke="#1F1F1F"
+                  strokeWidth={2}
+                  style={{ 
+                    fontFamily: 'Space Mono, monospace',
+                    fontWeight: '600',
+                    fontSize: '12px'
+                  }}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#FCFCF9',
+                    border: '3px solid #1F1F1F',
+                    borderRadius: '8px',
+                    fontFamily: 'Space Mono, monospace',
+                    fontWeight: '600'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="gradeValue" 
+                  stroke="#EF7326" 
+                  strokeWidth={4}
+                  strokeLinecap="round"
+                  dot={{ 
+                    fill: '#EF7326', 
+                    strokeWidth: 3, 
+                    stroke: '#1F1F1F', 
+                    r: 6 
+                  }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {!monthlyStats && (
+        <div className="retro-container p-8 text-center">
+          <Trophy className="w-12 h-12 mx-auto mb-4 text-climb-gray" />
+          <div className="retro-body text-climb-gray">
+            No climbing data available for the selected month
+          </div>
+        </div>
       )}
     </div>
   );

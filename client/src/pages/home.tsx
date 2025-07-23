@@ -1,157 +1,121 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mountain, MountainSnow, Zap, Flame, Target } from "lucide-react";
-import type { User, TodayStatsResponse, DailyQuoteResponse, AuthUserResponse } from "@shared/schema";
+import { format } from "date-fns";
+import { Mountain, Zap, Target, Activity } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Home() {
+  const { user: authUser } = useAuth();
 
-  const { data: authUser, isLoading: authLoading } = useQuery<AuthUserResponse>({
-    queryKey: ["api", "auth", "user"],
-  });
-
-  const { data: user, isLoading: userLoading } = useQuery<User>({
+  const { data: user } = useQuery({
     queryKey: ["api", "user"],
   });
 
-  const { data: todayStats } = useQuery<TodayStatsResponse>({
-    queryKey: ["api", "stats", "today"],
+  const { data: todayStats } = useQuery({
+    queryKey: ["api", "stats", "today", format(new Date(), 'yyyy-MM-dd')],
   });
 
-  const { data: dailyQuote } = useQuery<DailyQuoteResponse>({
-    queryKey: ["api", "daily-quote"],
-    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+  const { data: quote, isLoading: quoteLoading } = useQuery({
+    queryKey: ["api", "quote"],
   });
-
-  if (userLoading || authLoading) {
-    return (
-      <div className="py-2 px-0 flex items-center justify-center min-h-[50vh]">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 mx-auto">
-            <span className="text-white font-bold text-xl">🧗</span>
-          </div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   const summaryItems = [
     {
       icon: Mountain,
-      label: "Climbs Today:",
+      label: "Climbs",
       value: todayStats?.climbs || 0,
-      bgColor: "bg-blue-50",
-      iconColor: "text-blue-600",
+      color: "text-climb-blue"
     },
     {
       icon: Zap,
-      label: "Flashes Today:",
+      label: "Flashes", 
       value: todayStats?.flashes || 0,
-      bgColor: "bg-amber-50",
-      iconColor: "text-amber-600",
-    },
-    {
-      icon: Flame,
-      label: "Sends Today:",
-      value: todayStats?.sends || 0,
-      bgColor: "bg-emerald-50",
-      iconColor: "text-emerald-600",
+      color: "text-climb-orange"
     },
     {
       icon: Target,
-      label: "Project Today:",
+      label: "Sends",
+      value: todayStats?.sends || 0,
+      color: "text-climb-green"
+    },
+    {
+      icon: Activity,
+      label: "Projects",
       value: todayStats?.projects || 0,
-      bgColor: "bg-purple-50",
-      iconColor: "text-purple-600",
+      color: "text-climb-purple"
     },
   ];
 
   return (
-    <div className="py-2 page-transition space-y-3">
+    <div className="py-4 space-y-4">
       {/* Welcome Section */}
-      <div>
-        <div className="aa-overlay-medium backdrop-blur-sm rounded-xl p-3 border border-white/20">
-          <h2 
-            className="font-bold text-aa-dark mb-3 text-center whitespace-nowrap"
-            style={{
-              fontSize: `clamp(0.75rem, ${Math.max(0.75, 2.0 - ((authUser?.firstName || user?.firstName || "Climber").length * 0.1))}rem, 2.0rem)`
-            }}
-          >
-            {user?.lastLoginAt ? 
-              `Welcome back, ${authUser?.firstName || user?.firstName || "Climber"}!` : 
-              `Welcome, ${authUser?.firstName || user?.firstName || "Climber"}!`
-            }
-          </h2>
-        </div>
-        
-        {/* Streak Section - Full Width */}
-        <div className="aa-overlay-content backdrop-blur-sm rounded-xl p-4 border border-white/30 mt-3">
-          <div className="flex items-center justify-center space-x-2 text-aa-dark">
-            <span className="text-base font-medium">You're on a </span>
-            <span className="text-2xl font-bold">{user?.currentStreak || 0}</span>
-            <span className="text-base font-medium">-day streak!</span>
+      <div className="retro-container-accent p-4">
+        <h2 className="retro-heading text-center text-lg">
+          {user?.lastLoginAt ? 
+            `Welcome back, ${authUser?.firstName || user?.firstName || "Climber"}!` : 
+            `Welcome, ${authUser?.firstName || user?.firstName || "Climber"}!`
+          }
+        </h2>
 
+        {/* Streak Section */}
+        <div className="retro-container mt-4 p-4 text-center">
+          <div className="flex items-center justify-center space-x-3">
+            <span className="retro-body">You're on a</span>
+            <div className="retro-container-primary px-4 py-2">
+              <span className="retro-title text-3xl">{user?.currentStreak || 0}</span>
+            </div>
+            <span className="retro-body">day streak!</span>
             {(user?.currentStreak || 0) >= 1 && (
-              <video 
-                src="/fire-animation.webm" 
-                autoPlay 
-                loop 
+              <video
+                autoPlay
+                loop
                 muted
-                className="w-8 h-8 object-contain"
+                className="w-8 h-8 pixel-art"
                 onError={(e) => {
-                  // Fallback to emoji if video fails to load
-                  e.currentTarget.outerHTML = '<span class="text-2xl animate-pulse">🔥</span>';
+                  e.currentTarget.style.display = 'none';
+                  const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (nextSibling) {
+                    nextSibling.classList.remove('hidden');
+                  }
                 }}
-              />
+              >
+                <source src="/fire-animation.webm" type="video/webm" />
+              </video>
             )}
+            <span className={`text-2xl ${(user?.currentStreak || 0) >= 1 ? 'hidden' : ''}`}>🔥</span>
           </div>
         </div>
       </div>
 
-      {/* Today's Summary - Full Width */}
-      <Card className="aa-overlay-strong backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mx-0 card-transition">
-        <CardContent className="p-4">
-          <h3 className="text-lg font-semibold text-aa-dark mb-4">Your Summary</h3>
-          
-          <div className="grid grid-cols-2 gap-3">
-            {summaryItems.map((item, index) => (
-              <div key={index} className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-                <div className={`w-12 h-12 ${item.bgColor} rounded-lg flex items-center justify-center mb-2`}>
-                  {item.label === "Sends Today:" ? 
-                    <Flame size={32} className={item.iconColor} /> : 
-                    item.label === "Climbs Today:" ?
-                    <MountainSnow size={32} className={item.iconColor} /> :
-                    item.label === "Flashes Today:" ?
-                    <Zap size={32} className={item.iconColor} /> :
-                    item.label === "Project Today:" ?
-                    <Target size={32} className={item.iconColor} /> :
-                    <item.icon className={`w-6 h-6 ${item.iconColor}`} />
-                  }
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-aa-dark mb-1">{item.value}</div>
-                  <div className="text-sm text-aa-medium font-medium">{item.label.replace(':', '')}</div>
-                </div>
+      {/* Summary Section */}
+      <div className="retro-container p-4">
+        <h3 className="retro-heading text-lg mb-4">Your Summary</h3>
+
+        <div className="grid grid-cols-2 gap-3">
+          {summaryItems.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <div key={index} className="retro-container-accent p-4 text-center retro-bounce">
+                <Icon className={`w-8 h-8 mx-auto mb-2 ${item.color}`} strokeWidth={3} />
+                <div className="retro-title text-2xl mb-1">{item.value}</div>
+                <div className="retro-label">{item.label}</div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Daily Quote Section */}
-      {dailyQuote && (
-        <div className="aa-overlay-strong backdrop-blur-sm rounded-xl p-4 border border-white/30">
-          <div className="text-center">
-            <p className="text-sm font-medium text-aa-dark italic">
-              "{dailyQuote.quote}"
-            </p>
-            {dailyQuote.fallback && (
-              <p className="text-xs text-aa-medium mt-1">📱 Offline mode</p>
-            )}
-          </div>
+            );
+          })}
         </div>
-      )}
+      </div>
 
+      {/* Quote Section */}
+      <div className="retro-container p-4">
+        <h3 className="retro-heading text-lg mb-3">Daily Motivation</h3>
+        <div className="retro-container-accent p-4 text-center">
+          {quoteLoading ? (
+            <div className="retro-body text-climb-gray">Loading motivation...</div>
+          ) : (
+            <div className="retro-body italic">"{quote?.text || "Keep climbing, one hold at a time!"}"</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

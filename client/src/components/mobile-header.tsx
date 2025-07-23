@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import burgerIcon from "@assets/burger_877951_1752826463530.png";
+import React from 'react';
 
 export default function MobileHeader() {
   const [location, setLocation] = useLocation();
@@ -119,6 +120,13 @@ export default function MobileHeader() {
           <div className="w-8"></div>
         </div>
       </header>
+       <div className="retro-container-primary px-4 py-3 mb-4">
+        <div className="flex items-center justify-center">
+          <div className="retro-title text-2xl tracking-wider">
+            CLIMB-CADE
+          </div>
+        </div>
+      </div>
     </>
   );
 }
