@@ -137,15 +137,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log(`DEBUG: Attempting to verify code ${code} for ${email}`);
+      console.log(`DEBUG: Environment: ${process.env.NODE_ENV || 'undefined'}`);
 
-      // Development bypass for testing
-      const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV || process.env.NODE_ENV !== 'production';
+      // Enhanced development bypass - works in any non-production environment
+      const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV !== 'production';
+      
       if (isDevelopment && code === '000000') {
-        console.log(`DEBUG: Using development bypass code for ${email}`);
+        console.log(`🚀 DEBUG: Using development bypass code 000000 for ${email}`);
+        
+        // Get or create user for bypass
         let user = await storage.getUserByEmail(email);
         if (!user) {
+          console.log(`DEBUG: Creating new user for ${email} via bypass`);
           user = await storage.createAuthUser(email, 'Dev User');
         }
+        
+        // Update last login time
+        await storage.updateLastLogin(user.id);
         
         // Create session for bypass
         const session = await storage.createSession(user.id, user.email || '');
@@ -155,16 +163,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
 
+        console.log(`✅ DEBUG: Development bypass successful for ${email}`);
         return res.json({ message: "Successfully verified (dev bypass)" });
       }
 
+      // Regular verification flow
+      console.log(`DEBUG: Attempting regular verification for ${email} with code ${code}`);
       const user = await storage.verifyUser(email, code);
+      
       if (!user) {
-        console.log(`DEBUG: Failed to verify code ${code} for ${email}`);
-        return res.status(400).json({ error: "Invalid or expired code" });
+        console.log(`❌ DEBUG: Failed to verify code ${code} for ${email} - either invalid or expired`);
+        
+        // Check if user exists to provide better error message
+        const existingUser = await storage.getUserByEmail(email);
+        if (!existingUser) {
+          return res.status(400).json({ error: "User not found. Please sign up first." });
+        }
+        
+        return res.status(400).json({ error: "Invalid or expired code. Please request a new one." });
       }
 
-      console.log(`DEBUG: Successfully verified code for ${email}`);
+      console.log(`✅ DEBUG: Successfully verified code for ${email}`);
 
       // Update last login time
       await storage.updateLastLogin(user.id);
