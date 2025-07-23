@@ -7,6 +7,9 @@ import OpenAI from "openai";
 import { Resend } from "resend";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Development bypass control
+  let developmentBypassDisabled = false;
+
   // Initialize OpenAI
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -31,7 +34,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Helper function for development user lookup
   async function getDevelopmentUser(email?: string): Promise<User | null> {
-    if (process.env.NODE_ENV !== 'development') {
+    if (process.env.NODE_ENV !== 'development' || developmentBypassDisabled) {
       return null;
     }
 
@@ -254,13 +257,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // Logout route
-  app.get("/api/logout", async (req, res) => {
+  app.post("/api/logout", async (req, res) => {
     try {
       const sessionId = req.cookies?.sessionId;
       if (sessionId) {
         await storage.deleteSession(sessionId);
-        res.clearCookie('sessionId');
       }
+      // Clear the session cookie
+      res.clearCookie('sessionId', { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production',
+        path: '/'
+      });
+      
+      // Disable development bypass after logout
+      if (process.env.NODE_ENV === 'development') {
+        developmentBypassDisabled = true;
+      }
+      
       res.json({ message: "Logged out successfully" });
     } catch (error) {
       console.error("Logout error:", error);

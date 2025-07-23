@@ -39,7 +39,10 @@ export default function MobileHeader() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/logout");
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include"
+      });
       // Clear React Query cache for authentication data
       await queryClient.invalidateQueries({ queryKey: ["api", "auth", "user"] });
       await queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
