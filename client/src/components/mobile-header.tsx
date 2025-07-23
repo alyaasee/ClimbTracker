@@ -116,7 +116,17 @@ export default function MobileHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <h1 className="text-xl font-semibold text-aa-dark flex-1 text-center header-title">{getTitle()}</h1>
+          {location === "/" ? (
+            <div className="flex-1 flex justify-center">
+              <div className="retro-container-primary px-6 py-2 rounded-lg">
+                <div className="retro-title text-lg tracking-wider">
+                  HOME
+                </div>
+              </div>
+            </div>
+          ) : (
+            <h1 className="text-xl font-semibold text-aa-dark flex-1 text-center header-title">{getTitle()}</h1>
+          )}
           <div className="w-8"></div>
         </div>
       </header>
