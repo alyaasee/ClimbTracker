@@ -91,7 +91,7 @@ export default function Stats() {
               <div className="retro-container-accent p-4 text-center">
                 <Trophy className="w-8 h-8 mx-auto mb-2" style={{color: '#B96BFF'}} strokeWidth={3} />
                 <div className="retro-title text-xl mb-1">{(monthlyStats as any)?.successRate || 0}%</div>
-                <div className="retro-label text-xs">ACHIEVEMENTS</div>
+                <div className="retro-label text-xs">SUCCESS</div>
               </div>
             </div>
           </div>
