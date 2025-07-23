@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Log Climb Modal Integration and Summary Auto-Update Fix (July 23, 2025)
+- Connected LOG button in bottom navigation to open climb logging modal with modern card-tile layout
+- Implemented 4-tile cards for Date, Location, Style, Grade and 2-tile cards for Outcome, Photos/Videos
+- Fixed automatic cache invalidation for "Your Summary" section to update immediately after logging climbs
+- Enhanced query key specificity using date-specific keys for today's stats (format: yyyy-MM-dd)
+- Applied consistent cache invalidation across create, update, and delete climb operations
+- Fixed welcome text dynamic font sizing to display complete message with exclamation mark on one line
+
 ### Animated Fire Icon and AA Contrast Implementation (July 21, 2025)
 - Successfully implemented animated fire icon using WebM video format for streak display
 - Fire animation shows for streaks >= 1 day with auto-play, looping, and muted attributes
