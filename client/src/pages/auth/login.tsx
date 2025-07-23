@@ -3,33 +3,17 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import climbCadeIcon from "@assets/CLIMB-CADE App Icon_1753260765331.png";
 
-// CLIMB-CADE Pixel Art Mountain Icon Component
+// CLIMB-CADE App Icon Component
 function ClimbCadeIcon() {
   return (
-    <div className="w-16 h-16 flex items-center justify-center retro-container" style={{ background: 'linear-gradient(135deg, #CEE4D2 0%, #EF7326 100%)' }}>
-      <svg width="32" height="32" viewBox="0 0 32 32" className="pixel-art">
-        {/* Pixel art mountain - inspired by CLIMB-CADE app icon */}
-        <rect x="14" y="6" width="4" height="2" fill="#1F1F1F"/>
-        <rect x="12" y="8" width="8" height="2" fill="#1F1F1F"/>
-        <rect x="10" y="10" width="12" height="2" fill="#1F1F1F"/>
-        <rect x="8" y="12" width="16" height="2" fill="#1F1F1F"/>
-        <rect x="6" y="14" width="20" height="2" fill="#1F1F1F"/>
-        <rect x="4" y="16" width="24" height="2" fill="#1F1F1F"/>
-        <rect x="2" y="18" width="28" height="8" fill="#1F1F1F"/>
-        
-        {/* Mountain fill with gradient colors */}
-        <rect x="14" y="8" width="4" height="2" fill="#EF7326"/>
-        <rect x="12" y="10" width="8" height="2" fill="#EF7326"/>
-        <rect x="10" y="12" width="12" height="2" fill="#EF7326"/>
-        <rect x="8" y="14" width="16" height="2" fill="#EF7326"/>
-        <rect x="6" y="16" width="20" height="2" fill="#EF7326"/>
-        <rect x="4" y="18" width="24" height="6" fill="#EF7326"/>
-        
-        {/* Peak highlight */}
-        <rect x="15" y="8" width="2" height="2" fill="#FCFCF9"/>
-        <rect x="13" y="10" width="6" height="2" fill="#FCFCF9"/>
-      </svg>
+    <div className="w-20 h-20 flex items-center justify-center">
+      <img 
+        src={climbCadeIcon} 
+        alt="CLIMB-CADE" 
+        className="w-16 h-16 rounded-xl shadow-lg"
+      />
     </div>
   );
 }
