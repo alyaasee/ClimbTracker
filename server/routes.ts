@@ -4,12 +4,16 @@ import { storage } from "./storage";
 import { insertClimbSchema, type User } from "@shared/schema";
 import { format } from "date-fns";
 import OpenAI from "openai";
+import { Resend } from "resend";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize OpenAI
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
+
+  // Initialize Resend
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   // Clean up expired sessions periodically
   setInterval(async () => {
@@ -30,7 +34,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (process.env.NODE_ENV !== 'development') {
       return null;
     }
-    
+
     // Priority: passed email > environment variable > default
     const userEmail = email || process.env.DEV_USER_EMAIL || 'lyhakim@gmail.com';
     const user = await storage.getUserByEmail(userEmail);
@@ -41,7 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/send-code", async (req, res) => {
     try {
       const { email, name } = req.body;
-      
+
       if (!email) {
         return res.status(400).json({ error: "Email is required" });
       }
@@ -62,9 +66,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       await storage.updateVerificationCode(email, code, expiresAt);
 
-      // In a real app, you'd send this via email service
-      console.log(`Verification code for ${email}: ${code}`);
-      
+      // Send verification code via email
+      try {
+        await resend.emails.send({
+          from: 'ClimbTracker <onboarding@resend.dev>',
+          to: email,
+          subject: 'Your ClimbTracker Verification Code',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px;">🧗 ClimbTracker</h1>
+              </div>
+
+              <div style="background: white; padding: 40px 20px; border-left: 4px solid #667eea;">
+                <h2 style="color: #333; margin-top: 0;">Your Verification Code</h2>
+                <p style="color: #666; font-size: 16px; line-height: 1.5;">
+                  Hi ${name || 'Climber'}! Welcome to ClimbTracker. Use the code below to complete your login:
+                </p>
+
+                <div style="background: #f8f9fa; border: 2px dashed #667eea; border-radius: 8px; padding: 20px; margin: 30px 0; text-align: center;">
+                  <span style="font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 8px;">${code}</span>
+                </div>
+
+                <p style="color: #666; font-size: 14px; line-height: 1.5;">
+                  This code will expire in 10 minutes. If you didn't request this code, you can safely ignore this email.
+                </p>
+
+                <div style="border-top: 1px solid #eee; margin-top: 30px; padding-top: 20px;">
+                  <p style="color: #999; font-size: 12px; margin: 0;">
+                    Happy climbing! 🏔️
+                  </p>
+                </div>
+              </div>
+            </div>
+          `
+        });
+
+        console.log(`Verification code sent to ${email}`);
+      } catch (emailError) {
+        console.error("Failed to send email:", emailError);
+        // Fallback to console logging in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Verification code for ${email}: ${code}`);
+        } else {
+          throw new Error("Failed to send verification email");
+        }
+      }
+
       res.json({ message: "Verification code sent" });
     } catch (error) {
       console.error("Send code error:", error);
@@ -75,7 +123,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/verify-code", async (req, res) => {
     try {
       const { email, code } = req.body;
-      
+
       if (!email || !code) {
         return res.status(400).json({ error: "Email and code are required" });
       }
@@ -107,7 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/user", async (req, res) => {
     try {
       const sessionId = req.cookies?.sessionId;
-      
+
       if (!sessionId) {
         // Development-only bypass - strictly gated
         if (process.env.NODE_ENV === 'development') {
@@ -166,7 +214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const requireAuth = async (req: any, res: any, next: any) => {
     try {
       const sessionId = req.cookies?.sessionId;
-      
+
       if (!sessionId) {
         // Development-only bypass - strictly gated
         if (process.env.NODE_ENV === 'development') {
@@ -224,7 +272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/user", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
-      
+
       // Recalculate streak to ensure it's up to date
       const currentStreak = await storage.calculateWeeklyStreak(user.id);
       if (currentStreak !== user.currentStreak) {
@@ -234,7 +282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const updatedUser = await storage.getUser(user.id);
         return res.json(updatedUser);
       }
-      
+
       res.json(user);
     } catch (error) {
       res.status(500).json({ error: "Failed to get user" });
@@ -246,11 +294,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       const climbs = await storage.getClimbsByUser(user.id);
-      
+
       // Secure cache headers
       res.set('Cache-Control', 'private, max-age=300');
       res.set('Vary', 'Authorization');
-      
+
       res.json(climbs);
     } catch (error) {
       res.status(500).json({ error: "Failed to get climbs" });
@@ -285,16 +333,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const validatedData = insertClimbSchema.partial().parse(req.body);
       const climb = await storage.updateClimb(id, validatedData);
-      
+
       if (!climb) {
         return res.status(404).json({ error: "Climb not found" });
       }
-      
+
       // Recalculate streak after update (in case date changed)
       const newStreak = await storage.calculateWeeklyStreak(user.id);
       const today = format(new Date(), 'yyyy-MM-dd');
       await storage.updateUserStreak(user.id, newStreak, today);
-      
+
       res.json(climb);
     } catch (error) {
       res.status(400).json({ error: "Invalid climb data" });
@@ -307,12 +355,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       const id = parseInt(req.params.id);
       await storage.deleteClimb(id);
-      
+
       // Recalculate streak after deletion
       const newStreak = await storage.calculateWeeklyStreak(user.id);
       const today = format(new Date(), 'yyyy-MM-dd');
       await storage.updateUserStreak(user.id, newStreak, today);
-      
+
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete climb" });
@@ -325,11 +373,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       const today = format(new Date(), 'yyyy-MM-dd');
       const stats = await storage.getTodayStats(user.id, today);
-      
+
       // Secure cache headers
       res.set('Cache-Control', 'private, max-age=60');
       res.set('Vary', 'Authorization');
-      
+
       res.json(stats);
     } catch (error) {
       res.status(500).json({ error: "Failed to get today's stats" });
@@ -342,13 +390,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       const year = parseInt(req.query.year as string) || new Date().getFullYear();
       const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
-      
+
       const stats = await storage.getMonthlyStats(user.id, year, month);
-      
+
       // Secure cache headers
       res.set('Cache-Control', 'private, max-age=300');
       res.set('Vary', 'Authorization');
-      
+
       res.json(stats);
     } catch (error) {
       console.error("Monthly stats error:", error);
@@ -361,11 +409,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       const months = await storage.getAvailableMonths(user.id);
-      
+
       // Secure cache headers
       res.set('Cache-Control', 'private, max-age=300');
       res.set('Vary', 'Authorization');
-      
+
       res.json(months);
     } catch (error) {
       res.status(500).json({ error: "Failed to get available months" });
@@ -378,13 +426,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       const year = parseInt(req.query.year as string) || new Date().getFullYear();
       const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
-      
+
       const progressionData = await storage.getGradeProgressionData(user.id, year, month);
-      
+
       // Secure cache headers
       res.set('Cache-Control', 'private, max-age=300');
       res.set('Vary', 'Authorization');
-      
+
       res.json(progressionData);
     } catch (error) {
       console.error("Grade progression error:", error);
@@ -397,19 +445,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       const { firstName, profileImageUrl } = req.body;
-      
+
       const profileData: { firstName?: string; profileImageUrl?: string } = {};
-      
+
       if (firstName !== undefined) {
         profileData.firstName = firstName.trim();
       }
-      
+
       if (profileImageUrl !== undefined) {
         profileData.profileImageUrl = profileImageUrl;
       }
-      
+
       const updatedUser = await storage.updateUserProfile(user.id, profileData);
-      
+
       res.json(updatedUser);
     } catch (error) {
       console.error("Profile update error:", error);
@@ -421,7 +469,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/quote", requireAuth, async (req: any, res) => {
     try {
       const today = format(new Date(), 'yyyy-MM-dd');
-      
+
       if (!process.env.OPENAI_API_KEY) {
         // Fallback quotes with date-based selection for consistency
         const fallbackQuotes = [
@@ -431,11 +479,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "Nothing says 'I make excellent decisions' like paying money to hang off a cliff. Peak adulting right there.",
           "Oh wonderful, another opportunity to discover creative new ways to question your life choices mid-route."
         ];
-        
+
         // Use date to ensure same quote per day but different quotes on different days
         const dateHash = today.split('-').reduce((a, b) => parseInt(a.toString()) + parseInt(b), 0);
         const quoteIndex = dateHash % fallbackQuotes.length;
-        
+
         return res.json({ 
           quote: fallbackQuotes[quoteIndex],
           fallback: true 
@@ -480,12 +528,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "Nothing says 'sound judgment' like looking at a vertical wall and thinking 'I should definitely climb that.'",
         "Today's goal: Defy physics, ignore logic, and somehow call it exercise. Peak human behavior right there."
       ];
-      
+
       // Use date-based selection for consistent daily quotes
       const today = format(new Date(), 'yyyy-MM-dd');
       const dateHash = today.split('-').reduce((a, b) => parseInt(a.toString()) + parseInt(b), 0);
       const quoteIndex = dateHash % fallbackQuotes.length;
-      
+
       res.json({ quote: fallbackQuotes[quoteIndex], fallback: true, date: today });
     }
   });
