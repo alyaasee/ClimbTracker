@@ -108,6 +108,35 @@ export default function ClimbLog() {
     }
   };
 
+  const formatDateHeader = (dateString: string) => {
+    try {
+      return format(parseISO(dateString), 'EEEE, MMMM d, yyyy');
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Group climbs by date
+  const groupClimbsByDate = (climbs: any[]) => {
+    const grouped = climbs.reduce((acc: any, climb) => {
+      const date = climb.climbDate.split('T')[0]; // Get just the date part
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push(climb);
+      return acc;
+    }, {});
+
+    // Sort dates in descending order (newest first)
+    const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+    return sortedDates.map(date => ({
+      date,
+      climbs: grouped[date]
+    }));
+  };
+
+  const groupedClimbs = groupClimbsByDate(paginatedClimbs);
+
   return (
     <div className="py-4 space-y-4">
       {/* Date Filter */}
@@ -164,7 +193,7 @@ export default function ClimbLog() {
       )}
 
       {/* Climbs List */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         {paginatedClimbs.length === 0 ? (
           <div className="retro-container p-8 text-center">
             <Mountain className="w-12 h-12 mx-auto mb-4 text-climb-gray" />
@@ -173,86 +202,98 @@ export default function ClimbLog() {
             </div>
           </div>
         ) : (
-          paginatedClimbs.map((climb: any) => (
-            <div key={climb.id} className="retro-container p-4">
-              <div className="flex items-start space-x-4">
-                {/* Media thumbnail */}
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 retro-container-accent flex items-center justify-center overflow-hidden cursor-pointer"
-                       onClick={() => climb.mediaUrl && handleMediaClick(climb.mediaUrl)}>
-                    {climb.mediaUrl ? (
-                      climb.mediaUrl.startsWith('data:video/') ? (
-                        <video 
-                          src={climb.mediaUrl} 
-                          className="w-full h-full object-cover pixel-art"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
-                            if (nextSibling) {
-                              nextSibling.classList.remove('hidden');
-                            }
-                          }}
-                        />
-                      ) : (
-                        <img 
-                          src={climb.mediaUrl} 
-                          alt="Climb" 
-                          className="w-full h-full object-cover pixel-art"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
-                            if (nextSibling) {
-                              nextSibling.classList.remove('hidden');
-                            }
-                          }}
-                        />
-                      )
-                    ) : null}
-                    <Mountain className={`w-6 h-6 text-climb-gray ${climb.mediaUrl ? 'hidden' : ''}`} />
-                  </div>
-                </div>
+          groupedClimbs.map((group) => (
+            <div key={group.date} className="space-y-3">
+              {/* Date Header */}
+              <div className="retro-container-primary p-3">
+                <h3 className="retro-title text-center">
+                  {formatDateHeader(group.date)}
+                </h3>
+              </div>
 
-                {/* Climb details */}
-                <div className="flex-1">
-                  <div className="retro-label text-climb-gray mb-1">
-                    {formatShortDate(climb.climbDate)}
-                  </div>
-                  <div className="retro-heading text-lg mb-1">
-                    {climb.gym}
-                  </div>
-                  <div className="retro-body text-sm mb-2">
-                    {climb.routeType} • {climb.grade} • {climb.outcome}
-                  </div>
-                  {climb.notes && (
-                    <div className="retro-body text-sm text-climb-gray">
-                      {climb.notes}
+              {/* Climbs for this date */}
+              <div className="space-y-3">
+                {group.climbs.map((climb: any) => (
+                  <div key={climb.id} className="retro-container p-4">
+                    <div className="flex items-start space-x-4">
+                      {/* Media thumbnail */}
+                      <div className="flex-shrink-0">
+                        <div className="w-16 h-16 retro-container-accent flex items-center justify-center overflow-hidden cursor-pointer"
+                             onClick={() => climb.mediaUrl && handleMediaClick(climb.mediaUrl)}>
+                          {climb.mediaUrl ? (
+                            climb.mediaUrl.startsWith('data:video/') ? (
+                              <video 
+                                src={climb.mediaUrl} 
+                                className="w-full h-full object-cover pixel-art"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
+                                  if (nextSibling) {
+                                    nextSibling.classList.remove('hidden');
+                                  }
+                                }}
+                              />
+                            ) : (
+                              <img 
+                                src={climb.mediaUrl} 
+                                alt="Climb" 
+                                className="w-full h-full object-cover pixel-art"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
+                                  if (nextSibling) {
+                                    nextSibling.classList.remove('hidden');
+                                  }
+                                }}
+                              />
+                            )
+                          ) : null}
+                          <Mountain className={`w-6 h-6 text-climb-gray ${climb.mediaUrl ? 'hidden' : ''}`} />
+                        </div>
+                      </div>
+
+                      {/* Climb details */}
+                      <div className="flex-1">
+                        <div className="retro-heading text-lg mb-1">
+                          {climb.gym}
+                        </div>
+                        <div className="retro-body text-sm mb-2">
+                          {climb.routeType} • {climb.grade} • {climb.outcome}
+                        </div>
+                        {climb.notes && (
+                          <div className="retro-body text-sm text-climb-gray">
+                            {climb.notes}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex flex-col space-y-2">
+                        <Button
+                          onClick={() => setEditingClimb(climb)}
+                          size="sm"
+                          className="retro-button-secondary px-3 py-2"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteClimb(climb.id)}
+                          size="sm"
+                          variant="destructive"
+                          className="retro-button px-3 py-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                </div>
-
-                {/* Action buttons */}
-                <div className="flex flex-col space-y-2">
-                  <Button
-                    onClick={() => setEditingClimb(climb)}
-                    size="sm"
-                    className="retro-button-secondary px-3 py-2"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteClimb(climb.id)}
-                    size="sm"
-                    variant="destructive"
-                    className="retro-button px-3 py-2"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))
         )}
       </div>
+
 
       {/* Pagination */}
       {totalPages > 1 && (

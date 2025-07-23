@@ -10,9 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### Floating Navigation and Daily Quote Enhancement (July 23, 2025)
+### Date-Grouped Climb Log and Floating Navigation (July 23, 2025)
+- Implemented date-based grouping for climb logs with styled date headers
+- Organized climbs chronologically with newest dates first for better browsing
+- Added formatted date headers (e.g., "Wednesday, July 23, 2025") with gradient styling
+- Maintained pagination functionality while preserving date grouping within pages
 - Converted bottom navigation bar to floating design with rounded corners and shadow
-- Applied fixed positioning with centered alignment for consistent floating appearance
+- Applied fixed positioning with full-width span across mobile interface
 - Enhanced navigation with backdrop blur, increased opacity, and hover scale effects
 - Adjusted main content padding to accommodate floating navigation bar
 - Removed "CLIMB-CADE" title from mobile header across all pages for cleaner interface
