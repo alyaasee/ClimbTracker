@@ -418,11 +418,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get daily motivational quote
-  app.get("/api/daily-quote", requireAuth, async (req: any, res) => {
+  app.get("/api/quote", requireAuth, async (req: any, res) => {
     try {
+      const today = format(new Date(), 'yyyy-MM-dd');
+      
       if (!process.env.OPENAI_API_KEY) {
+        // Fallback quotes with date-based selection for consistency
+        const fallbackQuotes = [
+          "Oh great, another day of pretending gravity doesn't exist. How wonderfully delusional of us climbers.",
+          "Ah yes, because clearly what this world needed was more people voluntarily dangling from rocks. Brilliant life choices all around.",
+          "Today's agenda: Ignore basic physics, defy common sense, and somehow call it 'fun.' Classic climber logic.",
+          "Nothing says 'I make excellent decisions' like paying money to hang off a cliff. Peak adulting right there.",
+          "Oh wonderful, another opportunity to discover creative new ways to question your life choices mid-route."
+        ];
+        
+        // Use date to ensure same quote per day but different quotes on different days
+        const dateHash = today.split('-').reduce((a, b) => parseInt(a.toString()) + parseInt(b), 0);
+        const quoteIndex = dateHash % fallbackQuotes.length;
+        
         return res.json({ 
-          quote: "Oh great, another day of pretending gravity doesn't exist. How wonderfully delusional of us climbers.",
+          quote: fallbackQuotes[quoteIndex],
           fallback: true 
         });
       }
@@ -432,35 +447,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         messages: [
           {
             role: "system",
-            content: "You are a sarcastic motivational coach for rock climbers. Generate a short, witty, and sarcastically motivational quote about climbing. Keep it under 50 words and make it actually motivating despite the sarcasm."
+            content: "You are a brilliantly sarcastic motivational coach for rock climbers. Your humor is dry, witty, and delightfully cynical while still being genuinely motivating. Think of yourself as a climbing coach who graduated from the school of sarcasm with honors. Generate a short, hilariously sarcastic yet oddly inspiring quote about climbing. Keep it under 60 words and make sure it's both amusing and motivating despite the heavy dose of sarcasm."
           },
           {
             role: "user",
-            content: "Give me a sarcastic motivational climbing quote for today."
+            content: `Give me a sarcastic motivational climbing quote for ${today}. Make it unique to today and really lean into the sarcastic humor while still being motivational.`
           }
         ],
-        max_tokens: 100,
-        temperature: 0.9,
+        max_tokens: 120,
+        temperature: 0.8,
+        // Use date as seed for consistency  
+        seed: parseInt(today.replace(/-/g, '')) % 1000000,
       });
 
       const quote = completion.choices[0]?.message?.content || 
-        "Congratulations! You've chosen a hobby where success is measured by how high you can go before gravity reminds you who's boss.";
+        "Congratulations! You've chosen a hobby where success is measured by how high you can go before gravity reminds you who's boss. How refreshingly optimistic.";
 
-      // Cache for 24 hours
+      // Cache for 24 hours but with date-specific headers
       res.set('Cache-Control', 'private, max-age=86400');
-      res.json({ quote, fallback: false });
+      res.set('Vary', 'Authorization, Date');
+      res.json({ quote, fallback: false, date: today });
     } catch (error) {
       console.error("Daily quote error:", error);
-      // Fallback quotes if API fails
+      // Enhanced fallback quotes with more sarcasm
       const fallbackQuotes = [
-        "Oh wonderful, another day of voluntarily fighting gravity. Because that always ends well.",
-        "Today's forecast: 100% chance of falling with a slight possibility of not hitting the ground.",
+        "Oh wonderful, another day of voluntarily fighting gravity. Because that always ends well for humans.",
+        "Today's forecast: 100% chance of falling with a slight possibility of not completely embarrassing yourself.",
         "Remember, every expert was once a beginner who refused to give up. How annoyingly persistent of them.",
         "Climbing: Because apparently walking on flat ground is too mainstream for some people.",
-        "Today you'll either reach new heights or discover new ways to embrace the ground. Either way, it's progress!"
+        "Today you'll either reach new heights or discover exciting new ways to become one with the ground. Character building!",
+        "Ah yes, let's pay money to make our hands bleed and our muscles scream. What could possibly go wrong?",
+        "Nothing says 'sound judgment' like looking at a vertical wall and thinking 'I should definitely climb that.'",
+        "Today's goal: Defy physics, ignore logic, and somehow call it exercise. Peak human behavior right there."
       ];
-      const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
-      res.json({ quote: randomQuote, fallback: true });
+      
+      // Use date-based selection for consistent daily quotes
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const dateHash = today.split('-').reduce((a, b) => parseInt(a.toString()) + parseInt(b), 0);
+      const quoteIndex = dateHash % fallbackQuotes.length;
+      
+      res.json({ quote: fallbackQuotes[quoteIndex], fallback: true, date: today });
     }
   });
 

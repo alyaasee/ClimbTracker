@@ -10,12 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### UI Title Styling and Summary Auto-Update Fix (July 23, 2025)
+### UI Title Styling and Daily Quote Enhancement (July 23, 2025)
 - Removed "CLIMB-CADE" title from mobile header across all pages for cleaner interface
 - Added gradient title styling for Home, Climb Log, and Stats pages with retro-container-primary styling
 - Applied consistent orange gradient background with rounded corners to all main page titles
 - Removed duplicate titles from climb log and stats pages to eliminate redundancy
 - Renamed "Stats" to "Climbing Stats" in header for better clarity
+- Enhanced daily motivation quotes with date-based variation and more sarcastic, humorous tone
+- Fixed quote API endpoint path from `/api/daily-quote` to `/api/quote` for proper frontend integration
+- Added date-based seed for OpenAI to ensure unique quotes per day with consistent daily experience
+- Improved fallback quotes with enhanced sarcasm and humor while maintaining motivational value
 - Fixed summary section real-time updates by correcting API endpoint mismatch
 - Updated cache invalidation to use proper query keys for immediate stats refresh
 - Resolved TypeScript type issues preventing proper data display in summary tiles
