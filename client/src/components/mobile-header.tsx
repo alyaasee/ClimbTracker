@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { User, Mail, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { queryClient } from "@/lib/queryClient";
 import type { AuthUserResponse } from "@shared/schema";
 import {
   DropdownMenu,
@@ -39,12 +40,17 @@ export default function MobileHeader() {
   const handleLogout = async () => {
     try {
       await fetch("/api/logout");
-      // Clear any cached data and redirect to login
-      window.location.href = "/";
+      // Clear React Query cache for authentication data
+      await queryClient.invalidateQueries({ queryKey: ["api", "auth", "user"] });
+      await queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
+      // Clear all cached data
+      queryClient.clear();
+      // Force page reload to reset authentication state
+      window.location.reload();
     } catch (error) {
       console.error("Logout error:", error);
-      // Force redirect even if logout fails
-      window.location.href = "/";
+      // Force page reload even if logout fails to clear local state
+      window.location.reload();
     }
   };
 
