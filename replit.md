@@ -14,6 +14,7 @@ Preferred communication style: Simple, everyday language.
 - Implemented date-based grouping for climb logs with styled date headers
 - Organized climbs chronologically with newest dates first for better browsing
 - Added formatted date headers (e.g., "Wednesday, July 23, 2025") with gradient styling
+- Removed text shadows from date headers for improved readability and cleaner appearance
 - Maintained pagination functionality while preserving date grouping within pages
 - Converted bottom navigation bar to floating design with rounded corners and shadow
 - Applied fixed positioning with full-width span across mobile interface
