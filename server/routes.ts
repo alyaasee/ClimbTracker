@@ -69,35 +69,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       await storage.updateVerificationCode(email, code, expiresAt);
 
+      // Always log code in development mode first
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`\n🔑 VERIFICATION CODE for ${email}: ${code}`);
+        console.log(`⏰ Code expires at: ${expiresAt.toISOString()}\n`);
+      }
+
       // Send verification code via email
       try {
         await resend.emails.send({
-          from: 'ClimbTracker <onboarding@resend.dev>',
+          from: 'CLIMB-CADE <onboarding@resend.dev>',
           to: email,
-          subject: 'Your ClimbTracker Verification Code',
+          subject: 'Your CLIMB-CADE Verification Code',
           html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 28px;">🧗 ClimbTracker</h1>
+            <div style="font-family: 'Space Mono', monospace; max-width: 600px; margin: 0 auto; background: #FCFCF9;">
+              <div style="background: linear-gradient(135deg, #CEE4D2 0%, #EF7326 100%); padding: 40px 20px; text-align: center;">
+                <h1 style="color: #1F1F1F; margin: 0; font-size: 28px; font-weight: bold;">🧗 CLIMB-CADE</h1>
               </div>
 
-              <div style="background: white; padding: 40px 20px; border-left: 4px solid #667eea;">
-                <h2 style="color: #333; margin-top: 0;">Your Verification Code</h2>
-                <p style="color: #666; font-size: 16px; line-height: 1.5;">
-                  Hi ${name || 'Climber'}! Welcome to ClimbTracker. Use the code below to complete your login:
+              <div style="background: #FCFCF9; padding: 40px 20px; border-left: 4px solid #EF7326;">
+                <h2 style="color: #1F1F1F; margin-top: 0; font-family: 'Space Mono', monospace;">Your Verification Code</h2>
+                <p style="color: #1F1F1F; font-size: 16px; line-height: 1.5; font-family: 'Space Mono', monospace;">
+                  Hi ${name || 'Climber'}! Welcome to CLIMB-CADE. Use the code below to complete your login:
                 </p>
 
-                <div style="background: #f8f9fa; border: 2px dashed #667eea; border-radius: 8px; padding: 20px; margin: 30px 0; text-align: center;">
-                  <span style="font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 8px;">${code}</span>
+                <div style="background: #CEE4D2; border: 3px solid #1F1F1F; border-radius: 8px; padding: 20px; margin: 30px 0; text-align: center;">
+                  <span style="font-size: 32px; font-weight: bold; color: #1F1F1F; letter-spacing: 8px; font-family: 'Space Mono', monospace;">${code}</span>
                 </div>
 
-                <p style="color: #666; font-size: 14px; line-height: 1.5;">
+                <p style="color: #1F1F1F; font-size: 14px; line-height: 1.5; font-family: 'Space Mono', monospace;">
                   This code will expire in 10 minutes. If you didn't request this code, you can safely ignore this email.
                 </p>
 
-                <div style="border-top: 1px solid #eee; margin-top: 30px; padding-top: 20px;">
-                  <p style="color: #999; font-size: 12px; margin: 0;">
-                    Happy climbing! 🏔️
+                <div style="border-top: 2px solid #EF7326; margin-top: 30px; padding-top: 20px;">
+                  <p style="color: #1F1F1F; font-size: 12px; margin: 0; font-family: 'Space Mono', monospace;">
+                    Happy climbing! Made by Alyaa 🏔️
                   </p>
                 </div>
               </div>
@@ -108,10 +114,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Verification code sent to ${email}`);
       } catch (emailError) {
         console.error("Failed to send email:", emailError);
-        // Fallback to console logging in development
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`Verification code for ${email}: ${code}`);
-        } else {
+        console.error("Email error details:", JSON.stringify(emailError, null, 2));
+        // Don't throw error in development, just log it
+        if (process.env.NODE_ENV !== 'development') {
           throw new Error("Failed to send verification email");
         }
       }
