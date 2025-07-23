@@ -12,10 +12,13 @@ import Login from "@/pages/auth/login";
 import Verify from "@/pages/auth/verify";
 import BottomNav from "@/components/bottom-nav";
 import MobileHeader from "@/components/mobile-header";
+import LogClimbModal from "@/components/log-climb-modal";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 function Router() {
   const { user, isLoading, isAuthenticated } = useAuth();
+  const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -52,7 +55,11 @@ function Router() {
             <Route component={NotFound} />
           </Switch>
         </main>
-        <BottomNav />
+        <BottomNav onLogClimbClick={() => setIsLogModalOpen(true)} />
+        <LogClimbModal 
+          open={isLogModalOpen} 
+          onOpenChange={setIsLogModalOpen}
+        />
       </div>
     </div>
   );
