@@ -130,7 +130,7 @@ export default function Login() {
                 <rect x="2" y="6" width="12" height="6" fill="#EF7326"/>
                 <rect x="7" y="4" width="2" height="2" fill="#FCFCF9"/>
               </svg>
-              <span className="retro-label text-[#9BA0A5] text-sm">Made with CLIMB-CADE</span>
+              <span className="retro-label text-[#1F1F1F] text-sm">Made by Alyaa</span>
             </div>
           </div>
         </div>
