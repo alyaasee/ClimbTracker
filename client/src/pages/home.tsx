@@ -13,10 +13,14 @@ export default function Home() {
   });
 
   const { data: todayStats } = useQuery<TodayStatsResponse>({
-    queryKey: ["api", "stats", "today", format(new Date(), 'yyyy-MM-dd')],
+    queryKey: ["api", "stats", "today"],
     staleTime: 0, // Always fresh
     gcTime: 0, // Don't cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
+
+
 
   const { data: quote, isLoading: quoteLoading } = useQuery<DailyQuoteResponse>({
     queryKey: ["api", "quote"],

@@ -54,8 +54,8 @@ export default function ClimbLog() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["api", "climbs"] });
       queryClient.invalidateQueries({ queryKey: ["api", "user"] });
-      // Invalidate today's stats with date-specific key
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today", format(new Date(), 'yyyy-MM-dd')] });
+      // Invalidate today's stats
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today"] });
       // Invalidate all stats queries
       queryClient.invalidateQueries({ queryKey: ["api", "stats"] });
       toast({
