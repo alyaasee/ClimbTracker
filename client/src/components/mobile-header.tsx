@@ -120,7 +120,7 @@ export default function MobileHeader() {
             <div className="flex-1 flex justify-center">
               <div className="retro-container-primary px-6 py-2 rounded-lg">
                 <div className="retro-title text-lg tracking-wider">
-                  {location === "/" ? "HOME" : location === "/climb-log" ? "CLIMB LOG" : "STATS"}
+                  {location === "/" ? "HOME" : location === "/climb-log" ? "CLIMB LOG" : "CLIMBING STATS"}
                 </div>
               </div>
             </div>

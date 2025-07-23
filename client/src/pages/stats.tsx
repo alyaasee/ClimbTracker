@@ -33,11 +33,6 @@ export default function Stats() {
 
   return (
     <div className="py-4 space-y-4">
-      {/* Header */}
-      <div className="retro-container-primary p-4">
-        <h1 className="retro-title text-xl text-center">Climbing Stats</h1>
-      </div>
-
       {/* Month Selector */}
       <div className="retro-container p-4">
         <div className="retro-label mb-3">Select Month</div>
