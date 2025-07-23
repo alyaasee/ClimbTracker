@@ -46,7 +46,7 @@ function Router() {
     <div className="min-h-screen w-full relative" style={{ background: 'linear-gradient(228deg, rgba(206, 228, 210, 0.65) 35%, rgba(239, 115, 38, 0.65) 100%)' }}>
       <div className="max-w-sm mx-auto min-h-screen relative">
         <MobileHeader />
-        <main className="pb-20 px-3">
+        <main className="pb-24 px-3">
           <Switch>
             <Route path="/" component={Home} />
             <Route path="/climb-log" component={ClimbLog} />
