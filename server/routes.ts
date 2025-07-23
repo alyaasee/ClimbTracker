@@ -67,17 +67,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const code = generateVerificationCode();
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-      await storage.updateVerificationCode(email, code, expiresAt);
+      // FORCE LOG THE CODE - NO CONDITIONS
+      console.log(`\n🔑🔑🔑 VERIFICATION CODE for ${email}: ${code} 🔑🔑🔑`);
+      console.log(`⏰ Code expires at: ${expiresAt.toISOString()}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'undefined'}`);
+      console.log(`Current time: ${new Date().toISOString()}\n`);
 
-      // Always log code in development - check multiple environment indicators
-      const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV || process.env.NODE_ENV !== 'production';
-      if (isDevelopment) {
-        console.log(`\n🔑 VERIFICATION CODE for ${email}: ${code}`);
-        console.log(`⏰ Code expires at: ${expiresAt.toISOString()}\n`);
-      }
-      
-      // Also always log for debugging purposes
-      console.log(`DEBUG: Generated verification code ${code} for ${email} at ${new Date().toISOString()}`);
+      await storage.updateVerificationCode(email, code, expiresAt);
 
       // Send verification code via email
       try {
