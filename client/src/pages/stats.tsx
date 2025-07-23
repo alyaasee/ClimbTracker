@@ -38,11 +38,6 @@ export default function Stats() {
 
   return (
     <div className="py-4 space-y-4 pb-24">
-      {/* Page Title */}
-      <div className="retro-container-primary p-4 text-center">
-        <h1 className="retro-title text-2xl">Stats</h1>
-      </div>
-
       {/* Month Selector */}
       <div className="retro-container p-4">
         <div className="retro-label mb-3">Select Month</div>
