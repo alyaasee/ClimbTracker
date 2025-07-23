@@ -1,11 +1,39 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+
+// CLIMB-CADE Pixel Art Mountain Icon Component
+function ClimbCadeIcon() {
+  return (
+    <div className="w-16 h-16 flex items-center justify-center retro-container" style={{ background: 'linear-gradient(135deg, #CEE4D2 0%, #EF7326 100%)' }}>
+      <svg width="32" height="32" viewBox="0 0 32 32" className="pixel-art">
+        {/* Pixel art mountain - inspired by CLIMB-CADE app icon */}
+        <rect x="14" y="6" width="4" height="2" fill="#1F1F1F"/>
+        <rect x="12" y="8" width="8" height="2" fill="#1F1F1F"/>
+        <rect x="10" y="10" width="12" height="2" fill="#1F1F1F"/>
+        <rect x="8" y="12" width="16" height="2" fill="#1F1F1F"/>
+        <rect x="6" y="14" width="20" height="2" fill="#1F1F1F"/>
+        <rect x="4" y="16" width="24" height="2" fill="#1F1F1F"/>
+        <rect x="2" y="18" width="28" height="8" fill="#1F1F1F"/>
+        
+        {/* Mountain fill with gradient colors */}
+        <rect x="14" y="8" width="4" height="2" fill="#EF7326"/>
+        <rect x="12" y="10" width="8" height="2" fill="#EF7326"/>
+        <rect x="10" y="12" width="12" height="2" fill="#EF7326"/>
+        <rect x="8" y="14" width="16" height="2" fill="#EF7326"/>
+        <rect x="6" y="16" width="20" height="2" fill="#EF7326"/>
+        <rect x="4" y="18" width="24" height="6" fill="#EF7326"/>
+        
+        {/* Peak highlight */}
+        <rect x="15" y="8" width="2" height="2" fill="#FCFCF9"/>
+        <rect x="13" y="10" width="6" height="2" fill="#FCFCF9"/>
+      </svg>
+    </div>
+  );
+}
 
 export default function Verify() {
   const [code, setCode] = useState("");
@@ -94,25 +122,23 @@ export default function Verify() {
   };
 
   const handleBack = () => {
-    setLocation("/auth/login");
+    setLocation("/");
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <Card className="w-full max-w-sm bg-white rounded-3xl shadow-xl">
-        <CardContent className="p-8">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ background: 'linear-gradient(228deg, rgba(206, 228, 210, 0.65) 35%, rgba(239, 115, 38, 0.65) 100%)' }}>
+      <div className="w-full max-w-sm">
+        <div className="retro-container p-8 bg-[#FCFCF9]">
           {/* Logo/Icon */}
           <div className="flex justify-center mb-8">
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center">
-              <span className="text-white font-bold text-xl">🧗</span>
-            </div>
+            <ClimbCadeIcon />
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">
+          <h1 className="retro-title text-2xl text-center mb-2">
             Enter verification code
           </h1>
-          <p className="text-gray-600 text-center mb-8">
+          <p className="retro-body text-center mb-8 text-[#9BA0A5]">
             We sent a code to {email}
           </p>
 
@@ -124,44 +150,56 @@ export default function Verify() {
               onChange={handleCodeChange}
               disabled={verifyCodeMutation.isPending}
             >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
+              <InputOTPGroup className="gap-2">
+                <InputOTPSlot index={0} className="retro-input w-12 h-12 text-center text-[#1F1F1F]" style={{ fontFamily: 'Space Mono, monospace', fontWeight: '700' }} />
+                <InputOTPSlot index={1} className="retro-input w-12 h-12 text-center text-[#1F1F1F]" style={{ fontFamily: 'Space Mono, monospace', fontWeight: '700' }} />
+                <InputOTPSlot index={2} className="retro-input w-12 h-12 text-center text-[#1F1F1F]" style={{ fontFamily: 'Space Mono, monospace', fontWeight: '700' }} />
+                <InputOTPSlot index={3} className="retro-input w-12 h-12 text-center text-[#1F1F1F]" style={{ fontFamily: 'Space Mono, monospace', fontWeight: '700' }} />
+                <InputOTPSlot index={4} className="retro-input w-12 h-12 text-center text-[#1F1F1F]" style={{ fontFamily: 'Space Mono, monospace', fontWeight: '700' }} />
+                <InputOTPSlot index={5} className="retro-input w-12 h-12 text-center text-[#1F1F1F]" style={{ fontFamily: 'Space Mono, monospace', fontWeight: '700' }} />
               </InputOTPGroup>
             </InputOTP>
           </div>
 
-          {/* Resend and Back buttons */}
+          {verifyCodeMutation.isPending && (
+            <div className="text-center mb-6">
+              <p className="retro-body text-[#9BA0A5] text-sm">Verifying code...</p>
+            </div>
+          )}
+
+          {/* Action buttons */}
           <div className="space-y-4">
-            <Button
+            <button
               onClick={handleResend}
-              variant="ghost"
-              className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              className="retro-button-secondary w-full p-3 retro-bounce"
               disabled={resendCodeMutation.isPending}
             >
               {resendCodeMutation.isPending ? "Sending..." : "Resend code"}
-            </Button>
+            </button>
             
-            <Button
+            <button
               onClick={handleBack}
-              variant="outline"
-              className="w-full"
+              className="w-full p-3 retro-body text-[#9BA0A5] hover:text-[#1F1F1F] transition-colors"
+              style={{ fontFamily: 'Space Mono, monospace', fontWeight: '600' }}
             >
               Back to login
-            </Button>
+            </button>
           </div>
 
-          {verifyCodeMutation.isPending && (
-            <div className="text-center mt-4">
-              <p className="text-gray-500 text-sm">Verifying code...</p>
+          {/* Footer branding */}
+          <div className="text-center mt-8 pt-6 border-t-2 border-[#1F1F1F]">
+            <div className="flex items-center justify-center space-x-2">
+              <svg width="16" height="16" viewBox="0 0 16 16" className="pixel-art">
+                <rect x="6" y="2" width="4" height="2" fill="#EF7326"/>
+                <rect x="4" y="4" width="8" height="2" fill="#EF7326"/>
+                <rect x="2" y="6" width="12" height="6" fill="#EF7326"/>
+                <rect x="7" y="4" width="2" height="2" fill="#FCFCF9"/>
+              </svg>
+              <span className="retro-label text-[#9BA0A5] text-sm">Made with CLIMB-CADE</span>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
