@@ -24,6 +24,9 @@ Preferred communication style: Simple, everyday language.
 - Corrected query structure to properly connect frontend with backend using URL query parameters
 - Changed "ACHIEVEMENTS" label to "SUCCESS" for better clarity in summary tiles
 - Removed redundant "STATS" header title for cleaner interface design
+- Improved font contrast following CLIMB-CADE brand guidelines by changing retro-title text from orange (#EF7326) to dark (#1F1F1F)
+- Updated navigation button text colors to use dark neutral (#1F1F1F) for better readability against light mint backgrounds
+- Enhanced accessibility compliance by ensuring proper color contrast ratios per WCAG standards
 
 ### Date-Grouped Climb Log and Floating Navigation (July 23, 2025)
 - Implemented date-based grouping for climb logs with styled date headers

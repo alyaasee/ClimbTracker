@@ -29,8 +29,8 @@ export default function BottomNav({ onLogClimbClick }: BottomNavProps) {
                 onClick={() => setLocation(item.path)}
                 className={`flex flex-col items-center p-2 rounded-lg transition-all retro-bounce ${
                   isActive 
-                    ? 'retro-container-accent text-climb-dark scale-105' 
-                    : 'text-climb-dark hover:text-climb-orange hover:scale-105'
+                    ? 'retro-container-accent text-[#1F1F1F] scale-105' 
+                    : 'text-[#1F1F1F] hover:text-[#1F1F1F] hover:scale-105'
                 }`}
               >
                 <Icon size={20} strokeWidth={3} />
