@@ -110,11 +110,6 @@ export default function ClimbLog() {
 
   return (
     <div className="py-4 space-y-4">
-      {/* Header */}
-      <div className="retro-container-primary p-4">
-        <h1 className="retro-title text-xl text-center">Climb Log</h1>
-      </div>
-
       {/* Date Filter */}
       <div className="retro-container p-4">
         <div className="retro-label mb-3">Filter by Date Range</div>
