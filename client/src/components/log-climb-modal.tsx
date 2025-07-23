@@ -410,16 +410,16 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
                   <SelectValue placeholder="Select grade" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="5c">5c</SelectItem>
-                  <SelectItem value="6a">6a</SelectItem>
-                  <SelectItem value="6a+">6a+</SelectItem>
-                  <SelectItem value="6b">6b</SelectItem>
-                  <SelectItem value="6b+">6b+</SelectItem>
-                  <SelectItem value="6c">6c</SelectItem>
-                  <SelectItem value="6c+">6c+</SelectItem>
-                  <SelectItem value="7a">7a</SelectItem>
-                  <SelectItem value="7b">7b</SelectItem>
                   <SelectItem value="7c">7c</SelectItem>
+                  <SelectItem value="7b">7b</SelectItem>
+                  <SelectItem value="7a">7a</SelectItem>
+                  <SelectItem value="6c+">6c+</SelectItem>
+                  <SelectItem value="6c">6c</SelectItem>
+                  <SelectItem value="6b+">6b+</SelectItem>
+                  <SelectItem value="6b">6b</SelectItem>
+                  <SelectItem value="6a+">6a+</SelectItem>
+                  <SelectItem value="6a">6a</SelectItem>
+                  <SelectItem value="5c">5c</SelectItem>
                 </SelectContent>
               </Select>
             </div>

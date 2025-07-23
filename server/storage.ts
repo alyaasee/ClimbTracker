@@ -412,12 +412,16 @@ export class DatabaseStorage implements IStorage {
           const monthlyStats = await this.getMonthlyStats(userId, monthData.year, monthData.month);
 
           
+          // Convert grade to display value (higher number = higher grade)
+          const gradeIndex = gradeOrder.indexOf(monthlyStats.maxGrade);
+          const gradeValue = gradeIndex !== -1 ? gradeIndex + 1 : 0;
+          
           progressionData.push({
             month: monthNames[monthData.month - 1],
             year: monthData.year,
             monthNum: monthData.month,
             maxGrade: monthlyStats.maxGrade,
-            gradeValue: gradeOrder.indexOf(monthlyStats.maxGrade) + 1
+            gradeValue: gradeValue
           });
         } catch (error) {
           console.error(`Error getting monthly stats for ${monthData.year}-${monthData.month}:`, error);

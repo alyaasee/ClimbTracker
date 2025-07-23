@@ -36,6 +36,21 @@ export default function Stats() {
     });
   };
 
+  // Climbing grade scale (highest to lowest)
+  const GRADE_SCALE = ['7c', '7b', '7a', '6c+', '6c', '6b+', '6b', '6a+', '6a', '5c'];
+  
+  // Convert grade to numeric value for chart (higher numeric = higher grade)
+  const gradeToValue = (grade: string) => {
+    const index = GRADE_SCALE.indexOf(grade);
+    return index !== -1 ? GRADE_SCALE.length - index : 0;
+  };
+
+  // Convert numeric value back to grade for display
+  const valueToGrade = (value: number) => {
+    const index = GRADE_SCALE.length - value;
+    return GRADE_SCALE[index] || '';
+  };
+
   return (
     <div className="py-4 space-y-4 pb-24">
       {/* Month Selector */}
@@ -121,6 +136,9 @@ export default function Stats() {
                         fontWeight: '600',
                         fontSize: '10px'
                       }}
+                      domain={[1, GRADE_SCALE.length]}
+                      tickCount={GRADE_SCALE.length}
+                      tickFormatter={valueToGrade}
                     />
                     <Tooltip 
                       contentStyle={{
@@ -130,6 +148,7 @@ export default function Stats() {
                         fontFamily: 'Space Mono, monospace',
                         fontWeight: '600'
                       }}
+                      formatter={(value: any, name: any) => [valueToGrade(value), 'Grade']}
                     />
                     <Line 
                       type="monotone" 
