@@ -64,17 +64,15 @@ export default function Verify() {
     },
     onSuccess: async () => {
       // Invalidate the auth query to refresh user state
-      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      await queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
       
       toast({
         title: "Welcome!",
         description: "You have successfully logged in.",
       });
       
-      // Small delay to ensure state is updated before redirect
-      setTimeout(() => {
-        setLocation("/");
-      }, 100);
+      // Force a page reload to ensure authentication state is properly updated
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       toast({
@@ -138,7 +136,7 @@ export default function Verify() {
           <h1 className="retro-title text-2xl text-center mb-2">
             Enter verification code
           </h1>
-          <p className="retro-body text-center mb-8 text-[#9BA0A5]">
+          <p className="retro-body text-center mb-8 text-[#1F1F1F]">
             We sent a code to {email}
           </p>
 
@@ -195,7 +193,7 @@ export default function Verify() {
                 <rect x="2" y="6" width="12" height="6" fill="#EF7326"/>
                 <rect x="7" y="4" width="2" height="2" fill="#FCFCF9"/>
               </svg>
-              <span className="retro-label text-[#9BA0A5] text-sm">Made with CLIMB-CADE</span>
+              <span className="retro-label text-[#1F1F1F] text-sm">Made by Alyaa</span>
             </div>
           </div>
         </div>
