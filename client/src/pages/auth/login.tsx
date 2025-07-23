@@ -81,8 +81,8 @@ export default function Login() {
           <h1 className="retro-title text-2xl text-center mb-2">
             Hi, Climber!
           </h1>
-          <p className="retro-body text-center mb-8 text-[#9BA0A5]">
-            Please enter your email address
+          <p className="retro-body text-center mb-8 text-[#1F1F1F]">
+            Please enter your name and email address
           </p>
 
           {/* Login Form */}
