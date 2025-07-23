@@ -120,13 +120,6 @@ export default function MobileHeader() {
           <div className="w-8"></div>
         </div>
       </header>
-       <div className="retro-container-primary px-4 py-3 mb-4">
-        <div className="flex items-center justify-center">
-          <div className="retro-title text-2xl tracking-wider">
-            CLIMB-CADE
-          </div>
-        </div>
-      </div>
     </>
   );
 }

@@ -10,6 +10,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### UI Title Removal and Summary Auto-Update Fix (July 23, 2025)
+- Removed "CLIMB-CADE" title from mobile header across all pages for cleaner interface
+- Fixed summary section real-time updates by correcting API endpoint mismatch
+- Updated cache invalidation to use proper query keys for immediate stats refresh
+- Resolved TypeScript type issues preventing proper data display in summary tiles
+
 ### Log Climb Modal Integration and Summary Auto-Update Fix (July 23, 2025)
 - Connected LOG button in bottom navigation to open climb logging modal with modern card-tile layout
 - Implemented 4-tile cards for Date, Location, Style, Grade and 2-tile cards for Outcome, Photos/Videos
