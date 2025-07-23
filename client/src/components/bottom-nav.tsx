@@ -16,9 +16,9 @@ export default function BottomNav({ onLogClimbClick }: BottomNavProps) {
   ];
 
   return (
-    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 mx-3">
-      <div className="retro-container bg-climb-mint border-4 border-climb-dark rounded-2xl shadow-2xl backdrop-blur-sm bg-opacity-95">
-        <div className="flex justify-around items-center py-3 px-2">
+    <div className="fixed bottom-4 left-4 right-4 z-50">
+      <div className="retro-container bg-climb-mint border-4 border-climb-dark rounded-2xl shadow-2xl backdrop-blur-sm bg-opacity-95 w-full">
+        <div className="flex justify-around items-center py-3 px-4">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location === item.path;
