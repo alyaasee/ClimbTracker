@@ -3,19 +3,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { Mountain, Zap, Target, Activity } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
+import type { User, TodayStatsResponse, DailyQuoteResponse } from "@shared/schema";
 
 export default function Home() {
   const { user: authUser } = useAuth();
 
-  const { data: user } = useQuery({
+  const { data: user } = useQuery<User>({
     queryKey: ["api", "user"],
   });
 
-  const { data: todayStats } = useQuery({
+  const { data: todayStats } = useQuery<TodayStatsResponse>({
     queryKey: ["api", "stats", "today", format(new Date(), 'yyyy-MM-dd')],
+    staleTime: 0, // Always fresh
+    gcTime: 0, // Don't cache
   });
 
-  const { data: quote, isLoading: quoteLoading } = useQuery({
+  const { data: quote, isLoading: quoteLoading } = useQuery<DailyQuoteResponse>({
     queryKey: ["api", "quote"],
   });
 
@@ -52,8 +55,8 @@ export default function Home() {
       <div className="retro-container-accent p-4">
         <h2 className="retro-heading text-center text-lg">
           {user?.lastLoginAt ? 
-            `Welcome back, ${authUser?.firstName || user?.firstName || "Climber"}!` : 
-            `Welcome, ${authUser?.firstName || user?.firstName || "Climber"}!`
+            `Welcome back, ${(authUser as any)?.firstName || user?.firstName || "Climber"}!` : 
+            `Welcome, ${(authUser as any)?.firstName || user?.firstName || "Climber"}!`
           }
         </h2>
 
@@ -112,7 +115,7 @@ export default function Home() {
           {quoteLoading ? (
             <div className="retro-body text-climb-gray">Loading motivation...</div>
           ) : (
-            <div className="retro-body italic">"{quote?.text || "Keep climbing, one hold at a time!"}"</div>
+            <div className="retro-body italic">"{(quote as any)?.quote || "Keep climbing, one hold at a time!"}"</div>
           )}
         </div>
       </div>
