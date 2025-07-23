@@ -183,14 +183,7 @@ export default function ClimbLog() {
         )}
       </div>
 
-      {/* Climb Count */}
-      {totalItems > 0 && (
-        <div className="retro-container-accent p-3 text-center">
-          <span className="retro-body">
-            Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} climbs
-          </span>
-        </div>
-      )}
+
 
       {/* Climbs List */}
       <div className="space-y-4">
