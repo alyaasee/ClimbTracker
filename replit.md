@@ -10,9 +10,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### UI Title Removal and Home Page Gradient Title (July 23, 2025)
+### UI Title Styling and Summary Auto-Update Fix (July 23, 2025)
 - Removed "CLIMB-CADE" title from mobile header across all pages for cleaner interface
-- Added gradient title styling for Home page with retro-container-primary styling
+- Added gradient title styling for Home, Climb Log, and Stats pages with retro-container-primary styling
+- Applied consistent orange gradient background with rounded corners to all main page titles
 - Fixed summary section real-time updates by correcting API endpoint mismatch
 - Updated cache invalidation to use proper query keys for immediate stats refresh
 - Resolved TypeScript type issues preventing proper data display in summary tiles

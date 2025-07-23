@@ -116,11 +116,11 @@ export default function MobileHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {location === "/" ? (
+          {location === "/" || location === "/climb-log" || location === "/stats" ? (
             <div className="flex-1 flex justify-center">
               <div className="retro-container-primary px-6 py-2 rounded-lg">
                 <div className="retro-title text-lg tracking-wider">
-                  HOME
+                  {location === "/" ? "HOME" : location === "/climb-log" ? "CLIMB LOG" : "STATS"}
                 </div>
               </div>
             </div>
