@@ -18,7 +18,7 @@ function ClimbCadeIcon() {
         <rect x="6" y="14" width="20" height="2" fill="#1F1F1F"/>
         <rect x="4" y="16" width="24" height="2" fill="#1F1F1F"/>
         <rect x="2" y="18" width="28" height="8" fill="#1F1F1F"/>
-        
+
         {/* Mountain fill with gradient colors */}
         <rect x="14" y="8" width="4" height="2" fill="#EF7326"/>
         <rect x="12" y="10" width="8" height="2" fill="#EF7326"/>
@@ -26,7 +26,7 @@ function ClimbCadeIcon() {
         <rect x="8" y="14" width="16" height="2" fill="#EF7326"/>
         <rect x="6" y="16" width="20" height="2" fill="#EF7326"/>
         <rect x="4" y="18" width="24" height="6" fill="#EF7326"/>
-        
+
         {/* Peak highlight */}
         <rect x="15" y="8" width="2" height="2" fill="#FCFCF9"/>
         <rect x="13" y="10" width="6" height="2" fill="#FCFCF9"/>
@@ -56,21 +56,20 @@ export default function Verify() {
 
   const verifyCodeMutation = useMutation({
     mutationFn: async ({ email, code }: { email: string; code: string }) => {
-      const response = await apiRequest(`/api/auth/verify-code`, {
+      await apiRequest(`/api/auth/verify-code`, {
         method: "POST",
-        body: { email, code }
+        body: { email, code, name }
       });
-      return response;
     },
     onSuccess: async () => {
       // Invalidate the auth query to refresh user state
       await queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
-      
+
       toast({
         title: "Welcome!",
         description: "You have successfully logged in.",
       });
-      
+
       // Force a page reload to ensure authentication state is properly updated
       window.location.href = "/";
     },
@@ -174,7 +173,7 @@ export default function Verify() {
             >
               {resendCodeMutation.isPending ? "Sending..." : "Resend code"}
             </button>
-            
+
             <button
               onClick={handleBack}
               className="w-full p-3 retro-body text-[#9BA0A5] hover:text-[#1F1F1F] transition-colors"
