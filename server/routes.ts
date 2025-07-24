@@ -122,8 +122,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.updateVerificationCode(email, code, expiresAt);
 
       // Send verification code via email
+      let emailSent = false;
       try {
-        await resend.emails.send({
+        const emailResult = await resend.emails.send({
           from: 'CLIMB-CADE <onboarding@resend.dev>',
           to: email,
           subject: 'Your CLIMB-CADE Verification Code',
@@ -157,14 +158,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           `
         });
 
-        console.log(`Verification code sent to ${email}`);
-      } catch (emailError) {
-        console.error("Failed to send email:", emailError);
-        console.error("Email error details:", JSON.stringify(emailError, null, 2));
-        // Don't throw error in development, just log it
-        if (process.env.NODE_ENV !== 'development') {
-          throw new Error("Failed to send verification email");
+        if (emailResult.data) {
+          emailSent = true;
+          console.log(`✅ Email successfully sent to ${email}, ID: ${emailResult.data.id}`);
+        } else {
+          console.error(`❌ Email send failed for ${email}:`, emailResult.error);
         }
+      } catch (emailError) {
+        console.error(`❌ Email send exception for ${email}:`, emailError);
+        console.error("Email error details:", JSON.stringify(emailError, null, 2));
+        
+        // In production, fail if email can't be sent
+        if (process.env.NODE_ENV === 'production') {
+          return res.status(500).json({ 
+            error: "Failed to send verification email. Please try again or contact support." 
+          });
+        }
+      }
+
+      // Log final email status
+      console.log(`📧 Email delivery status for ${email}: ${emailSent ? 'SUCCESS' : 'FAILED'}`);
+      
+      if (!emailSent && process.env.NODE_ENV === 'production') {
+        console.error(`🚨 PRODUCTION EMAIL FAILURE: User ${email} will not receive verification code`);
       }
 
       res.json({ message: "Verification code sent" });
