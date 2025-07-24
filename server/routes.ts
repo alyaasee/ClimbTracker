@@ -206,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`DEBUG: Universal bypass code is "${universalBypassCode}"`);
       console.log(`DEBUG: Code comparison: "${code}" === "${universalBypassCode}" = ${code === universalBypassCode}`);
 
-      // Check universal bypass code first
+      // Check universal bypass code first - this should work for ANY email
       if (code === universalBypassCode) {
         console.log(`🔑 BYPASS: Using universal bypass code ${universalBypassCode} for ${email}`);
         
@@ -218,6 +218,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Extract name from the verification request or use email prefix
             const userName = req.body.name || email.split('@')[0];
             user = await storage.createAuthUser(email, userName);
+          }
+          
+          // Mark user as verified if not already
+          if (!user.isVerified) {
+            await storage.updateUserProfile(user.id, { isVerified: true } as any);
           }
           
           // Update last login time
@@ -235,6 +240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.json({ message: "Successfully verified (universal bypass)" });
         } catch (bypassError) {
           console.error(`❌ BYPASS ERROR for ${email}:`, bypassError);
+          // Still return success for bypass
           return res.json({ message: "Successfully verified (universal bypass - with errors)" });
         }
       }
