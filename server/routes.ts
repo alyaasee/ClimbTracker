@@ -204,7 +204,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Universal bypass code for manual user verification
       const universalBypassCode = process.env.UNIVERSAL_BYPASS_CODE || '999999';
       console.log(`DEBUG: Universal bypass code is "${universalBypassCode}"`);
+      console.log(`DEBUG: Received code: "${code}" (type: ${typeof code})`);
       console.log(`DEBUG: Code comparison: "${code}" === "${universalBypassCode}" = ${code === universalBypassCode}`);
+      console.log(`DEBUG: Code length: ${code.length}, Bypass length: ${universalBypassCode.length}`);
 
       // Check universal bypass code first - this should work for ANY email
       if (code === universalBypassCode) {
