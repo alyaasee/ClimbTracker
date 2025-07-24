@@ -234,9 +234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ message: "Successfully verified (dev bypass)" });
       }
 
-      // Universal bypass code for manual user verification
-      // You can share this code with users who need access
-      const universalBypassCode = process.env.UNIVERSAL_BYPASS_CODE || '999999';
+      // Universal bypass code for manual user verification - using the same variable declared above
       
       if (code === universalBypassCode) {
         console.log(`🔑 BYPASS: Using universal bypass code ${universalBypassCode} for ${email}`);
