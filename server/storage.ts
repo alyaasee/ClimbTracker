@@ -30,8 +30,8 @@ export interface IStorage {
   getClimbsByUser(userId: number): Promise<Climb[]>;
   getClimbsByUserAndDateRange(userId: number, startDate: string, endDate: string): Promise<Climb[]>;
   getClimbsByUserAndDate(userId: number, date: string): Promise<Climb[]>;
-  updateClimb(id: number, climb: Partial<InsertClimb>): Promise<Climb | undefined>;
-  deleteClimb(id: number): Promise<void>;
+  updateClimb(id: number, userId: number, climb: Partial<InsertClimb>): Promise<Climb | undefined>;
+  deleteClimb(id: number, userId: number): Promise<void>;
   
   getTodayStats(userId: number, date: string): Promise<{
     climbs: number;
@@ -263,17 +263,17 @@ export class DatabaseStorage implements IStorage {
       );
   }
 
-  async updateClimb(id: number, climb: Partial<InsertClimb>): Promise<Climb | undefined> {
+  async updateClimb(id: number, userId: number, climb: Partial<InsertClimb>): Promise<Climb | undefined> {
     const [updatedClimb] = await db
       .update(climbs)
       .set(climb)
-      .where(eq(climbs.id, id))
+      .where(and(eq(climbs.id, id), eq(climbs.userId, userId)))
       .returning();
     return updatedClimb || undefined;
   }
 
-  async deleteClimb(id: number): Promise<void> {
-    await db.delete(climbs).where(eq(climbs.id, id));
+  async deleteClimb(id: number, userId: number): Promise<void> {
+    await db.delete(climbs).where(and(eq(climbs.id, id), eq(climbs.userId, userId)));
   }
 
   async getTodayStats(userId: number, date: string): Promise<{

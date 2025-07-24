@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Critical Security Fix - User Data Isolation (July 24, 2025)
+- Fixed critical security vulnerability where users could see each other's climb data
+- Removed dangerous development bypass system that caused data leakage between users
+- Enhanced updateClimb and deleteClimb operations to verify user ownership
+- Added userId parameter validation to all climb modification operations
+- Enforced proper session-based authentication without fallback bypasses
+- Each user now sees only their own climbs, ensuring complete data isolation
+- Verified that new accounts start with zero climbs as expected
+
 ### CLIMB-CADE Login Page Implementation (July 23, 2025)
 - Created authentic CLIMB-CADE branded login page following brand guidelines
 - Implemented authentic CLIMB-CADE app icon with retro pixel art mountain design

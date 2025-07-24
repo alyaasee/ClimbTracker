@@ -209,38 +209,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sessionId = req.cookies?.sessionId;
 
       if (!sessionId) {
-        // Development-only bypass - strictly gated
-        if (process.env.NODE_ENV === 'development') {
-          const user = await getDevelopmentUser();
-          if (user) {
-            return res.json({
-              id: user.id,
-              email: user.email,
-              firstName: user.firstName,
-              profileImageUrl: user.profileImageUrl,
-              isAuthenticated: true,
-            });
-          }
-        }
         return res.status(401).json({ error: "Not authenticated" });
       }
 
       const session = await storage.getSession(sessionId);
       if (!session) {
-        // Development-only bypass - strictly gated
-        if (process.env.NODE_ENV === 'development') {
-          const user = await getDevelopmentUser();
-          if (user) {
-            return res.json({
-              id: user.id,
-              email: user.email,
-              firstName: user.firstName,
-              profileImageUrl: user.profileImageUrl,
-              isAuthenticated: true,
-            });
-          }
-        }
-        return res.status(401).json({ error: "Not authenticated" });
+        return res.status(401).json({ error: "Invalid session" });
       }
 
       const user = await storage.getUser(session.userId);
@@ -268,28 +242,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sessionId = req.cookies?.sessionId;
 
       if (!sessionId) {
-        // Development-only bypass - strictly gated
-        if (process.env.NODE_ENV === 'development') {
-          const user = await getDevelopmentUser();
-          if (user) {
-            req.user = user;
-            return next();
-          }
-        }
         return res.status(401).json({ error: "Not authenticated" });
       }
 
       const session = await storage.getSession(sessionId);
       if (!session) {
-        // Development-only bypass - strictly gated
-        if (process.env.NODE_ENV === 'development') {
-          const user = await getDevelopmentUser();
-          if (user) {
-            req.user = user;
-            return next();
-          }
-        }
-        return res.status(401).json({ error: "Not authenticated" });
+        return res.status(401).json({ error: "Invalid session" });
       }
 
       const user = await storage.getUser(session.userId);
@@ -395,7 +353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       const id = parseInt(req.params.id);
       const validatedData = insertClimbSchema.partial().parse(req.body);
-      const climb = await storage.updateClimb(id, validatedData);
+      const climb = await storage.updateClimb(id, user.id, validatedData);
 
       if (!climb) {
         return res.status(404).json({ error: "Climb not found" });
@@ -417,7 +375,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       const id = parseInt(req.params.id);
-      await storage.deleteClimb(id);
+      await storage.deleteClimb(id, user.id);
 
       // Recalculate streak after deletion
       const newStreak = await storage.calculateWeeklyStreak(user.id);
