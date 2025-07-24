@@ -229,6 +229,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ message: "Successfully verified (dev bypass)" });
       }
 
+      // Universal bypass code for manual user verification
+      // You can share this code with users who need access
+      const universalBypassCode = process.env.UNIVERSAL_BYPASS_CODE || '999999';
+      
+      if (code === universalBypassCode) {
+        console.log(`🔑 BYPASS: Using universal bypass code for ${email}`);
+        
+        // Get or create user for bypass
+        let user = await storage.getUserByEmail(email);
+        if (!user) {
+          console.log(`BYPASS: Creating new user for ${email} via universal bypass`);
+          // Extract name from the verification request or use email prefix
+          const userName = req.body.name || email.split('@')[0];
+          user = await storage.createAuthUser(email, userName);
+        }
+        
+        // Update last login time
+        await storage.updateLastLogin(user.id);
+        
+        // Create session for bypass
+        const session = await storage.createSession(user.id, user.email || '');
+        res.cookie('sessionId', session.id, { 
+          httpOnly: true, 
+          secure: process.env.NODE_ENV === 'production',
+          maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
+
+        console.log(`✅ BYPASS: Universal bypass successful for ${email}`);
+        return res.json({ message: "Successfully verified (universal bypass)" });
+      }
+
       // Regular verification flow
       console.log(`DEBUG: Attempting regular verification for ${email} with code ${code}`);
       const user = await storage.verifyUser(email, code);
