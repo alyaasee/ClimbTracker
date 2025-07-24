@@ -198,19 +198,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email and code are required" });
       }
 
-      console.log(`DEBUG: Attempting to verify code "${code}" for ${email}`);
-      console.log(`DEBUG: Environment: ${process.env.NODE_ENV || 'undefined'}`);
+      console.log(`\n🔍 VERIFICATION DEBUG START`);
+      console.log(`Email: ${email}`);
+      console.log(`Code received: "${code}" (type: ${typeof code}, length: ${code.length})`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'undefined'}`);
       
-      // Universal bypass code for manual user verification
-      const universalBypassCode = process.env.UNIVERSAL_BYPASS_CODE || '999999';
-      console.log(`DEBUG: Universal bypass code is "${universalBypassCode}"`);
-      console.log(`DEBUG: Received code: "${code}" (type: ${typeof code})`);
-      console.log(`DEBUG: Code comparison: "${code}" === "${universalBypassCode}" = ${code === universalBypassCode}`);
-      console.log(`DEBUG: Code length: ${code.length}, Bypass length: ${universalBypassCode.length}`);
+      // Only use 999999 as bypass code
+      const bypassCode = '999999';
+      console.log(`Bypass code: "${bypassCode}" (length: ${bypassCode.length})`);
+      console.log(`Code match: "${code}" === "${bypassCode}" = ${code === bypassCode}`);
+      console.log(`Code comparison (char by char): ${Array.from(code).map((c, i) => `${c}(${c.charCodeAt(0)}) vs ${bypassCode[i]}(${bypassCode[i]?.charCodeAt(0)})`).join(', ')}`);
+      console.log(`🔍 VERIFICATION DEBUG END\n`);
 
-      // Check universal bypass code first - this should work for ANY email
-      if (code === universalBypassCode) {
-        console.log(`🔑 BYPASS: Using universal bypass code ${universalBypassCode} for ${email}`);
+      // Check bypass code first - this should work for ANY email
+      if (code === bypassCode) {
+        console.log(`🔑 BYPASS: Using bypass code ${bypassCode} for ${email}`);
         
         try {
           // Get or create user for bypass
@@ -246,36 +248,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.json({ message: "Successfully verified (universal bypass - with errors)" });
         }
       }
-
-      // Enhanced development bypass - works in any non-production environment
-      const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV !== 'production';
-      
-      if (isDevelopment && code === '000000') {
-        console.log(`🚀 DEBUG: Using development bypass code 000000 for ${email}`);
-        
-        // Get or create user for bypass
-        let user = await storage.getUserByEmail(email);
-        if (!user) {
-          console.log(`DEBUG: Creating new user for ${email} via bypass`);
-          user = await storage.createAuthUser(email, 'Dev User');
-        }
-        
-        // Update last login time
-        await storage.updateLastLogin(user.id);
-        
-        // Create session for bypass
-        const session = await storage.createSession(user.id, user.email || '');
-        res.cookie('sessionId', session.id, { 
-          httpOnly: true, 
-          secure: process.env.NODE_ENV === 'production',
-          maxAge: 24 * 60 * 60 * 1000 // 24 hours
-        });
-
-        console.log(`✅ DEBUG: Development bypass successful for ${email}`);
-        return res.json({ message: "Successfully verified (dev bypass)" });
-      }
-
-      
 
       // Regular verification flow
       console.log(`DEBUG: Attempting regular verification for ${email} with code ${code}`);
