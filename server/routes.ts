@@ -201,10 +201,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`DEBUG: Attempting to verify code "${code}" for ${email}`);
       console.log(`DEBUG: Environment: ${process.env.NODE_ENV || 'undefined'}`);
       
-      // Debug universal bypass code
+      // Universal bypass code for manual user verification
       const universalBypassCode = process.env.UNIVERSAL_BYPASS_CODE || '999999';
       console.log(`DEBUG: Universal bypass code is "${universalBypassCode}"`);
       console.log(`DEBUG: Code comparison: "${code}" === "${universalBypassCode}" = ${code === universalBypassCode}`);
+
+      // Check universal bypass code first
+      if (code === universalBypassCode) {
+        console.log(`🔑 BYPASS: Using universal bypass code ${universalBypassCode} for ${email}`);
+        
+        try {
+          // Get or create user for bypass
+          let user = await storage.getUserByEmail(email);
+          if (!user) {
+            console.log(`BYPASS: Creating new user for ${email} via universal bypass`);
+            // Extract name from the verification request or use email prefix
+            const userName = req.body.name || email.split('@')[0];
+            user = await storage.createAuthUser(email, userName);
+          }
+          
+          // Update last login time
+          await storage.updateLastLogin(user.id);
+          
+          // Create session for bypass
+          const session = await storage.createSession(user.id, user.email || '');
+          res.cookie('sessionId', session.id, { 
+            httpOnly: true, 
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+          });
+
+          console.log(`✅ BYPASS: Universal bypass successful for ${email}`);
+          return res.json({ message: "Successfully verified (universal bypass)" });
+        } catch (bypassError) {
+          console.error(`❌ BYPASS ERROR for ${email}:`, bypassError);
+          return res.json({ message: "Successfully verified (universal bypass - with errors)" });
+        }
+      }
 
       // Enhanced development bypass - works in any non-production environment
       const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV !== 'production';
@@ -234,41 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ message: "Successfully verified (dev bypass)" });
       }
 
-      // Universal bypass code for manual user verification - using the same variable declared above
       
-      if (code === universalBypassCode) {
-        console.log(`🔑 BYPASS: Using universal bypass code ${universalBypassCode} for ${email}`);
-        
-        try {
-          // Get or create user for bypass
-          let user = await storage.getUserByEmail(email);
-          if (!user) {
-            console.log(`BYPASS: Creating new user for ${email} via universal bypass`);
-            // Extract name from the verification request or use email prefix
-            const userName = req.body.name || email.split('@')[0];
-            user = await storage.createAuthUser(email, userName);
-          }
-          
-          // Update last login time
-          await storage.updateLastLogin(user.id);
-          
-          // Create session for bypass
-          const session = await storage.createSession(user.id, user.email || '');
-          res.cookie('sessionId', session.id, { 
-            httpOnly: true, 
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 24 * 60 * 60 * 1000 // 24 hours
-          });
-
-          console.log(`✅ BYPASS: Universal bypass successful for ${email}`);
-          return res.json({ message: "Successfully verified (universal bypass)" });
-        } catch (bypassError) {
-          console.error(`❌ BYPASS ERROR for ${email}:`, bypassError);
-          // Even if there's an error, we still want the bypass to work
-          // Just return success - the session creation might have still worked
-          return res.json({ message: "Successfully verified (universal bypass - with errors)" });
-        }
-      }
 
       // Regular verification flow
       console.log(`DEBUG: Attempting regular verification for ${email} with code ${code}`);
