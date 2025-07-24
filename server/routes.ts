@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { insertClimbSchema, type User } from "@shared/schema";
 import { format } from "date-fns";
@@ -17,6 +18,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Initialize Resend
   const resend = new Resend(process.env.RESEND_API_KEY);
+
+  /**
+   * Rate limiting configuration for different endpoint types.
+   * These limits help prevent abuse and ensure fair usage across all users.
+   */
+
+  // Strict rate limiting for authentication endpoints (prevents brute force attacks)
+  const authRateLimit = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit each IP to 5 requests per windowMs for auth
+    message: {
+      error: "Too many authentication attempts. Please try again in 15 minutes."
+    },
+    standardHeaders: true, // Return rate limit info in headers
+    legacyHeaders: false,
+    // Skip rate limiting in development for easier testing
+    skip: (req) => process.env.NODE_ENV === 'development'
+  });
+
+  // Moderate rate limiting for sensitive operations (prevents spam)
+  const sensitiveRateLimit = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 20, // Limit each IP to 20 requests per 5 minutes
+    message: {
+      error: "Too many requests. Please slow down and try again later."
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => process.env.NODE_ENV === 'development'
+  });
+
+  // General API rate limiting for all endpoints
+  const generalRateLimit = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 100, // Limit each IP to 100 requests per minute
+    message: {
+      error: "Rate limit exceeded. Please wait a moment before making more requests."
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => process.env.NODE_ENV === 'development'
+  });
+
+  // Apply general rate limiting to all API routes
+  app.use('/api', generalRateLimit);
 
   // Clean up expired sessions periodically
   setInterval(async () => {
@@ -44,8 +90,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return user || null;
   }
 
-  // Auth routes
-  app.post("/api/auth/send-code", async (req, res) => {
+  // Auth routes with strict rate limiting
+  app.post("/api/auth/send-code", authRateLimit, async (req, res) => {
     try {
       const { email, name } = req.body;
 
@@ -128,7 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/verify-code", async (req, res) => {
+  app.post("/api/auth/verify-code", authRateLimit, async (req, res) => {
     try {
       const { email, code } = req.body;
 
@@ -236,29 +282,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Middleware to check authentication
+  /**
+   * Authentication middleware that validates user sessions for protected routes.
+   * 
+   * This middleware performs a multi-step verification process:
+   * 1. Extracts sessionId from HTTP-only cookies (secure, not accessible via JS)
+   * 2. Validates the session exists and hasn't expired in the database
+   * 3. Ensures the associated user account still exists and is active
+   * 4. Attaches user data to the request object for downstream route handlers
+   * 
+   * Security considerations:
+   * - Sessions are stored server-side with expiration times
+   * - Invalid sessions are automatically cleaned up from the database
+   * - User data is scoped per request to prevent data leakage between users
+   * 
+   * @param {Request} req - Express request object, will be enhanced with user data
+   * @param {Response} res - Express response object for sending error responses
+   * @param {NextFunction} next - Express next function to continue to route handler
+   */
   const requireAuth = async (req: any, res: any, next: any) => {
     try {
+      // Extract session ID from secure HTTP-only cookie
       const sessionId = req.cookies?.sessionId;
 
       if (!sessionId) {
         return res.status(401).json({ error: "Not authenticated" });
       }
 
+      // Validate session exists and hasn't expired
       const session = await storage.getSession(sessionId);
       if (!session) {
         return res.status(401).json({ error: "Invalid session" });
       }
 
+      // Ensure user account still exists (handles deleted accounts gracefully)
       const user = await storage.getUser(session.userId);
       if (!user) {
+        // Clean up orphaned session when user no longer exists
         await storage.deleteSession(sessionId);
         return res.status(401).json({ error: "User not found" });
       }
 
+      // Attach authenticated user to request for use in route handlers
+      // This ensures all subsequent operations are scoped to this specific user
       req.user = user;
       next();
     } catch (error) {
+      console.error("Authentication middleware error:", error);
       res.status(500).json({ error: "Authentication error" });
     }
   };
@@ -310,19 +380,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all climbs for user
+  /**
+   * Get all climbs for the authenticated user.
+   * 
+   * SECURITY: This endpoint enforces strict user data isolation.
+   * - Only climbs belonging to the authenticated user are returned
+   * - User ID comes from validated session, not client input
+   * - No cross-user data leakage is possible
+   */
   app.get("/api/climbs", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
+      
+      // CRITICAL: user.id comes from authenticated session, ensuring data isolation
       const climbs = await storage.getClimbsByUser(user.id);
 
-      // Secure cache headers
+      // Secure cache headers prevent caching across different users
       res.set('Cache-Control', 'private, max-age=300');
       res.set('Vary', 'Authorization');
 
+      console.log(`Retrieved ${climbs.length} climbs for user ${user.id}`);
       res.json(climbs);
     } catch (error) {
-      res.status(500).json({ error: "Failed to get climbs" });
+      console.error("Get climbs error:", error);
+      res.status(500).json({ 
+        error: "Failed to load your climbs. Please refresh and try again.",
+        details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+      });
     }
   });
 
@@ -330,7 +414,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/climbs", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
-      const validatedData = insertClimbSchema.parse(req.body);
+      
+      // Validate input data with detailed error messages
+      let validatedData;
+      try {
+        validatedData = insertClimbSchema.parse(req.body);
+      } catch (validationError) {
+        console.error("Climb validation error:", validationError);
+        return res.status(400).json({ 
+          error: "Invalid climb data provided. Please check all required fields.",
+          details: validationError instanceof Error ? validationError.message : "Validation failed"
+        });
+      }
+
+      // Create the climb with user isolation
       const climb = await storage.createClimb({
         ...validatedData,
         userId: user.id,
@@ -341,9 +438,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const today = format(new Date(), 'yyyy-MM-dd');
       await storage.updateUserStreak(user.id, newStreak, today);
 
+      console.log(`Climb created successfully for user ${user.id}`);
       res.json(climb);
     } catch (error) {
-      res.status(400).json({ error: "Invalid climb data" });
+      console.error("Create climb error:", error);
+      res.status(500).json({ 
+        error: "Failed to create climb. Please try again.",
+        details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+      });
     }
   });
 
@@ -352,11 +454,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       const id = parseInt(req.params.id);
-      const validatedData = insertClimbSchema.partial().parse(req.body);
+      
+      // Validate climb ID parameter
+      if (isNaN(id) || id <= 0) {
+        return res.status(400).json({ error: "Invalid climb ID provided" });
+      }
+
+      // Validate input data with detailed error messages
+      let validatedData;
+      try {
+        validatedData = insertClimbSchema.partial().parse(req.body);
+      } catch (validationError) {
+        console.error("Climb update validation error:", validationError);
+        return res.status(400).json({ 
+          error: "Invalid climb data provided. Please check all fields.",
+          details: validationError instanceof Error ? validationError.message : "Validation failed"
+        });
+      }
+
+      // Update climb with proper user authorization
       const climb = await storage.updateClimb(id, user.id, validatedData);
 
       if (!climb) {
-        return res.status(404).json({ error: "Climb not found" });
+        console.warn(`Climb ${id} not found or unauthorized for user ${user.id}`);
+        return res.status(404).json({ error: "Climb not found or you don't have permission to edit it" });
       }
 
       // Recalculate streak after update (in case date changed)
@@ -364,9 +485,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const today = format(new Date(), 'yyyy-MM-dd');
       await storage.updateUserStreak(user.id, newStreak, today);
 
+      console.log(`Climb ${id} updated successfully for user ${user.id}`);
       res.json(climb);
     } catch (error) {
-      res.status(400).json({ error: "Invalid climb data" });
+      console.error("Update climb error:", error);
+      res.status(500).json({ 
+        error: "Failed to update climb. Please try again.",
+        details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+      });
     }
   });
 
@@ -375,16 +501,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       const id = parseInt(req.params.id);
-      await storage.deleteClimb(id, user.id);
+      
+      // Validate climb ID parameter
+      if (isNaN(id) || id <= 0) {
+        return res.status(400).json({ error: "Invalid climb ID provided" });
+      }
 
+      // Attempt to delete climb with proper user authorization
+      const deleteResult = await storage.deleteClimb(id, user.id);
+      
       // Recalculate streak after deletion
       const newStreak = await storage.calculateWeeklyStreak(user.id);
       const today = format(new Date(), 'yyyy-MM-dd');
       await storage.updateUserStreak(user.id, newStreak, today);
 
-      res.json({ success: true });
+      console.log(`Climb ${id} deleted successfully for user ${user.id}`);
+      res.json({ success: true, message: "Climb deleted successfully" });
     } catch (error) {
-      res.status(500).json({ error: "Failed to delete climb" });
+      console.error("Delete climb error:", error);
+      
+      // Provide specific error messages based on the error type
+      if ((error as Error).message?.includes('not found')) {
+        return res.status(404).json({ error: "Climb not found or you don't have permission to delete it" });
+      }
+      
+      res.status(500).json({ 
+        error: "Failed to delete climb. Please try again.",
+        details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+      });
     }
   });
 
@@ -393,6 +537,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       const today = format(new Date(), 'yyyy-MM-dd');
+      
+      console.log(`Fetching today's stats for user ${user.id} on ${today}`);
       const stats = await storage.getTodayStats(user.id, today);
 
       // Secure cache headers
@@ -401,17 +547,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(stats);
     } catch (error) {
-      res.status(500).json({ error: "Failed to get today's stats" });
+      console.error("Today's stats error:", error);
+      res.status(500).json({ 
+        error: "Failed to load today's statistics. Please refresh and try again.",
+        details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+      });
     }
   });
 
-  // Get monthly stats
+  /**
+   * Get monthly climbing statistics for the authenticated user.
+   * 
+   * SECURITY: User data isolation is enforced by:
+   * - Using authenticated user.id from session (not client input)
+   * - All database queries are scoped to the specific user
+   * - Private caching prevents cross-user data exposure
+   */
   app.get("/api/stats/monthly", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
       const year = parseInt(req.query.year as string) || new Date().getFullYear();
       const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
 
+      // Validate year and month parameters
+      if (year < 2020 || year > 2030) {
+        return res.status(400).json({ error: "Invalid year parameter" });
+      }
+      if (month < 1 || month > 12) {
+        return res.status(400).json({ error: "Invalid month parameter" });
+      }
+
+      // SECURITY: user.id ensures only this user's stats are returned
       const stats = await storage.getMonthlyStats(user.id, year, month);
 
       // Secure cache headers
@@ -421,7 +587,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       console.error("Monthly stats error:", error);
-      res.status(500).json({ error: "Failed to get monthly stats" });
+      res.status(500).json({ 
+        error: "Failed to load monthly statistics. Please try again.",
+        details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+      });
     }
   });
 
@@ -467,27 +636,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       const { firstName, profileImageUrl } = req.body;
 
+      // Validate profile data inputs
       const profileData: { firstName?: string; profileImageUrl?: string } = {};
 
       if (firstName !== undefined) {
-        profileData.firstName = firstName.trim();
+        const trimmedName = firstName.trim();
+        if (trimmedName.length === 0) {
+          return res.status(400).json({ error: "First name cannot be empty" });
+        }
+        if (trimmedName.length > 50) {
+          return res.status(400).json({ error: "First name must be 50 characters or less" });
+        }
+        profileData.firstName = trimmedName;
       }
 
       if (profileImageUrl !== undefined) {
-        profileData.profileImageUrl = profileImageUrl;
+        // Basic URL validation for profile image
+        if (profileImageUrl && typeof profileImageUrl === 'string') {
+          try {
+            new URL(profileImageUrl);
+            profileData.profileImageUrl = profileImageUrl;
+          } catch {
+            return res.status(400).json({ error: "Invalid profile image URL provided" });
+          }
+        } else {
+          profileData.profileImageUrl = profileImageUrl; // Allow null/empty values
+        }
       }
 
+      if (Object.keys(profileData).length === 0) {
+        return res.status(400).json({ error: "No valid profile data provided to update" });
+      }
+
+      console.log(`Updating profile for user ${user.id}`);
       const updatedUser = await storage.updateUserProfile(user.id, profileData);
 
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      console.log(`Profile updated successfully for user ${user.id}`);
       res.json(updatedUser);
     } catch (error) {
       console.error("Profile update error:", error);
-      res.status(500).json({ error: "Failed to update profile" });
+      res.status(500).json({ 
+        error: "Failed to update profile. Please try again.",
+        details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+      });
     }
   });
 
-  // Get daily motivational quote
-  app.get("/api/quote", requireAuth, async (req: any, res) => {
+  // Get daily motivational quote with rate limiting (prevents API abuse)
+  app.get("/api/quote", requireAuth, sensitiveRateLimit, async (req: any, res) => {
     try {
       const today = format(new Date(), 'yyyy-MM-dd');
 
