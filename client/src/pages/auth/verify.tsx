@@ -174,13 +174,7 @@ export default function Verify() {
             We sent a code to {email || "your email"}
           </p>
           
-          {/* Debug info for development */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="text-center mb-4 p-2 bg-yellow-100 rounded text-xs">
-              <p>Debug: Email = "{email}"</p>
-              <p>Current URL: {window.location.href}</p>
-            </div>
-          )}
+
 
           {/* Code Input */}
           <div className="flex justify-center mb-4">
@@ -236,13 +230,7 @@ export default function Verify() {
               {verifyCodeMutation.isPending ? "Verifying..." : "Use Bypass Code (999999)"}
             </button>
 
-            <button
-              onClick={handleResend}
-              className="retro-button-secondary w-full p-3 retro-bounce"
-              disabled={resendCodeMutation.isPending}
-            >
-              {resendCodeMutation.isPending ? "Sending..." : "Resend code"}
-            </button>
+
 
             <button
               onClick={handleBack}
