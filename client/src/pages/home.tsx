@@ -9,12 +9,12 @@ export default function Home() {
   const { user: authUser } = useAuth();
 
   const { data: user } = useQuery<User>({
-    queryKey: ["api", "user", authUser?.id],
+    queryKey: ["/api/user", authUser?.id],
     enabled: !!authUser?.id,
   });
 
   const { data: todayStats } = useQuery<TodayStatsResponse>({
-    queryKey: ["api", "stats", "today", authUser?.id],
+    queryKey: ["/api/stats/today", authUser?.id],
     enabled: !!authUser?.id,
     staleTime: 0, // Always fresh
     gcTime: 0, // Don't cache
@@ -23,7 +23,7 @@ export default function Home() {
   });
 
   const { data: quote, isLoading: quoteLoading } = useQuery<DailyQuoteResponse>({
-    queryKey: ["api", "quote", authUser?.id],
+    queryKey: ["/api/quote", authUser?.id],
     enabled: !!authUser?.id,
   });
 
