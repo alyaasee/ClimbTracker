@@ -214,19 +214,7 @@ export default function Verify() {
 
           {/* Action buttons */}
           <div className="space-y-4">
-            {/* Quick bypass button for development - maintains user isolation */}
-            <button
-              onClick={() => {
-                const emailToUse = email || "demo@example.com";
-                console.log(`🔧 Bypass button clicked with email: "${emailToUse}"`);
-                setCode("999999");
-                verifyCodeMutation.mutate({ email: emailToUse, code: "999999" });
-              }}
-              className="retro-button-primary w-full p-3 retro-bounce"
-              disabled={verifyCodeMutation.isPending}
-            >
-              {verifyCodeMutation.isPending ? "Verifying..." : "Use Bypass Code (999999)"}
-            </button>
+
 
 
 
