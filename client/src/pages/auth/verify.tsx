@@ -56,7 +56,12 @@ export default function Verify() {
 
   const verifyCodeMutation = useMutation({
     mutationFn: async ({ email, code }: { email: string; code: string }) => {
-      console.log(`🚀 Frontend: Verifying code "${code}" for ${email}`);
+      console.log(`🚀 Frontend: Starting verification process`);
+      console.log(`   Email: "${email}"`);
+      console.log(`   Code: "${code}" (length: ${code.length})`);
+      console.log(`   Name: "${name}"`);
+      console.log(`   URL: /api/auth/verify-code`);
+      
       try {
         const result = await apiRequest(`/api/auth/verify-code`, {
           method: "POST",
@@ -66,6 +71,7 @@ export default function Verify() {
         return result;
       } catch (error) {
         console.error(`❌ Frontend: Verification failed`, error);
+        console.error(`   Error details:`, error);
         throw error;
       }
     },
@@ -114,8 +120,10 @@ export default function Verify() {
   });
 
   const handleCodeChange = (value: string) => {
+    console.log(`📝 Code input changed: "${value}" (length: ${value.length})`);
     setCode(value);
     if (value.length === 6) {
+      console.log(`🎯 Triggering verification for complete code: "${value}"`);
       verifyCodeMutation.mutate({ email, code: value });
     }
   };
