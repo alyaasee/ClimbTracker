@@ -121,6 +121,21 @@ export default function Login() {
             </button>
           </form>
 
+          {/* Direct login bypass for development */}
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => {
+                // Navigate directly to verification page with bypass
+                setLocation(`/auth/verify?email=test@example.com&name=Test User`);
+              }}
+              className="w-full p-3 text-[#EF7326] hover:text-[#1F1F1F] transition-colors border-2 border-[#EF7326] hover:bg-[#EF7326] rounded-lg"
+              style={{ fontFamily: 'Space Mono, monospace', fontWeight: '600' }}
+            >
+              Skip Email - Use Bypass Code
+            </button>
+          </div>
+
           {/* Footer branding */}
           <div className="text-center mt-8 pt-6 border-t-2 border-[#1F1F1F]">
             <div className="flex items-center justify-center space-x-2">
