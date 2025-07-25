@@ -171,7 +171,7 @@ export default function Verify() {
           </p>
 
           {/* Code Input */}
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-4">
             <InputOTP
               maxLength={6}
               value={code}
@@ -189,6 +189,19 @@ export default function Verify() {
             </InputOTP>
           </div>
 
+          {/* Manual Verify Button for Testing */}
+          {code.length === 6 && (
+            <div className="flex justify-center mb-6">
+              <button
+                onClick={() => verifyCodeMutation.mutate({ email, code })}
+                className="retro-button-primary px-6 py-2 retro-bounce"
+                disabled={verifyCodeMutation.isPending}
+              >
+                {verifyCodeMutation.isPending ? "Verifying..." : "Verify Code"}
+              </button>
+            </div>
+          )}
+
           {verifyCodeMutation.isPending && (
             <div className="text-center mb-6">
               <p className="retro-body text-[#9BA0A5] text-sm">Verifying code...</p>
@@ -197,6 +210,18 @@ export default function Verify() {
 
           {/* Action buttons */}
           <div className="space-y-4">
+            {/* Quick bypass button for development */}
+            <button
+              onClick={() => {
+                setCode("999999");
+                verifyCodeMutation.mutate({ email, code: "999999" });
+              }}
+              className="retro-button-primary w-full p-3 retro-bounce"
+              disabled={verifyCodeMutation.isPending}
+            >
+              {verifyCodeMutation.isPending ? "Verifying..." : "Use Bypass Code (999999)"}
+            </button>
+
             <button
               onClick={handleResend}
               className="retro-button-secondary w-full p-3 retro-bounce"
