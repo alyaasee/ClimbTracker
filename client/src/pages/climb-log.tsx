@@ -27,7 +27,7 @@ export default function ClimbLog() {
 
   // User-specific query key to prevent data leakage between users
   const { data: climbs = [] } = useQuery({
-    queryKey: ["api", "climbs", user?.id],
+    queryKey: ["/api/climbs", user?.id],
     enabled: !!user?.id,
   });
 
@@ -57,12 +57,17 @@ export default function ClimbLog() {
     },
     onSuccess: () => {
       // User-specific cache invalidation to prevent cross-user contamination
-      queryClient.invalidateQueries({ queryKey: ["api", "climbs", user?.id] });
-      queryClient.invalidateQueries({ queryKey: ["api", "user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/climbs", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user", user?.id] });
       // Invalidate today's stats for this user only
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today", user?.id] });
+      queryClient.invalidateQueries({ queryKey: [`/api/stats/today`, user?.id] });
       // Invalidate all stats queries for this user only
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", user?.id] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey;
+          return key[0] === "/api/stats" && key.length > 1 && key[key.length - 1] === user?.id;
+        }
+      });
       toast({
         title: "Success",
         description: "Climb deleted successfully",
