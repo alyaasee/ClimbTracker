@@ -222,10 +222,10 @@ export default function Verify() {
 
           {/* Action buttons */}
           <div className="space-y-4">
-            {/* Quick bypass button for development */}
+            {/* Quick bypass button for development - maintains user isolation */}
             <button
               onClick={() => {
-                const emailToUse = email || "test@example.com";
+                const emailToUse = email || "demo@example.com";
                 console.log(`🔧 Bypass button clicked with email: "${emailToUse}"`);
                 setCode("999999");
                 verifyCodeMutation.mutate({ email: emailToUse, code: "999999" });

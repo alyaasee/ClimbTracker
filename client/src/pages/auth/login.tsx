@@ -121,13 +121,15 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Direct login bypass for development */}
+          {/* Direct login bypass for development - maintains user uniqueness */}
           <div className="mt-6">
             <button
               type="button"
               onClick={() => {
-                // Navigate directly to verification page with bypass
-                setLocation(`/auth/verify?email=test@example.com&name=Test User`);
+                // Use the actual email entered to maintain user isolation
+                const emailToUse = email.trim() || "demo@example.com";
+                const nameToUse = name.trim() || "Demo User";
+                setLocation(`/auth/verify?email=${encodeURIComponent(emailToUse)}&name=${encodeURIComponent(nameToUse)}`);
               }}
               className="w-full p-3 text-[#EF7326] hover:text-[#1F1F1F] transition-colors border-2 border-[#EF7326] hover:bg-[#EF7326] rounded-lg"
               style={{ fontFamily: 'Space Mono, monospace', fontWeight: '600' }}
