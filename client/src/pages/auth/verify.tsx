@@ -170,9 +170,7 @@ export default function Verify() {
           <h1 className="retro-title text-2xl text-center mb-2">
             Enter verification code
           </h1>
-          <p className="retro-body text-center mb-8 text-[#1F1F1F]">
-            We sent a code to {email || "your email"}
-          </p>
+
           
 
 
