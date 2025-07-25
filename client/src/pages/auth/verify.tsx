@@ -88,9 +88,24 @@ export default function Verify() {
       window.location.href = "/";
     },
     onError: (error: Error) => {
+      console.error(`❌ Frontend: Verification error details:`, error);
+      
+      // Extract the actual error message from the server response
+      let errorMessage = "Please check your code and try again.";
+      let errorTitle = "Invalid code";
+      
+      if (error.message) {
+        errorMessage = error.message;
+        
+        // Check if it's actually a server error vs invalid code
+        if (error.message.includes("Failed to") || error.message.includes("Error")) {
+          errorTitle = "Verification Error";
+        }
+      }
+      
       toast({
-        title: "Invalid code",
-        description: error.message || "Please check your code and try again.",
+        title: errorTitle,
+        description: errorMessage,
         variant: "destructive",
       });
       setCode("");

@@ -14,32 +14,40 @@ async function throwIfResNotOk(res: Response) {
 }
 
 export async function apiRequest(
-  urlOrOptions: string | { url?: string; method?: string; body?: unknown },
-  options?: { method?: string; body?: unknown }
-): Promise<any> {
-  let url: string;
-  let method: string;
-  let body: unknown;
+  url: string,
+  options: { method?: string; body?: any } = {}
+) {
+  const { method = "GET", body } = options;
 
-  // Handle both old and new calling patterns
-  if (typeof urlOrOptions === 'string') {
-    url = urlOrOptions;
-    method = options?.method || 'GET';
-    body = options?.body;
-  } else {
-    url = urlOrOptions.url || '';
-    method = urlOrOptions.method || 'GET';
-    body = urlOrOptions.body;
+  const config: RequestInit = {
+    method,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  if (body) {
+    config.body = JSON.stringify(body);
   }
 
-  const res = await fetch(url, {
-    method,
-    headers: body ? { "Content-Type": "application/json" } : {},
-    body: body ? JSON.stringify(body) : undefined,
-    credentials: "include",
-  });
+  const res = await fetch(url, config);
 
-  await throwIfResNotOk(res);
+  // Handle errors with better error messages
+  if (!res.ok) {
+    let errorData;
+    try {
+      errorData = await res.json();
+    } catch {
+      // If response isn't JSON, use status text
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+
+    // Throw error with server's error message
+    const errorMessage = errorData?.error || errorData?.message || `HTTP ${res.status}: ${res.statusText}`;
+    throw new Error(errorMessage);
+  }
+
   return await res.json();
 }
 
