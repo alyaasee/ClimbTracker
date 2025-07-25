@@ -8,12 +8,14 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { format, parseISO } from "date-fns";
 import { CalendarIcon, Pencil, Trash2, Mountain, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import LogClimbModal from "@/components/log-climb-modal";
 import type { DateRange } from "react-day-picker";
 
 export default function ClimbLog() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [editingClimb, setEditingClimb] = useState<any>(null);
   const [showLogModal, setShowLogModal] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
@@ -23,8 +25,10 @@ export default function ClimbLog() {
 
   const itemsPerPage = 20;
 
+  // User-specific query key to prevent data leakage between users
   const { data: climbs = [] } = useQuery({
-    queryKey: ["api", "climbs"],
+    queryKey: ["api", "climbs", user?.id],
+    enabled: !!user?.id,
   });
 
   // Filter climbs by date range
@@ -52,12 +56,13 @@ export default function ClimbLog() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["api", "climbs"] });
+      // User-specific cache invalidation to prevent cross-user contamination
+      queryClient.invalidateQueries({ queryKey: ["api", "climbs", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["api", "user"] });
-      // Invalidate today's stats
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today"] });
-      // Invalidate all stats queries
-      queryClient.invalidateQueries({ queryKey: ["api", "stats"] });
+      // Invalidate today's stats for this user only
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today", user?.id] });
+      // Invalidate all stats queries for this user only
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", user?.id] });
       toast({
         title: "Success",
         description: "Climb deleted successfully",

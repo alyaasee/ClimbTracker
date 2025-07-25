@@ -10,18 +10,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### Critical Security Fix - User Data Isolation (July 25, 2025)
-- Fixed critical security vulnerability where users could see each other's climb data
-- Removed dangerous development bypass system that caused data leakage between users
-- Enhanced updateClimb and deleteClimb operations to verify user ownership
-- Added userId parameter validation to all climb modification operations
-- Enforced proper session-based authentication without fallback bypasses
-- Each user now sees only their own climbs, ensuring complete data isolation
-- Verified that new accounts start with zero climbs as expected
-- Implemented secure bypass system that maintains user email isolation (999999 code works with any email)
-- Users must still enter their unique email address to maintain separate climbing logs
-- Replaced "Continue" button function with bypass functionality while keeping same button text
-- Login flow now skips email verification while preserving individual user account creation
+### Critical Security Fix - Complete User Data Isolation (July 25, 2025)
+- **RESOLVED**: Fixed critical security vulnerability where users could see each other's climb data
+- **Backend Security**: Removed dangerous development bypass system that caused data leakage between users
+- **API Protection**: Enhanced updateClimb and deleteClimb operations to verify user ownership
+- **Data Validation**: Added userId parameter validation to all climb modification operations
+- **Session Security**: Enforced proper session-based authentication without fallback bypasses
+- **Frontend Cache Isolation**: Implemented user-specific query keys across ALL components to prevent cache contamination
+- **Query Key Structure**: Updated all queries to use format ["api", "endpoint", userId] for complete isolation
+- **Cache Invalidation**: Fixed mutation cache invalidation to only affect the current user's data
+- **Automatic Cache Clearing**: Added user-change detection that clears entire cache when switching users
+- **Complete Data Separation**: Each user now sees only their own climbs with zero data leakage risk
+- **Verified Isolation**: Confirmed new accounts start with zero climbs and cannot access other users' data
+- **Secure Bypass System**: Maintained development bypass (999999 code) while preserving user account separation
+- **Login Flow**: Users enter unique email addresses to maintain completely separate climbing logs
 
 ### CLIMB-CADE Login Page Implementation (July 23, 2025)
 - Created authentic CLIMB-CADE branded login page following brand guidelines

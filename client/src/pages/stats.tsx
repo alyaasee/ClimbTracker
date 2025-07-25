@@ -3,22 +3,27 @@ import { useQuery } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Mountain, Gamepad2, Trophy } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Stats() {
+  const { user } = useAuth();
   const currentDate = new Date();
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
 
   const { data: availableMonths = [] } = useQuery({
-    queryKey: ["/api/stats/available-months"],
+    queryKey: ["/api/stats/available-months", user?.id],
+    enabled: !!user?.id,
   });
 
   const { data: monthlyStats } = useQuery({
-    queryKey: [`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`],
+    queryKey: [`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`, user?.id],
+    enabled: !!user?.id,
   });
 
   const { data: gradeProgression = [] } = useQuery({
-    queryKey: [`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`],
+    queryKey: [`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`, user?.id],
+    enabled: !!user?.id,
   });
 
   // Color palette from PRD
