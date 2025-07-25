@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { insertClimbSchema, type User } from "@shared/schema";
 import { format } from "date-fns";
 import OpenAI from "openai";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Development bypass control
@@ -16,8 +16,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  // Initialize Resend
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  // Initialize Gmail SMTP transporter
+  const gmailTransporter = nodemailer.createTransporter({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD
+    }
+  });
 
   /**
    * Rate limiting configuration for different endpoint types.
@@ -124,8 +130,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send verification code via email
       let emailSent = false;
       try {
-        const emailResult = await resend.emails.send({
-          from: 'CLIMB-CADE <onboarding@resend.dev>',
+        const mailOptions = {
+          from: `CLIMB-CADE <${process.env.GMAIL_USER}>`,
           to: email,
           subject: 'Your CLIMB-CADE Verification Code',
           html: `
@@ -156,14 +162,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               </div>
             </div>
           `
-        });
+        };
 
-        if (emailResult.data) {
-          emailSent = true;
-          console.log(`✅ Email successfully sent to ${email}, ID: ${emailResult.data.id}`);
-        } else {
-          console.error(`❌ Email send failed for ${email}:`, emailResult.error);
-        }
+        const emailResult = await gmailTransporter.sendMail(mailOptions);
+        emailSent = true;
+        console.log(`✅ Email successfully sent to ${email}, Message ID: ${emailResult.messageId}`);
       } catch (emailError) {
         console.error(`❌ Email send exception for ${email}:`, emailError);
         console.error("Email error details:", JSON.stringify(emailError, null, 2));
