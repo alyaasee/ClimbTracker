@@ -56,10 +56,18 @@ export default function Verify() {
 
   const verifyCodeMutation = useMutation({
     mutationFn: async ({ email, code }: { email: string; code: string }) => {
-      await apiRequest(`/api/auth/verify-code`, {
-        method: "POST",
-        body: { email, code, name }
-      });
+      console.log(`🚀 Frontend: Verifying code "${code}" for ${email}`);
+      try {
+        const result = await apiRequest(`/api/auth/verify-code`, {
+          method: "POST",
+          body: { email, code, name }
+        });
+        console.log(`✅ Frontend: Verification successful`, result);
+        return result;
+      } catch (error) {
+        console.error(`❌ Frontend: Verification failed`, error);
+        throw error;
+      }
     },
     onSuccess: async () => {
       // Invalidate the auth query to refresh user state
