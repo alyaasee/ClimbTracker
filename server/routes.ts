@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { insertClimbSchema, type User } from "@shared/schema";
 import { format } from "date-fns";
 import OpenAI from "openai";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Development bypass control
@@ -16,14 +16,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  // Initialize Gmail SMTP transporter
-  const gmailTransporter = nodemailer.createTransporter({
-    service: 'gmail',
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD
-    }
-  });
+  // Initialize Resend for email
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   /**
    * Rate limiting configuration for different endpoint types.
