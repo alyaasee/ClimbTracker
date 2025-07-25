@@ -63,16 +63,6 @@ export default function MobileHeader() {
 
   return (
     <>
-      {/* Status Bar */}
-      <div className="flex justify-between items-center px-3 py-2 aa-overlay-content backdrop-blur-sm text-aa-dark text-sm font-medium">
-        <span>11:41</span>
-        <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-gray-800 rounded-sm"></div>
-          <div className="w-4 h-2 bg-gray-800 rounded-sm"></div>
-          <div className="w-4 h-2 bg-gray-800 rounded-sm"></div>
-        </div>
-      </div>
-
       {/* Navigation Header */}
       <header className="px-3 py-4 aa-overlay-content backdrop-blur-sm border-b border-white/20">
         <div className="flex items-center justify-between">

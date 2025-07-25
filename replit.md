@@ -10,6 +10,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Mobile Status Bar Removal (July 25, 2025)
+- Removed non-functional mobile status bar section showing time and signal bars
+- Cleaner header interface with more space for navigation elements
+- Simplified mobile header component by removing simulation elements
+
 ### Critical Security Fix - Complete User Data Isolation (July 25, 2025)
 - **RESOLVED**: Fixed critical security vulnerability where users could see each other's climb data
 - **Backend Security**: Removed dangerous development bypass system that caused data leakage between users
