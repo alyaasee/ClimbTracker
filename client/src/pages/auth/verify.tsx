@@ -46,8 +46,12 @@ export default function Verify() {
     const params = new URLSearchParams(window.location.search);
     const emailParam = params.get("email");
     const nameParam = params.get("name");
+    console.log("Verify page loaded with params:", { emailParam, nameParam });
     if (emailParam) {
       setEmail(emailParam);
+      console.log("Email set to:", emailParam);
+    } else {
+      console.log("No email parameter found in URL");
     }
     if (nameParam) {
       setName(nameParam);
@@ -167,8 +171,16 @@ export default function Verify() {
             Enter verification code
           </h1>
           <p className="retro-body text-center mb-8 text-[#1F1F1F]">
-            We sent a code to {email}
+            We sent a code to {email || "your email"}
           </p>
+          
+          {/* Debug info for development */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="text-center mb-4 p-2 bg-yellow-100 rounded text-xs">
+              <p>Debug: Email = "{email}"</p>
+              <p>Current URL: {window.location.href}</p>
+            </div>
+          )}
 
           {/* Code Input */}
           <div className="flex justify-center mb-4">
@@ -213,8 +225,10 @@ export default function Verify() {
             {/* Quick bypass button for development */}
             <button
               onClick={() => {
+                const emailToUse = email || "test@example.com";
+                console.log(`🔧 Bypass button clicked with email: "${emailToUse}"`);
                 setCode("999999");
-                verifyCodeMutation.mutate({ email, code: "999999" });
+                verifyCodeMutation.mutate({ email: emailToUse, code: "999999" });
               }}
               className="retro-button-primary w-full p-3 retro-bounce"
               disabled={verifyCodeMutation.isPending}
