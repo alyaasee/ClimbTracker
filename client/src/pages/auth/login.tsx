@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import climbCadeIcon from "@assets/CLIMB-CADE App Icon_1753260765331.png";
@@ -24,28 +22,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const sendCodeMutation = useMutation({
-    mutationFn: async ({ email, name }: { email: string; name: string }) => {
-      await apiRequest(`/api/auth/send-code`, {
-        method: "POST",
-        body: { email, name }
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Code sent!",
-        description: "Please check your email for the verification code.",
-      });
-      setLocation(`/auth/verify?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send verification code",
-        variant: "destructive",
-      });
-    },
-  });
+
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +42,10 @@ export default function Login() {
       });
       return;
     }
-    sendCodeMutation.mutate({ email, name });
+    // Skip email sending and go directly to verification with bypass code
+    const emailToUse = email.trim();
+    const nameToUse = name.trim();
+    setLocation(`/auth/verify?email=${encodeURIComponent(emailToUse)}&name=${encodeURIComponent(nameToUse)}`);
   };
 
   return (
@@ -94,7 +74,6 @@ export default function Login() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="retro-input w-full p-4 text-[#1F1F1F] placeholder-[#9BA0A5]"
-                disabled={sendCodeMutation.isPending}
                 style={{ fontFamily: 'Space Mono, monospace', fontWeight: '600' }}
               />
             </div>
@@ -106,7 +85,6 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="retro-input w-full p-4 text-[#1F1F1F] placeholder-[#9BA0A5]"
-                disabled={sendCodeMutation.isPending}
                 style={{ fontFamily: 'Space Mono, monospace', fontWeight: '600' }}
               />
             </div>
@@ -114,29 +92,13 @@ export default function Login() {
             <button
               type="submit"
               className="retro-button w-full p-4 retro-bounce"
-              disabled={sendCodeMutation.isPending}
               style={{ background: '#CEE4D2', color: '#1F1F1F' }}
             >
-              {sendCodeMutation.isPending ? "Sending..." : "Continue"}
+              Continue
             </button>
           </form>
 
-          {/* Direct login bypass for development - maintains user uniqueness */}
-          <div className="mt-6">
-            <button
-              type="button"
-              onClick={() => {
-                // Use the actual email entered to maintain user isolation
-                const emailToUse = email.trim() || "demo@example.com";
-                const nameToUse = name.trim() || "Demo User";
-                setLocation(`/auth/verify?email=${encodeURIComponent(emailToUse)}&name=${encodeURIComponent(nameToUse)}`);
-              }}
-              className="w-full p-3 text-[#EF7326] hover:text-[#1F1F1F] transition-colors border-2 border-[#EF7326] hover:bg-[#EF7326] rounded-lg"
-              style={{ fontFamily: 'Space Mono, monospace', fontWeight: '600' }}
-            >
-              Skip Email - Use Bypass Code
-            </button>
-          </div>
+
 
           {/* Footer branding */}
           <div className="text-center mt-8 pt-6 border-t-2 border-[#1F1F1F]">

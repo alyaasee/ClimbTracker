@@ -20,6 +20,8 @@ Preferred communication style: Simple, everyday language.
 - Verified that new accounts start with zero climbs as expected
 - Implemented secure bypass system that maintains user email isolation (999999 code works with any email)
 - Users must still enter their unique email address to maintain separate climbing logs
+- Replaced "Continue" button function with bypass functionality while keeping same button text
+- Login flow now skips email verification while preserving individual user account creation
 
 ### CLIMB-CADE Login Page Implementation (July 23, 2025)
 - Created authentic CLIMB-CADE branded login page following brand guidelines
