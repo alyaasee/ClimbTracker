@@ -203,16 +203,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Code received: "${code}" (type: ${typeof code}, length: ${code.length})`);
       console.log(`Environment: ${process.env.NODE_ENV || 'undefined'}`);
       
-      // Only use 999999 as bypass code
-      const bypassCode = '999999';
-      console.log(`Bypass code: "${bypassCode}" (length: ${bypassCode.length})`);
-      console.log(`Code match: "${code}" === "${bypassCode}" = ${code === bypassCode}`);
-      console.log(`Code comparison (char by char): ${Array.from(code).map((c, i) => `${c}(${c.charCodeAt(0)}) vs ${bypassCode[i]}(${bypassCode[i]?.charCodeAt(0)})`).join(', ')}`);
+      // Universal bypass code - always 999999
+      const universalBypassCode = '999999';
+      console.log(`Universal bypass code: "${universalBypassCode}" (length: ${universalBypassCode.length})`);
+      console.log(`Code match: "${code}" === "${universalBypassCode}" = ${code === universalBypassCode}`);
       console.log(`🔍 VERIFICATION DEBUG END\n`);
 
-      // Check bypass code first - this should work for ANY email
-      if (code === bypassCode) {
-        console.log(`🔑 BYPASS: Using bypass code ${bypassCode} for ${email}`);
+      // Check universal bypass code first - this should work for ANY email
+      if (code === universalBypassCode) {
+        console.log(`🔑 BYPASS: Using universal bypass code ${universalBypassCode} for ${email}`);
         
         try {
           // Get or create user for bypass
@@ -222,30 +221,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Extract name from the verification request or use email prefix
             const userName = req.body.name || email.split('@')[0];
             user = await storage.createAuthUser(email, userName);
+            console.log(`BYPASS: Created user with ID ${user.id} for ${email}`);
+          } else {
+            console.log(`BYPASS: Found existing user with ID ${user.id} for ${email}`);
           }
           
-          // Mark user as verified if not already
+          // Always mark user as verified for bypass
           if (!user.isVerified) {
-            await storage.updateUserProfile(user.id, { isVerified: true } as any);
+            console.log(`BYPASS: Marking user ${user.id} as verified`);
+            user = await storage.updateUserProfile(user.id, { isVerified: true });
           }
           
           // Update last login time
           await storage.updateLastLogin(user.id);
+          console.log(`BYPASS: Updated last login for user ${user.id}`);
           
           // Create session for bypass
           const session = await storage.createSession(user.id, user.email || '');
+          console.log(`BYPASS: Created session ${session.id} for user ${user.id}`);
+          
           res.cookie('sessionId', session.id, { 
             httpOnly: true, 
             secure: process.env.NODE_ENV === 'production',
-            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
+            sameSite: 'lax'
           });
 
-          console.log(`✅ BYPASS: Universal bypass successful for ${email}`);
+          console.log(`✅ BYPASS: Universal bypass successful for ${email} with session ${session.id}`);
           return res.json({ message: "Successfully verified (universal bypass)" });
         } catch (bypassError) {
           console.error(`❌ BYPASS ERROR for ${email}:`, bypassError);
-          // Still return success for bypass
-          return res.json({ message: "Successfully verified (universal bypass - with errors)" });
+          console.error(`   Error stack:`, bypassError instanceof Error ? bypassError.stack : 'No stack trace');
+          return res.status(500).json({ error: "Bypass authentication failed. Please try again." });
         }
       }
 

@@ -150,11 +150,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUserProfile(userId: number, profileData: { firstName?: string; profileImageUrl?: string; isVerified?: boolean }): Promise<User> {
+    console.log(`DEBUG: Updating user ${userId} with data:`, profileData);
     const [updatedUser] = await db
       .update(users)
       .set(profileData)
       .where(eq(users.id, userId))
       .returning();
+    
+    if (!updatedUser) {
+      throw new Error(`Failed to update user ${userId} - user not found`);
+    }
+    
+    console.log(`DEBUG: Successfully updated user ${userId}:`, { id: updatedUser.id, isVerified: updatedUser.isVerified });
     return updatedUser;
   }
 
