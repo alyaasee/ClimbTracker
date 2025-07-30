@@ -229,6 +229,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createClimb(climb: InsertClimb & { userId: number }): Promise<Climb> {
+    // SECURITY: Verify userId is valid to prevent unauthorized climb creation
+    if (!climb.userId || climb.userId <= 0) {
+      throw new Error("Invalid user ID for climb creation");
+    }
+    
+    // Additional security: Verify user exists before creating climb
+    const user = await this.getUser(climb.userId);
+    if (!user) {
+      throw new Error("User not found - cannot create climb");
+    }
+    
     const [newClimb] = await db
       .insert(climbs)
       .values(climb)
@@ -250,6 +261,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getClimbsByUserAndDateRange(userId: number, startDate: string, endDate: string): Promise<Climb[]> {
+    // SECURITY: Verify userId is valid to prevent data leakage
+    if (!userId || userId <= 0) {
+      throw new Error("Invalid user ID for date range query");
+    }
+    
     return await db
       .select()
       .from(climbs)
@@ -264,6 +280,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getClimbsByUserAndDate(userId: number, date: string): Promise<Climb[]> {
+    // SECURITY: Verify userId is valid to prevent data leakage
+    if (!userId || userId <= 0) {
+      throw new Error("Invalid user ID for date query");
+    }
+    
     return await db
       .select()
       .from(climbs)
@@ -276,6 +297,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateClimb(id: number, userId: number, climb: Partial<InsertClimb>): Promise<Climb | undefined> {
+    // SECURITY: Verify userId is valid to prevent unauthorized updates
+    if (!userId || userId <= 0) {
+      throw new Error("Invalid user ID for climb update");
+    }
+    
     const [updatedClimb] = await db
       .update(climbs)
       .set(climb)
@@ -285,7 +311,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteClimb(id: number, userId: number): Promise<void> {
-    await db.delete(climbs).where(and(eq(climbs.id, id), eq(climbs.userId, userId)));
+    // SECURITY: Verify userId is valid to prevent unauthorized deletions
+    if (!userId || userId <= 0) {
+      throw new Error("Invalid user ID for climb deletion");
+    }
+    
+    const result = await db.delete(climbs).where(and(eq(climbs.id, id), eq(climbs.userId, userId)));
+    
+    // Verify that a record was actually deleted (ensures user owned the climb)
+    if (result.rowCount === 0) {
+      throw new Error("Climb not found or you don't have permission to delete it");
+    }
   }
 
   async getTodayStats(userId: number, date: string): Promise<{

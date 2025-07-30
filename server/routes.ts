@@ -502,6 +502,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       const id = parseInt(req.params.id);
       
+      // SECURITY: Double-check user authentication
+      if (!user?.id || !user?.email) {
+        console.error("Invalid user object in climb update:", user);
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
       // Validate climb ID parameter
       if (isNaN(id) || id <= 0) {
         return res.status(400).json({ error: "Invalid climb ID provided" });
@@ -532,7 +538,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const today = format(new Date(), 'yyyy-MM-dd');
       await storage.updateUserStreak(user.id, newStreak, today);
 
-      console.log(`Climb ${id} updated successfully for user ${user.id}`);
+      console.log(`Climb ${id} updated successfully for user ${user.id} (${user.email})`);
       res.json(climb);
     } catch (error) {
       console.error("Update climb error:", error);
@@ -549,20 +555,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       const id = parseInt(req.params.id);
       
+      // SECURITY: Double-check user authentication
+      if (!user?.id || !user?.email) {
+        console.error("Invalid user object in climb deletion:", user);
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
       // Validate climb ID parameter
       if (isNaN(id) || id <= 0) {
         return res.status(400).json({ error: "Invalid climb ID provided" });
       }
 
       // Attempt to delete climb with proper user authorization
-      const deleteResult = await storage.deleteClimb(id, user.id);
+      await storage.deleteClimb(id, user.id);
       
       // Recalculate streak after deletion
       const newStreak = await storage.calculateWeeklyStreak(user.id);
       const today = format(new Date(), 'yyyy-MM-dd');
       await storage.updateUserStreak(user.id, newStreak, today);
 
-      console.log(`Climb ${id} deleted successfully for user ${user.id}`);
+      console.log(`Climb ${id} deleted successfully for user ${user.id} (${user.email})`);
       res.json({ success: true, message: "Climb deleted successfully" });
     } catch (error) {
       console.error("Delete climb error:", error);
@@ -620,6 +632,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/stats/monthly", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
+      
+      // SECURITY: Double-check user authentication
+      if (!user?.id || !user?.email) {
+        console.error("Invalid user object in monthly stats request:", user);
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
       const year = parseInt(req.query.year as string) || new Date().getFullYear();
       const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
 
@@ -631,7 +650,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid month parameter" });
       }
 
-      // SECURITY: user.id ensures only this user's stats are returned
+      console.log(`Fetching monthly stats for user ${user.id} (${user.email}) - ${year}/${month}`);
       const stats = await storage.getMonthlyStats(user.id, year, month);
 
       // Secure cache headers
@@ -652,6 +671,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/stats/available-months", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
+      
+      // SECURITY: Double-check user authentication
+      if (!user?.id || !user?.email) {
+        console.error("Invalid user object in available months request:", user);
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
+      console.log(`Fetching available months for user ${user.id} (${user.email})`);
       const months = await storage.getAvailableMonths(user.id);
 
       // Secure cache headers
@@ -660,6 +687,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(months);
     } catch (error) {
+      console.error("Available months error:", error);
       res.status(500).json({ error: "Failed to get available months" });
     }
   });
@@ -668,9 +696,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/stats/grade-progression", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
+      
+      // SECURITY: Double-check user authentication
+      if (!user?.id || !user?.email) {
+        console.error("Invalid user object in grade progression request:", user);
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
       const year = parseInt(req.query.year as string) || new Date().getFullYear();
       const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
 
+      console.log(`Fetching grade progression for user ${user.id} (${user.email}) - ${year}/${month}`);
       const progressionData = await storage.getGradeProgressionData(user.id, year, month);
 
       // Secure cache headers
@@ -688,6 +724,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/profile", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
+      
+      // SECURITY: Double-check user authentication
+      if (!user?.id || !user?.email) {
+        console.error("Invalid user object in profile update:", user);
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
       const { firstName, profileImageUrl } = req.body;
 
       // Validate profile data inputs
