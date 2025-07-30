@@ -28,14 +28,7 @@ export default function ClimbLog() {
   // User-specific query key to prevent data leakage between users
   const { data: climbs = [] } = useQuery({
     queryKey: ["api", "climbs", { userId: user?.id }],
-    queryFn: async () => {
-      console.log(`🔍 CLIMB LOG: Fetching climbs for user ${user?.id} (${user?.email})`);
-      const response = await fetch('/api/climbs', { credentials: 'include' });
-      const data = await response.json();
-      console.log(`📊 CLIMB LOG: Received ${data.length} climbs for user ${user?.id}`);
-      console.log(`📊 CLIMB LOG: First climb preview:`, data[0] ? { id: data[0].id, gym: data[0].gym, userId: data[0].userId } : 'No climbs');
-      return data;
-    },
+    queryFn: () => fetch('/api/climbs', { credentials: 'include' }).then(res => res.json()),
     enabled: !!user?.id,
   });
 

@@ -16,6 +16,7 @@ export default function Profile() {
   
   const { data: user, isLoading } = useQuery({
     queryKey: ["api", "auth", "user"],
+    queryFn: () => fetch('/api/auth/user', { credentials: 'include' }).then(res => res.json()),
   });
 
   const [formData, setFormData] = useState({
@@ -42,7 +43,7 @@ export default function Profile() {
     onSuccess: () => {
       // Invalidate all user-related queries to ensure updates are reflected everywhere
       queryClient.invalidateQueries({ queryKey: ["api", "auth", "user"] });
-      queryClient.invalidateQueries({ queryKey: ["api", "user"] });
+      queryClient.invalidateQueries({ queryKey: ["api", "user", { userId: user?.id }] });
       toast({ title: "Profile updated successfully!" });
     },
     onError: (error: any) => {
