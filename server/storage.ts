@@ -237,6 +237,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getClimbsByUser(userId: number): Promise<Climb[]> {
+    // SECURITY: Verify userId is valid to prevent data leakage
+    if (!userId || userId <= 0) {
+      throw new Error("Invalid user ID for climbs query");
+    }
+    
     return await db
       .select()
       .from(climbs)
@@ -289,6 +294,10 @@ export class DatabaseStorage implements IStorage {
     sends: number;
     projects: number;
   }> {
+    // SECURITY: Verify userId is valid to prevent data leakage
+    if (!userId || userId <= 0) {
+      throw new Error("Invalid user ID for stats query");
+    }
     const todayClimbs = await this.getClimbsByUserAndDate(userId, date);
     
     return {
@@ -305,6 +314,10 @@ export class DatabaseStorage implements IStorage {
     successRate: number;
     routeTypeBreakdown: { routeType: string; count: number; percentage: number }[];
   }> {
+    // SECURITY: Verify userId is valid to prevent data leakage
+    if (!userId || userId <= 0) {
+      throw new Error("Invalid user ID for monthly stats query");
+    }
     const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
     const lastDay = new Date(year, month, 0).getDate();
     const endDate = `${year}-${month.toString().padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`;
@@ -362,6 +375,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAvailableMonths(userId: number): Promise<{ year: number; month: number; monthName: string }[]> {
+    // SECURITY: Verify userId is valid to prevent data leakage
+    if (!userId || userId <= 0) {
+      throw new Error("Invalid user ID for available months query");
+    }
     const climbs = await this.getClimbsByUser(userId);
     
     const monthNames = [

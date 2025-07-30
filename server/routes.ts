@@ -433,6 +433,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user;
       
+      // SECURITY: Double-check user authentication
+      if (!user?.id || !user?.email) {
+        console.error("Invalid user object in climbs request:", user);
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
       // CRITICAL: user.id comes from authenticated session, ensuring data isolation
       const climbs = await storage.getClimbsByUser(user.id);
 
@@ -440,7 +446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.set('Cache-Control', 'private, max-age=300');
       res.set('Vary', 'Authorization');
 
-      console.log(`Retrieved ${climbs.length} climbs for user ${user.id}`);
+      console.log(`Retrieved ${climbs.length} climbs for user ${user.id} (${user.email})`);
       res.json(climbs);
     } catch (error) {
       console.error("Get climbs error:", error);
@@ -577,9 +583,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/stats/today", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
+      
+      // SECURITY: Double-check user authentication
+      if (!user?.id || !user?.email) {
+        console.error("Invalid user object in stats request:", user);
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
       const today = format(new Date(), 'yyyy-MM-dd');
       
-      console.log(`Fetching today's stats for user ${user.id} on ${today}`);
+      console.log(`Fetching today's stats for user ${user.id} (${user.email}) on ${today}`);
       const stats = await storage.getTodayStats(user.id, today);
 
       // Secure cache headers
