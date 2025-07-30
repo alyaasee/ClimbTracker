@@ -35,6 +35,7 @@ export function useAuth() {
   
   const { data: user, isLoading, error } = useQuery<AuthUserResponse>({
     queryKey: ["api", "auth", "user"],
+    queryFn: () => fetch('/api/auth/user', { credentials: 'include' }).then(res => res.json()),
     retry: false, // Don't retry failed auth checks to avoid infinite loops
     staleTime: 5 * 60 * 1000, // Cache auth data for 5 minutes to reduce server requests
   });
@@ -43,9 +44,11 @@ export function useAuth() {
   // This prevents data leakage between different user accounts
   useEffect(() => {
     if (user?.id && previousUserIdRef.current !== null && previousUserIdRef.current !== user.id) {
-      console.log(`User changed from ${previousUserIdRef.current} to ${user.id}, clearing all cached data`);
+      console.log(`🔄 User changed from ${previousUserIdRef.current} to ${user.id}, clearing all cached data`);
       // Clear entire query cache to prevent any cross-user data contamination
       queryClient.clear();
+      // Force immediate refresh of all data for the new user
+      queryClient.invalidateQueries();
     }
     
     if (user?.id) {
