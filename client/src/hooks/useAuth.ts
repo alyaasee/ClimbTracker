@@ -35,7 +35,13 @@ export function useAuth() {
   
   const { data: user, isLoading, error } = useQuery<AuthUserResponse>({
     queryKey: ["api", "auth", "user"],
-    queryFn: () => fetch('/api/auth/user', { credentials: 'include' }).then(res => res.json()),
+    queryFn: async () => {
+      console.log(`🔐 AUTH: Fetching current user`);
+      const response = await fetch('/api/auth/user', { credentials: 'include' });
+      const data = await response.json();
+      console.log(`👤 AUTH: Current user:`, { id: data?.id, email: data?.email });
+      return data;
+    },
     retry: false, // Don't retry failed auth checks to avoid infinite loops
     staleTime: 5 * 60 * 1000, // Cache auth data for 5 minutes to reduce server requests
   });

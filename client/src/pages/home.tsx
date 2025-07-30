@@ -16,7 +16,13 @@ export default function Home() {
 
   const { data: todayStats } = useQuery<TodayStatsResponse>({
     queryKey: ["api", "stats", "today", { userId: authUser?.id }],
-    queryFn: () => fetch('/api/stats/today', { credentials: 'include' }).then(res => res.json()),
+    queryFn: async () => {
+      console.log(`🏠 HOME: Fetching today stats for user ${authUser?.id} (${authUser?.email})`);
+      const response = await fetch('/api/stats/today', { credentials: 'include' });
+      const data = await response.json();
+      console.log(`📈 HOME: Today stats for user ${authUser?.id}:`, data);
+      return data;
+    },
     enabled: !!authUser?.id,
     staleTime: 0, // Always fresh
     gcTime: 0, // Don't cache

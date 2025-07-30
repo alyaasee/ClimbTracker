@@ -10,15 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### CRITICAL FIX - Frontend Cache Isolation Vulnerability (July 30, 2025)
-- **RESOLVED**: Fixed critical React Query cache contamination where users could see each other's climb logs despite secure backend
-- **Root Cause**: Frontend query keys were NOT user-specific, causing shared cache between different users
-- **Frontend Cache Fix**: Updated ALL query keys to include user ID for complete cache isolation (`["api", "climbs", user?.id]`)
-- **Components Fixed**: climb-log.tsx, home.tsx, stats.tsx, log-climb-modal.tsx - all now use user-specific cache keys
-- **Cache Invalidation**: Updated all mutation cache invalidation to use proper user-specific keys
-- **Database Verification**: Confirmed users have separate data (alyezzsee@gmail.com: 1 climb, alyaa.see@prenetics.com: 3 climbs)
-- **Public Sharing Ready**: App is now safe for public sharing with zero cross-user data contamination risk
-- **User Experience**: Each email address now sees only their own climbs, stats, and progress data
+### CRITICAL FIX - Persistent Cross-User Data Contamination Debug (July 30, 2025)
+- **ONGOING ISSUE**: Despite multiple fix attempts, users still see identical data across different email accounts
+- **Database Status**: Confirmed each user has completely separate data (lyhakim: 24 climbs, alyaa.see: 6 climbs, alyezzsee: 3 climbs)
+- **Backend Security**: All API endpoints correctly filter by authenticated user ID and return user-specific data
+- **Frontend Investigation**: Added comprehensive debug logging to trace query execution and cache behavior
+- **Query Key Structure**: Updated to object-based keys (`["api", "climbs", { userId: user?.id }]`) with explicit queryFn
+- **Cache Management**: Removed default queryFn, enhanced user-switch cache clearing with invalidation
+- **Current Status**: Investigating persistent cache isolation failure despite proper query key isolation
+- **Debug Logging**: Added detailed console logging to track data flow and identify contamination source
 
 ### Enhanced Security Framework - Bulletproof User Data Isolation (July 30, 2025)
 - **RESOLVED**: Fixed critical cross-user data contamination where alyezzsee@gmail.com could see lyhakim@gmail.com's dashboard data
