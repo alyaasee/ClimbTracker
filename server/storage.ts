@@ -253,11 +253,21 @@ export class DatabaseStorage implements IStorage {
       throw new Error("Invalid user ID for climbs query");
     }
     
-    return await db
+    console.log(`🔍 STORAGE: Getting climbs for userId ${userId}`);
+    
+    const result = await db
       .select()
       .from(climbs)
       .where(eq(climbs.userId, userId))
       .orderBy(desc(climbs.climbDate), desc(climbs.createdAt));
+    
+    console.log(`📊 STORAGE: Found ${result.length} climbs for userId ${userId}`);
+    if (result.length > 0) {
+      console.log(`📊 STORAGE: First climb userId: ${result[0].userId}, expected: ${userId}`);
+      console.log(`📊 STORAGE: Sample climb IDs: ${result.slice(0, 3).map(c => c.id).join(', ')}`);
+    }
+    
+    return result;
   }
 
   async getClimbsByUserAndDateRange(userId: number, startDate: string, endDate: string): Promise<Climb[]> {
