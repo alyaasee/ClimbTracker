@@ -25,7 +25,8 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
   
   // Fetch today's climbs to prefill date and location - user-specific
   const { data: todaysClimbs } = useQuery({
-    queryKey: ["api", "climbs", user?.id],
+    queryKey: ["api", "climbs", { userId: user?.id }],
+    queryFn: () => fetch('/api/climbs', { credentials: 'include' }).then(res => res.json()),
     enabled: open && !climb && !!user?.id, // Only fetch when modal is open and not editing
   });
 
@@ -91,16 +92,17 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     mutationFn: (data: any) => apiRequest("/api/climbs", { method: "POST", body: data }),
     onSuccess: () => {
       // User-specific cache invalidation to prevent cross-user contamination
-      queryClient.invalidateQueries({ queryKey: ["api", "climbs", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["api", "climbs", { userId: user?.id }] });
       queryClient.invalidateQueries({ queryKey: ["api", "auth", "user"] });
-      queryClient.invalidateQueries({ queryKey: ["api", "user", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["api", "user", { userId: user?.id }] });
       // Invalidate today's stats for this user only
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today", { userId: user?.id }] });
       // Invalidate all stats queries for this user only
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const key = query.queryKey;
-          return Array.isArray(key) && key[0] === "api" && key[1] === "stats" && key[3] === user?.id;
+          return Array.isArray(key) && key[0] === "api" && key[1] === "stats" && 
+                 key[2] && typeof key[2] === "object" && (key[2] as any)?.userId === user?.id;
         }
       });
       toast({ title: "Climb logged successfully!" });
@@ -130,16 +132,17 @@ export default function LogClimbModal({ open, onOpenChange, climb }: LogClimbMod
     mutationFn: (data: any) => apiRequest(`/api/climbs/${climb?.id}`, { method: "PUT", body: data }),
     onSuccess: () => {
       // User-specific cache invalidation to prevent cross-user contamination
-      queryClient.invalidateQueries({ queryKey: ["api", "climbs", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["api", "climbs", { userId: user?.id }] });
       queryClient.invalidateQueries({ queryKey: ["api", "auth", "user"] });
-      queryClient.invalidateQueries({ queryKey: ["api", "user", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["api", "user", { userId: user?.id }] });
       // Invalidate today's stats for this user only
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today", { userId: user?.id }] });
       // Invalidate all stats queries for this user only
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const key = query.queryKey;
-          return Array.isArray(key) && key[0] === "api" && key[1] === "stats" && key[3] === user?.id;
+          return Array.isArray(key) && key[0] === "api" && key[1] === "stats" && 
+                 key[2] && typeof key[2] === "object" && (key[2] as any)?.userId === user?.id;
         }
       });
       toast({ title: "Climb updated successfully!" });

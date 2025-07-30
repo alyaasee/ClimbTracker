@@ -12,17 +12,20 @@ export default function Stats() {
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
 
   const { data: availableMonths = [] } = useQuery({
-    queryKey: ["api", "stats", "available-months", user?.id],
+    queryKey: ["api", "stats", "available-months", { userId: user?.id }],
+    queryFn: () => fetch('/api/stats/available-months', { credentials: 'include' }).then(res => res.json()),
     enabled: !!user?.id,
   });
 
   const { data: monthlyStats } = useQuery({
-    queryKey: ["api", "stats", "monthly", user?.id, selectedYear, selectedMonth],
+    queryKey: ["api", "stats", "monthly", { userId: user?.id, year: selectedYear, month: selectedMonth }],
+    queryFn: () => fetch(`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`, { credentials: 'include' }).then(res => res.json()),
     enabled: !!user?.id && selectedMonth !== null,
   });
 
   const { data: gradeProgression = [] } = useQuery({
-    queryKey: ["api", "stats", "grade-progression", user?.id, selectedYear, selectedMonth],
+    queryKey: ["api", "stats", "grade-progression", { userId: user?.id, year: selectedYear, month: selectedMonth }],
+    queryFn: () => fetch(`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`, { credentials: 'include' }).then(res => res.json()),
     enabled: !!user?.id && selectedMonth !== null,
   });
 

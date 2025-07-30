@@ -9,12 +9,14 @@ export default function Home() {
   const { user: authUser } = useAuth();
 
   const { data: user } = useQuery<User>({
-    queryKey: ["api", "user", authUser?.id],
+    queryKey: ["api", "user", { userId: authUser?.id }],
+    queryFn: () => fetch('/api/user', { credentials: 'include' }).then(res => res.json()),
     enabled: !!authUser?.id,
   });
 
   const { data: todayStats } = useQuery<TodayStatsResponse>({
-    queryKey: ["api", "stats", "today", authUser?.id],
+    queryKey: ["api", "stats", "today", { userId: authUser?.id }],
+    queryFn: () => fetch('/api/stats/today', { credentials: 'include' }).then(res => res.json()),
     enabled: !!authUser?.id,
     staleTime: 0, // Always fresh
     gcTime: 0, // Don't cache
@@ -23,7 +25,8 @@ export default function Home() {
   });
 
   const { data: quote, isLoading: quoteLoading } = useQuery<DailyQuoteResponse>({
-    queryKey: ["api", "quote", authUser?.id],
+    queryKey: ["api", "quote", { userId: authUser?.id }],
+    queryFn: () => fetch('/api/quote', { credentials: 'include' }).then(res => res.json()),
     enabled: !!authUser?.id,
   });
 

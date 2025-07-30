@@ -27,7 +27,8 @@ export default function ClimbLog() {
 
   // User-specific query key to prevent data leakage between users
   const { data: climbs = [] } = useQuery({
-    queryKey: ["api", "climbs", user?.id],
+    queryKey: ["api", "climbs", { userId: user?.id }],
+    queryFn: () => fetch('/api/climbs', { credentials: 'include' }).then(res => res.json()),
     enabled: !!user?.id,
   });
 
@@ -57,15 +58,17 @@ export default function ClimbLog() {
     },
     onSuccess: () => {
       // User-specific cache invalidation to prevent cross-user contamination
-      queryClient.invalidateQueries({ queryKey: ["api", "climbs", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["api", "climbs", { userId: user?.id }] });
       queryClient.invalidateQueries({ queryKey: ["api", "auth", "user"] });
+      queryClient.invalidateQueries({ queryKey: ["api", "user", { userId: user?.id }] });
       // Invalidate today's stats for this user only
-      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["api", "stats", "today", { userId: user?.id }] });
       // Invalidate all stats queries for this user only
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const key = query.queryKey;
-          return Array.isArray(key) && key[0] === "api" && key[1] === "stats" && key[3] === user?.id;
+          return Array.isArray(key) && key[0] === "api" && key[1] === "stats" && 
+                 key[2] && typeof key[2] === "object" && (key[2] as any)?.userId === user?.id;
         }
       });
       toast({
