@@ -12,18 +12,18 @@ export default function Stats() {
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
 
   const { data: availableMonths = [] } = useQuery({
-    queryKey: ["/api/stats/available-months", user?.id],
+    queryKey: ["/api/stats/available-months"],
     enabled: !!user?.id,
   });
 
   const { data: monthlyStats } = useQuery({
-    queryKey: [`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`, user?.id],
-    enabled: !!user?.id,
+    queryKey: [`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`],
+    enabled: !!user?.id && selectedMonth !== null,
   });
 
   const { data: gradeProgression = [] } = useQuery({
-    queryKey: [`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`, user?.id],
-    enabled: !!user?.id,
+    queryKey: [`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`],
+    enabled: !!user?.id && selectedMonth !== null,
   });
 
   // Color palette from PRD

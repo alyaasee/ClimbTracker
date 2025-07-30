@@ -27,7 +27,7 @@ export default function ClimbLog() {
 
   // User-specific query key to prevent data leakage between users
   const { data: climbs = [] } = useQuery({
-    queryKey: ["/api/climbs", user?.id],
+    queryKey: ["/api/climbs"],
     enabled: !!user?.id,
   });
 
@@ -57,15 +57,15 @@ export default function ClimbLog() {
     },
     onSuccess: () => {
       // User-specific cache invalidation to prevent cross-user contamination
-      queryClient.invalidateQueries({ queryKey: ["/api/climbs", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/climbs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       // Invalidate today's stats for this user only
-      queryClient.invalidateQueries({ queryKey: ["/api/stats/today", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/today"] });
       // Invalidate all stats queries for this user only
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const key = query.queryKey;
-          return Array.isArray(key) && key[0]?.toString().includes("/api/stats") && key.includes(user?.id);
+          return Array.isArray(key) && key[0]?.toString().includes("/api/stats");
         }
       });
       toast({
