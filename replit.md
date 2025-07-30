@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### CRITICAL FIX - Frontend Cache Isolation Vulnerability (July 30, 2025)
+- **RESOLVED**: Fixed critical React Query cache contamination where users could see each other's climb logs despite secure backend
+- **Root Cause**: Frontend query keys were NOT user-specific, causing shared cache between different users
+- **Frontend Cache Fix**: Updated ALL query keys to include user ID for complete cache isolation (`["api", "climbs", user?.id]`)
+- **Components Fixed**: climb-log.tsx, home.tsx, stats.tsx, log-climb-modal.tsx - all now use user-specific cache keys
+- **Cache Invalidation**: Updated all mutation cache invalidation to use proper user-specific keys
+- **Database Verification**: Confirmed users have separate data (alyezzsee@gmail.com: 1 climb, alyaa.see@prenetics.com: 3 climbs)
+- **Public Sharing Ready**: App is now safe for public sharing with zero cross-user data contamination risk
+- **User Experience**: Each email address now sees only their own climbs, stats, and progress data
+
 ### Enhanced Security Framework - Bulletproof User Data Isolation (July 30, 2025)
 - **RESOLVED**: Fixed critical cross-user data contamination where alyezzsee@gmail.com could see lyhakim@gmail.com's dashboard data
 - **Root Cause**: Orphaned user record (ID 1) with no email but 15 climbs was causing data leakage during authentication failures

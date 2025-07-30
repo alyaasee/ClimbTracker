@@ -12,17 +12,17 @@ export default function Stats() {
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
 
   const { data: availableMonths = [] } = useQuery({
-    queryKey: ["/api/stats/available-months"],
+    queryKey: ["api", "stats", "available-months", user?.id],
     enabled: !!user?.id,
   });
 
   const { data: monthlyStats } = useQuery({
-    queryKey: [`/api/stats/monthly?year=${selectedYear}&month=${selectedMonth}`],
+    queryKey: ["api", "stats", "monthly", user?.id, selectedYear, selectedMonth],
     enabled: !!user?.id && selectedMonth !== null,
   });
 
   const { data: gradeProgression = [] } = useQuery({
-    queryKey: [`/api/stats/grade-progression?year=${selectedYear}&month=${selectedMonth}`],
+    queryKey: ["api", "stats", "grade-progression", user?.id, selectedYear, selectedMonth],
     enabled: !!user?.id && selectedMonth !== null,
   });
 
