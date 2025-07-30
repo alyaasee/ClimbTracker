@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Critical Query Key Fix - Restored Climb Data Loading (July 30, 2025)
+- **RESOLVED**: Fixed critical issue where climb logs weren't displaying for authenticated users
+- **Root Cause**: Incorrect React Query keys were making requests to malformed API endpoints like `/api/user/2` instead of `/api/user`
+- **Frontend Fixes**: Updated all query keys across climb-log.tsx, home.tsx, stats.tsx, and log-climb-modal.tsx
+- **API Structure**: Corrected to use proper authentication-based endpoints without user ID in URL path
+- **Cache Management**: Fixed cache invalidation to use correct endpoint names for proper data refresh
+- **Stats Page Fix**: Month selector now properly loads available months (June/July) with climb data
+- **Data Verification**: Confirmed lyhakim@gmail.com can now access all 23 climbs (20 in July, 3 in June)
+- **Authentication Flow**: Maintained secure bypass system while ensuring proper session-based data access
+
 ### Mobile Status Bar Removal (July 25, 2025)
 - Removed non-functional mobile status bar section showing time and signal bars
 - Cleaner header interface with more space for navigation elements
